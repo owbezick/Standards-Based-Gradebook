@@ -1,6 +1,8 @@
 # Mastery Gradebook application - Professor View
 # Author: Owen Bezick
 
+
+source("courseInfo.R", local = TRUE)
 # Define UI
 ui <- dashboardPage(skin = "black"
                     , dashboardHeader(title = "Professor View" 
@@ -24,10 +26,7 @@ ui <- dashboardPage(skin = "black"
                             tabItem(
                                 tabName = "home"
                                 , fluidRow(
-                                    box(width = 9, title = "Course information"
-                                        , "Course location, meeting dates/times, office hours, helpful links, list of students,
-                                      etc... all editable so they can go on student info"
-                                    )
+                                    courseinfoUI("courseinfo")
                                     , box(width = 3, title = "Edit or Add!"
                                           , actionBttn(inputId = "courseInfo", label = "Course Information", style = "material-flat")
                                           , actionBttn(inputId = "addHomework", label = "Add Homework", style = "material-flat")
@@ -81,6 +80,8 @@ server <- function(input, output) {
         )
         timevis(df_timevis)
     })
+    
+    courseinfoServer("courseinfo", df_course_info)
 }
 
 # Run the application 
