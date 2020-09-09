@@ -1,8 +1,10 @@
 # Mastery Gradebook application - Professor View
 # Author: Owen Bezick
 
+source("courseinfo.R")
+source("data_intake.R")
+source("edit_and_add.R")
 
-source("courseInfo.R", local = TRUE)
 # Define UI
 ui <- dashboardPage(skin = "black"
                     , dashboardHeader(title = "Professor View" 
@@ -16,25 +18,24 @@ ui <- dashboardPage(skin = "black"
                     # Sidebar ----
                     , dashboardSidebar( 
                         sidebarMenu(
-                            menuItem(tabName = "home", text = "Home", icon = icon("home"))
-                            , menuItem(tabName ="grades", text = "Grades", icon = icon("chalkboard"))
+                            menuItem(tabName = "home", text = "Home", icon = icon("home")
+                                     )
+                            , menuItem(tabName ="grades", text = "Grades", icon = icon("chalkboard")
+                                       )
                         )
                     )
                     , dashboardBody(
-                        tabItems(
+                        includeCSS("style.css")
+                        , tabItems(
                             # Home Tab ----
                             tabItem(
                                 tabName = "home"
                                 , fluidRow(
                                     courseinfoUI("courseinfo")
-                                    , box(width = 3, title = "Edit or Add!"
-                                          , actionBttn(inputId = "courseInfo", label = "Course Information", style = "material-flat")
-                                          , actionBttn(inputId = "addHomework", label = "Add Homework", style = "material-flat")
-                                          , actionBttn(inputId = "addReview", label = "Add Review", style = "material-flat")
-                                    )
+                                    , edit_and_add_UI("edit&add")
                                 )
                                 , fluidRow(
-                                    box(width = 12, title = "Course Calendar"
+                                    box(width = 12, title = "Course Calendar", status = "primary"
                                         , timevisOutput("course_schedule")
                                     )
                                     
@@ -66,6 +67,7 @@ ui <- dashboardPage(skin = "black"
 
 # Define server logic 
 server <- function(input, output) {
+    # Course info page ----
     #TODO: action button modules
     
     # Schedule ----
@@ -81,6 +83,7 @@ server <- function(input, output) {
         timevis(df_timevis)
     })
     
+    # course info ----
     courseinfoServer("courseinfo", df_course_info)
 }
 

@@ -1,3 +1,24 @@
+courseinfoUI <- function(id){
+  
+   box(width = 8, title = "Course Information", status = "primary"
+        , column(width = 6
+                 , tags$b("Course Location: ")
+                 , textOutput(NS(id, "location"))
+                 , br()
+                 , tags$b("Meeting times: ")
+                 , textOutput(NS(id, "meeting_times"))
+        )
+        , column(width = 6
+                 , tags$b("Helpful links: ")
+                 , uiOutput(NS(id, "link"))
+                 , br()
+                 , tags$b("Office hours: ")
+                 , textOutput(NS(id, "office_hours"))
+        )
+        
+  )
+}
+
 courseinfoServer <- function(id, df){
   moduleServer(id, function(input,output,session){
     
@@ -11,26 +32,10 @@ courseinfoServer <- function(id, df){
       df$office_hours
     )
     output$link <- renderUI(
-        tags$a(df$link_description
-        , href = df$link
+      tags$a(df$link_description
+             , href = df$link
       )
     )
     
   })
-}
-
-courseinfoUI <- function(id){
-  box(width = 9, title = "Course information"
-      , tags$b("Course Location: ")
-      , textOutput(NS(id, "location"))
-      , br()
-      , tags$b("Meeting times: ")
-      , textOutput(NS(id, "meeting_times"))
-      , br()
-      , tags$b("Office hours: ")
-      , textOutput(NS(id, "office_hours"))
-      , br()
-      , tags$b("Helpful links: ")
-      , uiOutput(NS(id, "link"))
-  )
 }

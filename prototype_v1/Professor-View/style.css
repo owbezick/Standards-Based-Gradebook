@@ -1,0 +1,10 @@
+.bttn-material-flat.bttn-default {
+    background: #fff;
+    color: black;
+}
+.skin-black .main-header .navbar {
+    background-color: #222d32;
+}
+.box.box-primary {
+    border-top-color: #222d32;
+}
