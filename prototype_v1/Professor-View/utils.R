@@ -1,5 +1,3 @@
-
-
 grade_max <- function(x){
   max <- "NA"
   for (grade in x){
