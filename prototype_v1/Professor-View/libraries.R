@@ -1,6 +1,7 @@
 # Libraries 
 
 # Shiny
+library(shiny)
 library(shinydashboard)
 library(shinyWidgets)
 
