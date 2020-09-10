@@ -8,7 +8,7 @@
 source("modules/course_info.R")
 source("modules/edit_and_add.R")
 source("data/data_intake.R")
-
+source("utils/libraries.R")
 # Add the 80 character limit by going to code -> display -> show margin
 # We can start with 80 but depending on how we want to structure apps
 # we can potentially move to 120 now that you have a monitor as well.

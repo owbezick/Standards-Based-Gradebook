@@ -36,6 +36,5 @@ course_info_server <- function(id, df){
              , href = df$link
       )
     )
-    
   })
 }
