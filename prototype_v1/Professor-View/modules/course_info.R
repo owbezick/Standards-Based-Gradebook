@@ -14,11 +14,10 @@ course_info_UI <- function(id){
                  , tags$b("Office hours: ")
                  , textOutput(NS(id, "office_hours"))
         )
-        
   )
 }
 
-# Have to rework to use with reactive data 
+#TODO: Have to rework to use with reactive data 
 course_info_server <- function(id, df){
   moduleServer(id, function(input,output,session){
     

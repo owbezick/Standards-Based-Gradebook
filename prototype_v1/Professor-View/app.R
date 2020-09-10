@@ -2,24 +2,27 @@
 # Author: Owen Bezick & Calvin Spencer
 
 # Why do we need to still source these? I thought shiny 1.15 takes care of that 
-# automatically
+# automatically...
 
 # Can we just move over to creating a package?
 source("modules/course_info.R")
+source("modules/add_homework_button.R")
+source("modules/add_review_button.R")
 source("modules/edit_and_add.R")
+source("modules/course_calendar.R")
+source("modules/course_information_button.R")
+source("modules/topics.R")
 source("data/data_intake.R")
 source("utils/libraries.R")
-# Add the 80 character limit by going to code -> display -> show margin
-# We can start with 80 but depending on how we want to structure apps
-# we can potentially move to 120 now that you have a monitor as well.
+# Add the 120 character limit by going to Rstudio -> preferences -> code -> display -> show margin
 
 # Essentially how "factored out" do we want the code to be?
+# Do we wanna pull out dashboard headers, sidebar, and tab items?
 
-# We should also look into using the demo package (i forget the name for it)
+# We should also look into using the demo package (i forget the name for it) to explain how to use it
 
 ui <- dashboardPage(
     skin = "black"
-    # do we wanna pull this out? 
     , dashboardHeader(
         title = "Professor View" 
         , tags$li(class = "dropdown"
@@ -31,7 +34,6 @@ ui <- dashboardPage(
                   )
         )
     )
-    # do we wanna pull this out? 
     , dashboardSidebar( 
         sidebarMenu(
             menuItem(
@@ -49,7 +51,6 @@ ui <- dashboardPage(
     , dashboardBody(
         includeCSS("utils/style.css")
         , tabItems(
-            # do we wanna pull this out? 
             tabItem(
                 tabName = "home"
                 , fluidRow(
@@ -57,12 +58,12 @@ ui <- dashboardPage(
                     , edit_and_add_UI("edit_and_add")
                 )
                 , fluidRow(
-                    box(width = 12, status = "primary", title = "Course Calendar"
-                        , timevisOutput("course_schedule")
-                    )
+                    course_calendar_UI("course_calendar")
+                )
+                , fluidRow(
+                    topics_UI("topics")
                 )
             )
-            # do we wanna pull this out? 
             , tabItem(
                 tabName = "grades"
                 , box(width = 12
@@ -89,19 +90,7 @@ ui <- dashboardPage(
 
 # Define server logic 
 server <- function(input, output) {
-    #TODO: make module for calendar section
-    output$course_schedule <- renderTimevis({
-        homework_id <- unique(df_homework_data$homework_id)
-        homework_date <- unique(df_homework_data$homework_date)
-        review_id <- unique(df_review_data$review_id)
-        review_date <- unique(df_review_data$review_date)
-        df_timevis <- tibble(
-            content = c("Homework 1", "Review 1")
-            , start = c(homework_date, review_date)
-        )
-        timevis(df_timevis)
-    })
-
+    course_calendar_server("course_calendar", df_homework_data, df_review_data)
     course_info_server("courseinfo", df_course_info)
     edit_and_add_server("edit_and_add")
 }
