@@ -3,12 +3,23 @@
 
 # Why do we need to still source these? I thought shiny 1.15 takes care of that 
 # automatically
+
+# Can we just move over to creating a package?
 source("modules/course_info.R")
 source("modules/edit_and_add.R")
 source("data/data_intake.R")
 
+# Add the 80 character limit by going to code -> display -> show margin
+# We can start with 80 but depending on how we want to structure apps
+# we can potentially move to 120 now that you have a monitor as well.
+
+# Essentially how "factored out" do we want the code to be?
+
+# We should also look into using the demo package (i forget the name for it)
+
 ui <- dashboardPage(
     skin = "black"
+    # do we wanna pull this out? 
     , dashboardHeader(
         title = "Professor View" 
         , tags$li(class = "dropdown"
@@ -20,6 +31,7 @@ ui <- dashboardPage(
                   )
         )
     )
+    # do we wanna pull this out? 
     , dashboardSidebar( 
         sidebarMenu(
             menuItem(
@@ -37,18 +49,20 @@ ui <- dashboardPage(
     , dashboardBody(
         includeCSS("utils/style.css")
         , tabItems(
+            # do we wanna pull this out? 
             tabItem(
                 tabName = "home"
                 , fluidRow(
-                    courseinfoUI("courseinfo")
+                    course_info_UI("courseinfo")
                     , edit_and_add_UI("edit_and_add")
                 )
                 , fluidRow(
-                    box(width = 12, title = "Course Calendar", status = "primary"
+                    box(width = 12, status = "primary", title = "Course Calendar"
                         , timevisOutput("course_schedule")
                     )
                 )
             )
+            # do we wanna pull this out? 
             , tabItem(
                 tabName = "grades"
                 , box(width = 12
@@ -75,7 +89,7 @@ ui <- dashboardPage(
 
 # Define server logic 
 server <- function(input, output) {
-    #TODO: make module for calendar
+    #TODO: make module for calendar section
     output$course_schedule <- renderTimevis({
         homework_id <- unique(df_homework_data$homework_id)
         homework_date <- unique(df_homework_data$homework_date)
@@ -87,10 +101,8 @@ server <- function(input, output) {
         )
         timevis(df_timevis)
     })
-    
-    # course info box server ----
-    courseinfoServer("courseinfo", df_course_info)
-    # Edit and add server 
+
+    course_info_server("courseinfo", df_course_info)
     edit_and_add_server("edit_and_add")
 }
 

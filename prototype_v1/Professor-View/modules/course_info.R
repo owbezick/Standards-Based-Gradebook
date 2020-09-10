@@ -1,4 +1,4 @@
-courseinfoUI <- function(id){
+course_info_UI <- function(id){
    box(width = 8, title = "Course Information", status = "primary"
         , column(width = 6
                  , tags$b("Course Location: ")
@@ -18,7 +18,8 @@ courseinfoUI <- function(id){
   )
 }
 
-courseinfoServer <- function(id, df){
+# Have to rework to use with reactive data 
+course_info_server <- function(id, df){
   moduleServer(id, function(input,output,session){
     
     output$location <- renderText(

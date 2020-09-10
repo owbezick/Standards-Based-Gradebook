@@ -21,7 +21,7 @@ edit_and_add_server <- function(id){
         modalDialog(title = "Edit Course Information", size = "l"
         )
       )
-    }, ignoreInit = F)
+    }, ignoreInit = F) # Maybe set to F for first time only?
     
     
     observeEvent(NS(id, input$addHomework), {

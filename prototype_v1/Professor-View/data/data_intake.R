@@ -4,6 +4,9 @@ df_homework_data <- read.xlsx("data/example_data.xlsx", sheet = "homework") %>%
 df_review_data <- read.xlsx("data/example_data.xlsx", sheet = "review")%>%
   mutate(review_date = as.Date(review_date, origin = "1900-01-01"))
 
+
+# Lets pull this out into a data frame so that professors can address
+# specific needs?
 df_course_info <- tibble(
   location = "Chambers 2187"
   , meeting_times = "Tuesday and Thursday, 9:40am - 10:55am"
