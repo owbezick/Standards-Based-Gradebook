@@ -5,7 +5,7 @@ topics_UI <- function(id){
 }
 
 # Add and edit topics here?
-topics_Server <- function(id, df){
+topics_Server <- function(id){
   moduleServer(id, function(input,output,session){
     
   })
