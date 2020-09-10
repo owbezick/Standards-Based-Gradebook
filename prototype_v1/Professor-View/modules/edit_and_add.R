@@ -1,16 +1,17 @@
 # Edit and add module ----
 edit_and_add_UI <- function(id){
   box(width = 4, title = "Edit & Add", status = "primary"
-      , column(width = 12
-               , actionBttn(inputId = NS(id, "editCourseInfo")
-                            , label = "Course Information", style = "material-flat", block = T)
-               , br()
-      )
       , column(width = 6
+               , actionBttn(inputId = NS(id, "editCourseInfo")
+                            , label = "Course Info", style = "material-flat", block = T)
+               , br()
                , actionBttn(inputId = NS(id, "addHomework")
                             , label = "Homework", style = "material-flat", block = T)
       )
       , column(width = 6
+               , actionBttn(inputId = NS(id, "addTopic")
+                            , label = "Topic", style = "material-flat", block = T)
+               , br()
                , actionBttn(inputId = NS(id, "addReview")
                             , label = "Review", style = "material-flat", block = T)
       )
@@ -31,5 +32,9 @@ edit_and_add_server <- function(id){
       add_review_button_UI("add_review_button")
     }, ignoreInit = T)
     
+    observeEvent(NS(id, input$addTopic ), {
+      add_topic_button_UI("add_topic")
+    }, ignoreInit = T)
+
   })
 }

@@ -8,6 +8,7 @@
 source("modules/course_info.R")
 source("modules/add_homework_button.R")
 source("modules/add_review_button.R")
+source("modules/add_topic_button.R")
 source("modules/edit_and_add.R")
 source("modules/course_calendar.R")
 source("modules/course_information_button.R")
