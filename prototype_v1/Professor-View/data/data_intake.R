@@ -3,7 +3,7 @@
 # 
 # df_review_data <- read.xlsx("example_data.xlsx", sheet = "review")%>%
 #   mutate(review_date = as.Date(review_date, origin = "1900-01-01"))
-# 
+# # 
 # df_course_info <- tibble(
 #   location = "Chambers 2187"
 #   , meeting_times = "Tuesday and Thursday, 9:40am - 10:55am"
@@ -13,15 +13,15 @@
 # )
 
 library(config)
-config <- config::get()
-
-# Initial authentication caching ----
-options(gargle_oauth_cache = ".cache") # designate project-specific cache
-gargle::gargle_oauth_cache() # check the value of the option
-googledrive::drive_auth() # trigger auth on purpose to store a token in the specified cache
-cache_directory <- ".secrets/" # can add to config file
-list.files(cache_directory) # see your token file in the cache
-drive_deauth() # de auth
+# config <- config::get()
+# 
+# # Initial authentication caching ----
+# options(gargle_oauth_cache = ".cache") # designate project-specific cache
+# gargle::gargle_oauth_cache() # check the value of the option
+# googledrive::drive_auth() # trigger auth on purpose to store a token in the specified cache
+# cache_directory <- ".secrets/" # can add to config file
+# list.files(cache_directory) # see your token file in the cache
+#drive_deauth() # de auth
 
 library(googlesheets4)
 library(googledrive)
@@ -45,15 +45,17 @@ read_all_database_sheets <- function(sheets){
   data
 }
 
-ls_sheets <- c("student", "homework", "homework_grade", "exam_to_topic", "topic", "exam")
+ls_sheets <- c("student", "homework", "homework_grade", "course_info", "exam_to_topic", "topic", "exam")
 
-ls_all_data <- read_all_database_sheets(ls_sheets)
+#ls_all_data <- read_all_database_sheets(ls_sheets)
 
 df_student <- ls_all_data$student
 
 df_homework <- ls_all_data$homework
 
 df_homework_grade <- ls_all_data$homework_grade
+
+df_course_info <- ls_all_data$course_info
 
 df_exam_to_topic <- ls_all_data$exam_to_topic
 
