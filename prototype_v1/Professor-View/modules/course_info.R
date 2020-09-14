@@ -17,22 +17,34 @@ course_info_UI <- function(id){
   )
 }
 
-#TODO: Have to rework to use with reactive data 
-course_info_server <- function(id, df){
+course_info_server <- function(id, r){
   moduleServer(id, function(input,output,session){
     
+    #browser()
     output$location <- renderText(
-      df$location
+      r$df_course_info$location
     )
     output$meeting_times <- renderText(
-      df$meeting_times
+      r$df_course_info$meeting_times
     )
     output$office_hours <- renderText(
-      df$office_hours
+      r$df_course_info$office_hours
     )
     output$link <- renderUI(
-      tags$a(df$link_description
-             , href = df$link
+      div(tags$a(
+          r$df_course_info$link1_text
+          , href =  r$df_course_info$link1_url
+        )
+        , br()
+        , tags$a(
+          r$df_course_info$link2_text
+          , href =  r$df_course_info$link2_url
+        )
+        , br()
+        , tags$a(
+          r$df_course_info$link3_text
+          , href =  r$df_course_info$link3_url
+        )
       )
     )
   })
