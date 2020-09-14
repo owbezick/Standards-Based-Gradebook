@@ -8,3 +8,28 @@
 .box.box-primary {
     border-top-color: #222d32;
 }
+.bttn-material-flat {
+    margin: 0;
+    padding: 0;
+    border-color: black;
+    background: gray;
+    border-top-color: #222d32;
+}
+.main-header .logo {
+    font-weight: 700;
+}
+.skin-black .main-header>.logo {
+    background-color: #222d32;
+    color: #FFF;
+    border-bottom: 0 solid transparent;
+    border-right: 1px solid #222d32;
+    font-family: sans-serif;
+    font-weight: 350;
+}
+.skin-black .main-header .navbar>.sidebar-toggle {
+    color: #FFF;
+    border-right: 1px solid #f4f4f4;
+}
+.box.box-danger {
+    border-top-color: #FFF;
+}
