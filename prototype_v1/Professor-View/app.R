@@ -93,7 +93,6 @@ ui <- dashboardPage(
 server <- function(input, output) {
     
     #course_calendar_server("course_calendar", r)
-    
     course_info_server("courseinfo", r)
     edit_and_add_server("edit_and_add", r)
 }
