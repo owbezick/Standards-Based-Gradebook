@@ -6,12 +6,12 @@ library(shinydashboard)
 library(shinyWidgets)
 
 # Data
-library(DT)
 library(dplyr)
 library(lubridate)
 library(openxlsx)
 library(tidyverse)
-
+library(janitor)
 # Viz
 library(echarts4r)
 library(timevis)
+library(formattable)
