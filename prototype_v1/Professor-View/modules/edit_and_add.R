@@ -7,6 +7,7 @@ edit_and_add_UI <- function(id){
                , br()
                , actionBttn(inputId = NS(id, "addHomework")
                             , label = "Homework", style = "material-flat", block = T)
+               , br()
       )
       , column(width = 6
                , actionBttn(inputId = NS(id, "addTopic")
@@ -14,6 +15,7 @@ edit_and_add_UI <- function(id){
                , br()
                , actionBttn(inputId = NS(id, "addReview")
                             , label = "Review", style = "material-flat", block = T)
+               , br()
       )
   )
 }
