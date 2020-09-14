@@ -26,11 +26,9 @@ add_topic_button_UI <- function(id) {
 
 add_topic_button_Server <- function(id, r){
   moduleServer(id, function(input,output,session){
-    
-    
+  
     observeEvent(input$save, {
       df_topic <- r$df_topic
-      
       new_row <- tibble("id" = input$topicNumber
                        , "description" = input$topicDescription
       )
@@ -52,10 +50,7 @@ add_topic_button_Server <- function(id, r){
       new_df <- rbind(df_topic, new_row)
       r$df_topic <- new_df
       
-      
-      
       removeModal()
-      
     })
     observeEvent(input$close, {
       removeModal()

@@ -19,8 +19,6 @@ course_info_UI <- function(id){
 
 course_info_server <- function(id, r){
   moduleServer(id, function(input,output,session){
-    
-    #browser()
     output$location <- renderText(
       r$df_course_info$location
     )
