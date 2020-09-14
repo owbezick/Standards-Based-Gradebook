@@ -59,7 +59,7 @@ ui <- dashboardPage(
                     , edit_and_add_UI("edit_and_add")
                 )
                 , fluidRow(
-                    course_calendar_UI("course_calendar")
+                    #course_calendar_UI("course_calendar")
                 )
                 , fluidRow(
                     topics_UI("topics")
@@ -91,17 +91,9 @@ ui <- dashboardPage(
 
 # Define server logic 
 server <- function(input, output) {
-    r <- reactiveValues(df_student = NULL
-                        , df_homework = NULL
-                        , df_homework_grade = NULL
-                        , df_course_info = NULL
-                        , df_exam_to_topic = NULL
-                        , df_topic = NULL
-                        , df_exam = NULL
-                    )
-
-    r$df_course_info <- ls_all_data$course_info
-    course_calendar_server("course_calendar", df_homework_data, df_review_data)
+    
+    #course_calendar_server("course_calendar", r)
+    
     course_info_server("courseinfo", r)
     edit_and_add_server("edit_and_add", r)
 }

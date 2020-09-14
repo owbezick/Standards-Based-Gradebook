@@ -5,7 +5,7 @@ course_calendar_UI <- function(id){
 }
 
 # Have to rework to use with reactive data 
-course_calendar_server <- function(id, df_homework_data, df_review_data){
+course_calendar_server <- function(id, r){
   moduleServer(id, function(input,output,session){
     output$course_schedule <- renderTimevis({
       homework_id <- unique(df_homework_data$homework_id)

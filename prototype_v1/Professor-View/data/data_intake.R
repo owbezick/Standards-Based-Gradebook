@@ -32,7 +32,6 @@ drive_auth(cache = ".cache",
 gs4_auth(cache = ".cache",
          email = "caspencer@davidson.edu")
 
-
 # Read in data ----
 read_database_sheet <- function(sheet){
   df <- drive_get(config$database) %>%
@@ -47,21 +46,30 @@ read_all_database_sheets <- function(sheets){
 
 ls_sheets <- c("student", "homework", "homework_grade", "course_info", "exam_to_topic", "topic", "exam")
 
-#ls_all_data <- read_all_database_sheets(ls_sheets)
+ls_all_data <- read_all_database_sheets(ls_sheets)
 
-df_student <- ls_all_data$student
+r <- reactiveValues(df_student = NULL
+                    , df_homework = NULL
+                    , df_homework_grade = NULL
+                    , df_course_info = NULL
+                    , df_exam_to_topic = NULL
+                    , df_topic = NULL
+                    , df_exam = NULL
+)
 
-df_homework <- ls_all_data$homework
+r$df_student <- ls_all_data$student
 
-df_homework_grade <- ls_all_data$homework_grade
+r$df_homework <- ls_all_data$homework
 
-df_course_info <- ls_all_data$course_info
+r$df_homework_grade <- ls_all_data$homework_grade
 
-df_exam_to_topic <- ls_all_data$exam_to_topic
+r$df_course_info <- ls_all_data$course_info
 
-df_topic <- ls_all_data$topic
+r$df_exam_to_topic <- ls_all_data$exam_to_topic
 
-df_exam <- ls_all_data$exam
+r$df_topic <- ls_all_data$topic
+
+r$df_exam <- ls_all_data$exam
 
 #default:
 #database: "template_gradebook_database"

@@ -22,7 +22,7 @@ edit_and_add_server <- function(id, r){
   moduleServer(id, function(input, output, session) {
     observeEvent(NS(id, input$editCourseInfo), {
       course_information_button_UI("course_info_button", r)
-    }, ignoreInit = T) # Maybe set to F for first time only and change placeholders?
+    }, ignoreInit = T) 
     
     observeEvent(NS(id, input$addHomework), {
       add_homework_button_UI("add_homework_button")
