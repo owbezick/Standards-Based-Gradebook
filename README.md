@@ -5,7 +5,7 @@ Authors:
 * Owen Bezick 
 * Calvin Spencer
 
-Advisees: 
+Advisors: 
 * Dr. Heather Smith 
 * Dr. Sakib Miazi
 
