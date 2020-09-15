@@ -4,33 +4,34 @@ add_homework_button_UI <- function(id) {
   showModal(
     modalDialog(title = "Add Homework", size = "l"
                 , fluidRow(
-                  box(width = 12, status = "primary"
-                      , column(width = 6
-                               , numericInput(inputId = NS(id, "homeworkNumber")
-                                              , label = "Homework Number: "
-                                              , value = 0)
-                               , br()
-                               , textAreaInput(inputId = NS(id, "homeworkDescription")
-                                               , label = "Homework Description: ")
-                      )
-                      , column(width = 6
-                               , dateInput(inputId = NS(id, "homeworkDateDue")
-                                           , label = "Date Due: ")
-                               , br()
-                               , dateInput(inputId = NS(id, "homeworkDateAssigned")
-                                           , label = "Date Assigned: ")
-                      )
-                      , footer = fluidRow(
-                        actionBttn(
-                          inputId = NS(id,"save"), label = "Save Homework", block = T
-                        )
-                        , actionBttn(
-                          inputId = NS(id, "close"), label = "Close", block = T
-                        )
-                      )
+                  column(width = 6
+                         , numericInput(inputId = NS(id, "homeworkNumber")
+                                        , label = "Homework Number: "
+                                        , value = 0)
+                         , br()
+                         , textAreaInput(inputId = NS(id, "homeworkDescription")
+                                         , label = "Homework Description: ")
+                  )
+                  , column(width = 6
+                           , dateInput(inputId = NS(id, "homeworkDateDue")
+                                       , label = "Date Due: ")
+                           , br()
+                           , dateInput(inputId = NS(id, "homeworkDateAssigned")
+                                       , label = "Date Assigned: ")
                   )
                 )
-                
+                  , footer = fluidRow(
+                   column(width = 6
+                           , actionBttn(
+                             inputId = NS(id,"save"), label = "Save Homework", block = T
+                           )
+                  )
+                  , column(width = 6
+                           , actionBttn(
+                             inputId = NS(id, "close"), label = "Close", block = T
+                           )
+                  )
+                )
     )
   )
 }

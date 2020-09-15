@@ -4,31 +4,33 @@ add_review_button_UI <- function(id) {
   showModal(
     modalDialog(title = "Add Review", size = "l"
                 , fluidRow(
-                  box(width = 12
-                      , column(width = 6
+                  column(width = 6
                          , numericInput(inputId = NS(id, "reviewNumber")
                                         , label = "Review Number: "
                                         , value = 0)
                          , br()
                          , textAreaInput(inputId = NS(id, "reviewDescription")
                                          , label = "Review Description: ")
+                         , br()
+                         , tags$b()
+                         , dateInput(inputId = NS(id, "reviewDate")
+                                     , label = "Date: ")
                   )
                   , column(width = 6
-                           , tags$b()
-                           , dateInput(inputId = NS(id, "reviewDate")
-                                       , label = "Date: ")
-                           , br()
                            , uiOutput(NS(id, "topics"))
                   )
-                  , footer = fluidRow(
-                    actionBttn(
-                      inputId = NS(id,"save"), label = "Save Review", block = T
-                    )
-                    , actionBttn(
-                      inputId = NS(id, "close"), label = "Close", block = T
-                    )
-                  )
                 )
+                , footer = fluidRow(
+                  column(width = 6
+                         , actionBttn(
+                           inputId = NS(id,"save"), label = "Save Review", block = T
+                         )
+                  )
+                  , column(width = 6 
+                           , actionBttn(
+                             inputId = NS(id, "close"), label = "Close", block = T
+                           )
+                  )
                 )
     )
   )
@@ -43,9 +45,8 @@ add_review_button_Server <- function(id, r){
         , choices = r$df_topic$id
       )
     })
-     
+    
     observeEvent(input$save, {
-      browser()
       df_review <- r$df_review
       new_row <- tibble("id" = input$reviewNumber
                         , "date" = input$reviewDate

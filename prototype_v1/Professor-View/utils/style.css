@@ -33,3 +33,23 @@
 .box.box-danger {
     border-top-color: #FFF;
 }
+.bttn-unite.bttn-default {
+    border-color: #000000 !important;
+    color: #000000 !important;
+}
+.bttn-unite.bttn-default:before {
+    background: #dd4b39bf;
+    color: #000000 !important;
+}
+.bttn-unite.bttn-default:after {
+    background: #999999cf;
+    color: #000000 !important;
+}
+.bttn-unite.bttn-default {
+    border-color: #000000;
+    color: #000000 !important;
+}
+.bttn-unite.bttn-default:focus {
+    background:#d68e86 !important;
+    
+}

@@ -47,8 +47,14 @@ course_information_button_UI <- function(id, r) {
                            )
                   )
                 )
-                , footer = fluidRow(actionBttn(inputId = NS(id,"save"), label = "Save Information", block = T)
-                                    , actionBttn(inputId = NS(id, "close"), label = "Close", block = T))
+                , footer = fluidRow(
+                  column(width = 6
+                         , actionBttn(inputId = NS(id,"save"), label = "Save Information", block = T)
+                  )
+                  , column(width = 6
+                           , actionBttn(inputId = NS(id, "close"), label = "Close", block = T)
+                  )
+                )
     )
   )
 }
@@ -57,34 +63,34 @@ course_information_button_Server <- function(id, r){
   moduleServer(id, function(input,output,session){
     observeEvent(input$save, {
       new_df <- tibble("location" = input$location
-                          ,"meeting_times" = input$meeting_times
-                          , "office_hours" = input$office_hours
-                          , "link1_url" = input$link1_url
-                          , "link2_url" = input$link2_url
-                          , "link3_url" = input$link3_url
-                          , "link1_text" = input$link1_text
-                          , "link2_text" = input$link2_text
-                          , "link3_text" = input$link3_text
-        )
+                       ,"meeting_times" = input$meeting_times
+                       , "office_hours" = input$office_hours
+                       , "link1_url" = input$link1_url
+                       , "link2_url" = input$link2_url
+                       , "link3_url" = input$link3_url
+                       , "link1_text" = input$link1_text
+                       , "link2_text" = input$link2_text
+                       , "link3_text" = input$link3_text
+      )
       
       # Write to sheet ----
-        sheet_write(
-          ss = "https://docs.google.com/spreadsheets/d/1xIC4pGhnnodwxqopHa45KRSHIVcOTxFSfJSEGPbQH20/edit#gid=2102408290"
-          , data = new_df
-          , sheet = "course_info"
-        )
+      sheet_write(
+        ss = "https://docs.google.com/spreadsheets/d/1xIC4pGhnnodwxqopHa45KRSHIVcOTxFSfJSEGPbQH20/edit#gid=2102408290"
+        , data = new_df
+        , sheet = "course_info"
+      )
       
       # Update reactive ----
       r$df_course_info <- new_df
       showNotification("Saved to remote.")
       removeModal()
       
-      })
+    })
     observeEvent(input$close, {
       removeModal()
     })
-
-      
+    
+    
     
   })
 }

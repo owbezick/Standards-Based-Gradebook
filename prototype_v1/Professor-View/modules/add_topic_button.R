@@ -3,28 +3,29 @@
 add_topic_button_UI <- function(id) {
   showModal(
     modalDialog(title = "Add Topic", size = "m"
-                , fluidRow(box(width = 12, status = "primary"
-                               , column(width = 2
-                                        , tags$b("Topic Number: ")
-                                        , numericInput(inputId = NS(id, "topicNumber")
-                                                       , label = NULL
-                                                       , value = 0)
-                                        
-                               )
-                               , column(width = 10
-                                        , tags$b("Topic Description: ")
-                                        , textAreaInput(inputId = NS(id, "topicDescription")
-                                                        , label = NULL)
-                               )
-                               , footer = fluidRow(
-                                 actionBttn(
-                                   inputId = NS(id,"save"), label = "Save Topic", block = T
-                                 )
-                                 , actionBttn(
-                                   inputId = NS(id, "close"), label = "Close", block = T
-                                 )
-                               )
-                )
+                , fluidRow(
+                  column(width = 2
+                         , tags$b("Topic Number: ")
+                         , numericInput(inputId = NS(id, "topicNumber")
+                                        , label = NULL
+                                        , value = 0)
+                  )
+                  , column(width = 10
+                           , tags$b("Topic Description: ")
+                           , textAreaInput(inputId = NS(id, "topicDescription")
+                                           , label = NULL)
+                  ))
+                  , footer = fluidRow(
+                    column(width = 6
+                           , actionBttn(
+                             inputId = NS(id,"save"), label = "Save Topic", block = T
+                           )
+                    )
+                    , column(width = 6
+                             , actionBttn(
+                               inputId = NS(id, "close"), label = "Close", block = T
+                             )
+                    )
                 )
     )
   )
