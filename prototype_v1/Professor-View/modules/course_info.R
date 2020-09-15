@@ -1,5 +1,5 @@
 course_info_UI <- function(id){
-   box(width = 8, title = "Course Information", status = "primary"
+   box(width = 8, title = "Course Information", status = "primary", height = "225px"
        , column(width = 6
                 , box(width = 12
                       , tags$b("Course Location: ")
