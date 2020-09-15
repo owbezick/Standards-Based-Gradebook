@@ -1,27 +1,44 @@
 # Edit and add module ----
 edit_and_add_UI <- function(id){
-  box(width = 4, title = "Edit & Add", status = "primary"
-      , column(width = 6
+  box(width = 4, title = "Edit & Add", status = "primary", height = "225px"
+      , fluidRow(
+        column(width = 12
                , actionBttn(inputId = NS(id, "editCourseInfo")
-                            , label = "Course Info", style = "material-flat", block = T)
-               , br()
-               , actionBttn(inputId = NS(id, "addHomework")
-                            , label = "Homework", style = "material-flat", block = T)
-               , br()
+                            , label = "Course Info"
+                            , style = "material-flat"
+                            , block = T)
+        )
       )
-      , column(width = 6
+      , br()
+      , fluidRow(
+        column(width = 12
+               , actionBttn(inputId = NS(id, "editRoster")
+                            , label = "Course Roster"
+                            , style = "material-flat"
+                            , block = T)
+        )
+      )
+      , br()
+      , fluidRow(
+        column(width = 4
                , actionBttn(inputId = NS(id, "addTopic")
                             , label = "Topic", style = "material-flat", block = T)
-               , br()
-               , actionBttn(inputId = NS(id, "addReview")
-                            , label = "Review", style = "material-flat", block = T)
-               , br()
+        )
+        , column(width = 4
+                 , actionBttn(inputId = NS(id, "addReview")
+                              , label = "Review", style = "material-flat", block = T)
+        )
+        , column(width = 4
+                 , actionBttn(inputId = NS(id, "addHomework")
+                              , label = "Homework", style = "material-flat", block = T)
+        )
       )
   )
 }
 
 edit_and_add_server <- function(id, r){
   moduleServer(id, function(input, output, session) {
+    
     observeEvent(NS(id, input$editCourseInfo), {
       course_information_button_UI("course_info_button", r)
     }, ignoreInit = T) 
@@ -34,15 +51,17 @@ edit_and_add_server <- function(id, r){
       add_review_button_UI("add_review")
     }, ignoreInit = T)
     
-    observeEvent(NS(id, input$addTopic ), {
+    observeEvent(NS(id, input$addTopic), {
       add_topic_button_UI("add_topic")
     }, ignoreInit = T)
-
+    
+    observeEvent(NS(id, input$editRoster), {
+      edit_roster_button_UI("edit_roster")
+    }, ignoreInit = T)
+    # edit_roster_button_Server("edit_roster")
   })
-  
-  course_information_button_Server("course_info_button", r)
-  add_topic_button_Server("add_topic", r)
-  
   add_homework_button_Server("add_homework", r)
+  course_information_button_Server("course_info_button", r)
   add_review_button_Server("add_review", r)
+  add_topic_button_Server("add_topic", r)
 }

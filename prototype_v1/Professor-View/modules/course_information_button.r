@@ -49,10 +49,17 @@ course_information_button_UI <- function(id, r) {
                 )
                 , footer = fluidRow(
                   column(width = 6
-                         , actionBttn(inputId = NS(id,"save"), label = "Save Information", block = T)
+                         , actionBttn(inputId = NS(id,"save")
+                                      , label = "Save Information"
+                                      , style = "material-flat"
+                                      , block = T
+                                      )
                   )
                   , column(width = 6
-                           , actionBttn(inputId = NS(id, "close"), label = "Close", block = T)
+                           , actionBttn(inputId = NS(id, "close")
+                                        , label = "Close"
+                                        , style = "material-flat"
+                                        , block = T)
                   )
                 )
     )

@@ -23,12 +23,18 @@ add_review_button_UI <- function(id) {
                 , footer = fluidRow(
                   column(width = 6
                          , actionBttn(
-                           inputId = NS(id,"save"), label = "Save Review", block = T
+                           inputId = NS(id,"save")
+                           , label = "Save Review"
+                           , style = "material-flat"
+                           , block = T
                          )
                   )
                   , column(width = 6 
                            , actionBttn(
-                             inputId = NS(id, "close"), label = "Close", block = T
+                             inputId = NS(id, "close")
+                             , label = "Close"
+                             , style = "material-flat"
+                             , block = T
                            )
                   )
                 )
