@@ -1,22 +1,21 @@
 course_info_UI <- function(id){
    box(width = 8, title = "Course Information", status = "primary"
        , column(width = 6
-                , box(width = 12, status = "primary"
+                , box(width = 12
                       , tags$b("Course Location: ")
                       , textOutput(NS(id, "location"))
                 )
-                , box(width = 12, status = "primary"
+                , box(width = 12
                       , tags$b("Meeting times: ")
                       , textOutput(NS(id, "meeting_times"))
                 )
        )
        , column(width = 6
-                , box(width = 12, status = "primary"
+                , box(width = 12
                       , tags$b("Helpful links: ")
                       , uiOutput(NS(id, "link"))
                 )
-                , box(width = 12, status = "primary"
-                      
+                , box(width = 12
                       , tags$b("Office hours: ")
                       , textOutput(NS(id, "office_hours"))
                 )
@@ -37,18 +36,21 @@ course_info_server <- function(id, r){
     )
     output$link <- renderUI(
       div(tags$a(
-          r$df_course_info$link1_text
+        paste0(r$df_course_info$link1_text, ",")
           , href =  r$df_course_info$link1_url
+          , style = "width:33%;"
         )
-        , br()
+        
         , tags$a(
-          r$df_course_info$link2_text
+          paste0(r$df_course_info$link2_text, ",")
           , href =  r$df_course_info$link2_url
+          , style = "width:33%;"
         )
-        , br()
+        
         , tags$a(
           r$df_course_info$link3_text
           , href =  r$df_course_info$link3_url
+          , style = "width:33%;"
         )
       )
     )

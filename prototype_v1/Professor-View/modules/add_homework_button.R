@@ -4,24 +4,30 @@ add_homework_button_UI <- function(id) {
   showModal(
     modalDialog(title = "Add Homework", size = "l"
                 , fluidRow(
-                  column(width = 6
-                         , tags$b("Homework Number: ")
-                         , numericInput(inputId = "homeworkNumber"
-                                     , label = NULL
-                                     , value = 0)
-                         , br()
-                         , tags$b("Homework Description: ")
-                         , textAreaInput(inputId = "addHomeworkDescription"
-                                         , label = NULL)
-                  )
-                  , column(width = 6
-                           , tags$b("Date Due: ")
-                           , dateInput(inputId = "homeworkDateDue"
-                                       , label = NULL)
-                           , br()
-                           , tags$b("Date Assigned: ")
-                           , dateInput(inputId = "homeworkDateAssigned"
-                                       , label = NULL)
+                  box(width = 12, status = "primary"
+                      , column(width = 6
+                               , numericInput(inputId = NS(id, "homeworkNumber")
+                                              , label = "Homework Number: "
+                                              , value = 0)
+                               , br()
+                               , textAreaInput(inputId = NS(id, "homeworkDescription")
+                                               , label = "Homework Description: ")
+                      )
+                      , column(width = 6
+                               , dateInput(inputId = NS(id, "homeworkDateDue")
+                                           , label = "Date Due: ")
+                               , br()
+                               , dateInput(inputId = NS(id, "homeworkDateAssigned")
+                                           , label = "Date Assigned: ")
+                      )
+                      , footer = fluidRow(
+                        actionBttn(
+                          inputId = NS(id,"save"), label = "Save Homework", block = T
+                        )
+                        , actionBttn(
+                          inputId = NS(id, "close"), label = "Close", block = T
+                        )
+                      )
                   )
                 )
                 
@@ -29,8 +35,36 @@ add_homework_button_UI <- function(id) {
   )
 }
 
-add_homework_button_Server <- function(id){
+add_homework_button_Server <- function(id, r){
   moduleServer(id, function(input,output,session){
-    #TODO: add to data base once created ----
+    observeEvent(input$save, {
+      df_homework <- r$df_homework
+      new_row <- tibble("id" = input$homeworkNumber
+                        , "description" = input$homeworkDescription
+                        , "date_assigned" = input$homeworkDateAssigned
+                        , "date_due" = input$homeworkDateDue
+      )
+      
+      # Write to sheet ----
+      if(input$homeworkNumber %in% df_homework$id){
+        showNotification("Homework already exists.")
+        removeModal()
+      }else{
+        sheet_append(
+          ss = "https://docs.google.com/spreadsheets/d/1xIC4pGhnnodwxqopHa45KRSHIVcOTxFSfJSEGPbQH20/edit#gid=2102408290"
+          , data = new_row
+          , sheet = "homework"
+        )      # Update reactive ----
+        new_df <- rbind(df_homework, new_row)
+        r$df_homework <- new_df
+        removeModal()
+        showNotification("Saved to remote.")
+      }
+    })
+    
+    observeEvent(input$close, {
+      removeModal()
+    })
+    
   })
 }

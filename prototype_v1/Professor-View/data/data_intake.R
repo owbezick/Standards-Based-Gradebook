@@ -13,8 +13,11 @@
 # )
 
 library(config)
-# config <- config::get()
-# 
+# TODO: Warning in  config file:
+# Warning in readLines(con) :
+# incomplete final line found on '/Users/owenbezick/Documents/GitHub/Standards-Based-Gradebook/prototype_v1/Professor-View/config.yml'
+config <- config::get()
+
 # # Initial authentication caching ----
 # options(gargle_oauth_cache = ".cache") # designate project-specific cache
 # gargle::gargle_oauth_cache() # check the value of the option
@@ -44,9 +47,9 @@ read_all_database_sheets <- function(sheets){
   data
 }
 
-ls_sheets <- c("student", "homework", "homework_grade", "course_info", "exam_to_topic", "topic", "exam")
+ls_sheets <- c("student", "homework", "homework_grade", "course_info", "exam_to_topic", "topic", "review")
 
-#ls_all_data <- read_all_database_sheets(ls_sheets)
+ls_all_data <- read_all_database_sheets(ls_sheets)
 
 r <- reactiveValues(df_student = NULL
                     , df_homework = NULL
@@ -54,7 +57,7 @@ r <- reactiveValues(df_student = NULL
                     , df_course_info = NULL
                     , df_exam_to_topic = NULL
                     , df_topic = NULL
-                    , df_exam = NULL
+                    , df_review = NULL
 )
 
 r$df_student <- ls_all_data$student
@@ -69,7 +72,7 @@ r$df_exam_to_topic <- ls_all_data$exam_to_topic
 
 r$df_topic <- ls_all_data$topic
 
-r$df_exam <- ls_all_data$exam
+r$df_review <- ls_all_data$review
 
 #default:
 #database: "template_gradebook_database"

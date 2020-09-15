@@ -49,7 +49,7 @@ ui <- dashboardPage(
                     , edit_and_add_UI("edit_and_add")
                 )
                 , fluidRow(
-                    #course_calendar_UI("course_calendar")
+                    course_calendar_UI("course_calendar")
                 )
                 , fluidRow(
                     topics_UI("topics")
@@ -82,7 +82,7 @@ ui <- dashboardPage(
 # Define server logic 
 server <- function(input, output) {
     
-    #course_calendar_server("course_calendar", r)
+    course_calendar_server("course_calendar", r)
     course_info_server("courseinfo", r)
     edit_and_add_server("edit_and_add", r)
     topics_server("topics", r)

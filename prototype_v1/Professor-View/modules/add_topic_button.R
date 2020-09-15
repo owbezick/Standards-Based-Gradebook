@@ -16,8 +16,14 @@ add_topic_button_UI <- function(id) {
                                         , textAreaInput(inputId = NS(id, "topicDescription")
                                                         , label = NULL)
                                )
-                               , footer = fluidRow(actionBttn(inputId = NS(id,"save"), label = "Save Topic", block = T)
-                                                   , actionBttn(inputId = NS(id, "close"), label = "Close", block = T))
+                               , footer = fluidRow(
+                                 actionBttn(
+                                   inputId = NS(id,"save"), label = "Save Topic", block = T
+                                 )
+                                 , actionBttn(
+                                   inputId = NS(id, "close"), label = "Close", block = T
+                                 )
+                               )
                 )
                 )
     )
@@ -26,11 +32,11 @@ add_topic_button_UI <- function(id) {
 
 add_topic_button_Server <- function(id, r){
   moduleServer(id, function(input,output,session){
-  
+    
     observeEvent(input$save, {
       df_topic <- r$df_topic
       new_row <- tibble("id" = input$topicNumber
-                       , "description" = input$topicDescription
+                        , "description" = input$topicDescription
       )
       
       # Write to sheet ----
@@ -43,15 +49,15 @@ add_topic_button_Server <- function(id, r){
           , data = new_row
           , sheet = "topic"
         )
+        # Update reactive ----
+        new_df <- rbind(df_topic, new_row)
+        r$df_topic <- new_df
+        
+        removeModal()
         showNotification("Saved to remote.")
       }
-
-      # Update reactive ----
-      new_df <- rbind(df_topic, new_row)
-      r$df_topic <- new_df
-      
-      removeModal()
     })
+    
     observeEvent(input$close, {
       removeModal()
     })

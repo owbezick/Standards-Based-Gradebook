@@ -7,13 +7,17 @@ course_calendar_UI <- function(id){
 # Have to rework to use with reactive data 
 course_calendar_server <- function(id, r){
   moduleServer(id, function(input,output,session){
-    browser()
     output$course_schedule <- renderTimevis({
-      df_timevis <- tibble(
-        content = c("Homework 1", "Review 1")
-        , start = c(homework_date, review_date)
-      )
-      timevis(df_timevis)
+      df_homework <- r$df_homework
+      # Start and content necessary to form the tibble
+      df_timevis_homework <- r$df_homework %>%
+        mutate(content = paste("Homework", id)
+               , start = as.character(date_assigned)
+               , id = content
+               ) %>%
+        select(id, start, content)
+      
+      timevis(df_timevis_homework)
     })
   })
 }

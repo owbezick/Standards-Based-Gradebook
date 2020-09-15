@@ -27,11 +27,11 @@ edit_and_add_server <- function(id, r){
     }, ignoreInit = T) 
     
     observeEvent(NS(id, input$addHomework), {
-      add_homework_button_UI("add_homework_button")
+      add_homework_button_UI("add_homework")
     }, ignoreInit = T)
     
     observeEvent(NS(id, input$addReview), {
-      add_review_button_UI("add_review_button")
+      add_review_button_UI("add_review")
     }, ignoreInit = T)
     
     observeEvent(NS(id, input$addTopic ), {
@@ -43,6 +43,6 @@ edit_and_add_server <- function(id, r){
   course_information_button_Server("course_info_button", r)
   add_topic_button_Server("add_topic", r)
   
-  
-  
+  add_homework_button_Server("add_homework", r)
+  add_review_button_UI("add_review")
 }
