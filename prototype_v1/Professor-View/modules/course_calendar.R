@@ -8,7 +8,6 @@ course_calendar_UI <- function(id){
 course_calendar_server <- function(id, r){
   moduleServer(id, function(input,output,session){
     output$course_schedule <- renderTimevis({
-      df_homework <- r$df_homework
       # Start and content necessary to form the tibble
       df_timevis_homework <- r$df_homework %>%
         mutate(content = paste("Homework", id)
@@ -16,8 +15,15 @@ course_calendar_server <- function(id, r){
                , id = content
                ) %>%
         select(id, start, content)
+      df_timevis_review <- r$df_review %>%
+        mutate(content = paste("Review", id)
+               , start = as.character(date)
+               , id = content
+        ) %>%
+        select(id, start, content)
       
-      timevis(df_timevis_homework)
+      df_timevis <- rbind(df_timevis_review, df_timevis_review)
+      timevis(df_timevis)
     })
   })
 }

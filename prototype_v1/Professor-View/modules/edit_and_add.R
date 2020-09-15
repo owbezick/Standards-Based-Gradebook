@@ -44,5 +44,5 @@ edit_and_add_server <- function(id, r){
   add_topic_button_Server("add_topic", r)
   
   add_homework_button_Server("add_homework", r)
-  add_review_button_UI("add_review")
+  add_review_button_Server("add_review", r)
 }
