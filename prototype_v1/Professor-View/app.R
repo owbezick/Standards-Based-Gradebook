@@ -1,10 +1,6 @@
 # Mastery Gradebook application - Professor View
 # Author: Owen Bezick & Calvin Spencer
 
-# Why do we need to still source these? I thought shiny 1.15 takes care of that 
-# automatically...
-
-# Can we just move over to creating a package?
 source("modules/course_info.R")
 source("modules/add_homework_button.R")
 source("modules/add_review_button.R")
@@ -15,12 +11,6 @@ source("modules/course_information_button.R")
 source("modules/topics.R")
 source("data/data_intake.R")
 source("utils/libraries.R")
-# Add the 120 character limit by going to Rstudio -> preferences -> code -> display -> show margin
-
-# Essentially how "factored out" do we want the code to be?
-# Do we wanna pull out dashboard headers, sidebar, and tab items?
-
-# We should also look into using the demo package (i forget the name for it) to explain how to use it
 
 ui <- dashboardPage(
     skin = "black"
