@@ -51,5 +51,7 @@
 }
 .bttn-unite.bttn-default:focus {
     background:#d68e86 !important;
-    
+}
+.skin-black .main-header>.logo:hover {
+    background-color: #f10909;
 }
