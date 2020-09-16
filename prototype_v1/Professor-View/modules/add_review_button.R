@@ -107,8 +107,8 @@ add_review_button_Server <- function(id, r){
           
         )      
         # Update reactive 
-        new_df <- rbind(df_review_to_topic, df_review_to_topic_new)
-        r$df_review_top_topic <- new_df
+        new_df <- rbind(r$df_review_to_topic, df_review_to_topic_new)
+        r$df_review_to_topic <- new_df
         showNotification("Saved to remote.")
         removeModal()
       }
