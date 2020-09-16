@@ -58,7 +58,6 @@ edit_and_add_server <- function(id, r){
     observeEvent(NS(id, input$editRoster), {
       edit_roster_button_UI("edit_roster")
     }, ignoreInit = T)
-    # edit_roster_button_Server("edit_roster")
   })
   add_homework_button_Server("add_homework", r)
   course_information_button_Server("course_info_button", r)

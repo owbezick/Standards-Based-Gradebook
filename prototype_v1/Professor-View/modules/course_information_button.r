@@ -3,7 +3,7 @@
 course_information_button_UI <- function(id, r) {
   df <- r$df_course_info
   showModal(
-    modalDialog(title = "Edit Course Information", size = "l"
+    modalDialog(title = "Edit Course Information", size = "l", easyClose = T
                 , fluidRow(
                   column(width = 6
                          , tags$b("Course Location: ")
@@ -48,18 +48,12 @@ course_information_button_UI <- function(id, r) {
                   )
                 )
                 , footer = fluidRow(
-                  column(width = 6
+                  column(width = 12
                          , actionBttn(inputId = NS(id,"save")
                                       , label = "Save Information"
                                       , style = "material-flat"
                                       , block = T
                                       )
-                  )
-                  , column(width = 6
-                           , actionBttn(inputId = NS(id, "close")
-                                        , label = "Close"
-                                        , style = "material-flat"
-                                        , block = T)
                   )
                 )
     )
@@ -93,11 +87,6 @@ course_information_button_Server <- function(id, r){
       removeModal()
       
     })
-    observeEvent(input$close, {
-      removeModal()
-    })
-    
-    
-    
+
   })
 }

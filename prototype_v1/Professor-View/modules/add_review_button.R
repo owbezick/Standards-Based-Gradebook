@@ -2,7 +2,7 @@
 # Course information button module ----
 add_review_button_UI <- function(id) {
   showModal(
-    modalDialog(title = "Add Review", size = "l"
+    modalDialog(title = "Add Review", size = "l", easyClose = T
                 , fluidRow(
                   column(width = 6
                          , numericInput(inputId = NS(id, "reviewNumber")
@@ -21,21 +21,13 @@ add_review_button_UI <- function(id) {
                   )
                 )
                 , footer = fluidRow(
-                  column(width = 6
+                  column(width = 12
                          , actionBttn(
                            inputId = NS(id,"save")
                            , label = "Save Review"
                            , style = "material-flat"
                            , block = T
                          )
-                  )
-                  , column(width = 6 
-                           , actionBttn(
-                             inputId = NS(id, "close")
-                             , label = "Close"
-                             , style = "material-flat"
-                             , block = T
-                           )
                   )
                 )
     )
