@@ -10,7 +10,7 @@ library(dplyr)
 library(lubridate)
 library(openxlsx)
 library(tidyverse)
-library(janitor)
+#library(janitor)
 # Viz
 library(echarts4r)
 library(timevis)
