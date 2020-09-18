@@ -76,6 +76,10 @@ add_review_button_Server <- function(id, r){
         
       }
       
+      repeatTopic <- function(topics){
+        rep(topics, length(ls_student_ids))
+      }
+      
       # Add review to review_to_topic ----
       df_review_to_topic <- r$df_review_to_topic
       ls_student_ids <- r$df_student$id
@@ -83,8 +87,11 @@ add_review_button_Server <- function(id, r){
       review_id <- input$reviewNumber
       # Replicate list of student id's  to as many topics there are:
       ls_student_ids_rep <- rep(ls_student_ids, length(ls_topics_to_add))
+      
       # Replicate list of topics to as many students there are:
-      ls_topic_ids_rep <- rep(ls_topics_to_add, length(ls_student_ids))
+      ls_topic_ids_rep <- lapply(ls_topics_to_add, repeatTopic) %>% # lapply workaround. double check this won't cause any issues?
+                                            do.call(c, .) #combine lists returned from lapply
+      
       # Replicate list of review numbers to as many students and topics there are:
       ls_review_id_rep <- rep(review_id, length(ls_student_ids_rep))
       # List of "NA"s for grade
@@ -97,7 +104,7 @@ add_review_button_Server <- function(id, r){
         , "grade" = ls_grade_rep
       )
       # Write to sheet 
-      if(input$reviewNumber %in% df_review_to_topic$id){
+      if(input$reviewNumber %in% df_review_to_topic$review_id){
         showNotification("Review number already exists.")
         removeModal()
       }else{
