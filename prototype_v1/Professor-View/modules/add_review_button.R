@@ -75,8 +75,9 @@ add_review_button_Server <- function(id, r){
         r$df_review <- new_df
         
       }
+      
       # Add review to review_to_topic ----
-      df_review_to_topic <- r$review_to_topic
+      df_review_to_topic <- r$df_review_to_topic
       ls_student_ids <- r$df_student$id
       ls_topics_to_add <- input$addReviewTopics
       review_id <- input$reviewNumber
