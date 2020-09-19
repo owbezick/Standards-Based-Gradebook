@@ -10,8 +10,10 @@ source("modules/course_calendar.R")
 source("modules/course_information_button.R")
 source("modules/edit_roster.R")
 source("modules/topics.R")
+source("modules/view_calendar_item.R")
 source("data/data_intake.R")
 source("utils/libraries.R")
+
 
 ui <- dashboardPage(
     skin = "black"
@@ -82,11 +84,11 @@ ui <- dashboardPage(
 
 # Define server logic 
 server <- function(input, output) {
-    
     course_calendar_server("course_calendar", r)
     course_info_server("courseinfo", r)
     edit_and_add_server("edit_and_add", r)
     topics_server("topics", r)
+    view_calendar_item_Server("calendar_item", r)
 }
 
 # Run the application 

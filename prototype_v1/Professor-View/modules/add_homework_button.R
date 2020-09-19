@@ -84,7 +84,6 @@ add_homework_button_Server <- function(id, r){
       
       # List of NAs for grades
       ls_grade_rep <- rep("NA", length(ls_student_ids))
-      browser()
       
       # List of primary keys for each homework grade
       ls_homework_grade_ids <- lapply(ls_student_ids, generateID) %>%

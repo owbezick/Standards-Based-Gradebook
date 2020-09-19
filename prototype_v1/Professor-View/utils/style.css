@@ -55,3 +55,38 @@
 .skin-black .main-header>.logo:hover {
     background-color: #f10909;
 }
+.vis-item.homework {
+    background-color: #ac1a2f;
+    color: white;
+    border-color:  #222d32;
+   
+}
+.vis-item.review {
+    background-color: #222d32;
+    color: white;
+    border-color: #ac1a2f;
+}
+.vis-item.vis-point.vis-selected, .vis-item.vis-selected {
+     opacity: 0.8;
+}
+
+a:link {
+  color: #ac1a2f;
+  text-decoration: underline;
+}
+
+a:visited {
+  color: #ac1a2f;
+  text-decoration: underline;
+}
+
+a:hover {
+  color: #ac1a2f;
+  text-decoration: underline;
+  font-weight: 700;
+}
+
+a:active {
+  color: #ac1a2f;
+  text-decoration: underline;
+}

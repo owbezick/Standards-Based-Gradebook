@@ -33,6 +33,7 @@ course_info_server <- function(id, r){
     )
     output$office_hours <- renderText(
       r$df_course_info$office_hours
+      
     )
     output$link <- renderUI(
       div(tags$a(
