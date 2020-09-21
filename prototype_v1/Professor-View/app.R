@@ -1,5 +1,6 @@
 # Mastery Gradebook application - Professor View
 # Author: Owen Bezick & Calvin Spencer
+source("utils/libraries.R")
 
 source("modules/course_info.R")
 source("modules/add_homework_button.R")
@@ -12,7 +13,6 @@ source("modules/edit_roster.R")
 source("modules/topics.R")
 source("modules/view_calendar_item.R")
 source("data/data_intake.R")
-source("utils/libraries.R")
 
 
 ui <- dashboardPage(
