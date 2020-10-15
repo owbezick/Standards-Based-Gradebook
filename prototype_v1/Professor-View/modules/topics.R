@@ -1,6 +1,6 @@
 topics_UI <- function(id){
   box(width = 12, title = "Course Topics", status = "primary"
-      , formattableOutput(NS(id, "topicTable"))
+      , rHandsontableOutput(NS(id, "topicTable"))
   )
 }
 
@@ -27,6 +27,7 @@ topics_server <- function(id, r){
           , nrow = length(unique(df_review_to_topic$review_id))
         )
         , row.names = r$review$id
+        , stringsAsFactors = T
       )
       
       colnames(df) <- c("Review", "Date", df_topic$name)
@@ -38,7 +39,7 @@ topics_server <- function(id, r){
         df[exam_id, "Date"] = as.character(date)
         df[exam_id, "Review"] = paste("Review", current_exam[1, "review_id"])
         for (id in ls_topics_in_current_exam){
-          df[exam_id, paste("Topic", id)] = 1
+          df[exam_id, paste("Topic", id)] = TRUE
         }
       }
       df
@@ -46,9 +47,14 @@ topics_server <- function(id, r){
     
     
     
-    output$topicTable <- renderFormattable({
+    output$topicTable <- renderRHandsontable({
       df <- course_table()
-      formattable(df)
+      df <- df %>%
+        mutate(Date = ymd(Date))
+      rhandsontable(
+        df
+        , rowHeaders = NULL
+        )
     })
     
   })
