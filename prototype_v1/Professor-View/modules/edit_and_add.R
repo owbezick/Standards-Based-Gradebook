@@ -20,15 +20,15 @@ edit_and_add_UI <- function(id){
       )
       , br()
       , fluidRow(
-        column(width = 4
+        column(width = 6
                , actionBttn(inputId = NS(id, "addTopic")
                             , label = "Topic", style = "material-flat", block = T)
         )
-        , column(width = 4
-                 , actionBttn(inputId = NS(id, "addReview")
-                              , label = "Review", style = "material-flat", block = T)
-        )
-        , column(width = 4
+        # , column(width = 4
+        #          , actionBttn(inputId = NS(id, "addReview")
+        #                       , label = "Review", style = "material-flat", block = T)
+        # )
+        , column(width = 6
                  , actionBttn(inputId = NS(id, "addHomework")
                               , label = "Homework", style = "material-flat", block = T)
         )
@@ -47,9 +47,9 @@ edit_and_add_server <- function(id, r){
       add_homework_button_UI("add_homework")
     }, ignoreInit = T)
     
-    observeEvent(NS(id, input$addReview), {
-      add_review_button_UI("add_review")
-    }, ignoreInit = T)
+    # observeEvent(NS(id, input$addReview), {
+    #   add_review_button_UI("add_review")
+    # }, ignoreInit = T)
     
     observeEvent(NS(id, input$addTopic), {
       add_topic_button_UI("add_topic")

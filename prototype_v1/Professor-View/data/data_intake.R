@@ -24,7 +24,7 @@ config <- config::get()
 # googledrive::drive_auth() # trigger auth on purpose to store a token in the specified cache
 # cache_directory <- ".secrets/" # can add to config file
 # list.files(cache_directory) # see your token file in the cache
-#drive_deauth() # de auth
+# drive_deauth() # de auth
 
 library(googlesheets4)
 library(googledrive)
@@ -47,9 +47,9 @@ read_all_database_sheets <- function(sheets){
   data
 }
 
-ls_sheets <- c("student", "homework", "homework_grade", "course_info", "review_to_topic", "topic", "review")
+ls_sheets <- c("student", "homework", "homework_grade", "course_info", "review_to_topic", "topic", "review", "review_table")
 
-#ls_all_data <- read_all_database_sheets(ls_sheets)
+ls_all_data <- read_all_database_sheets(ls_sheets)
 
 r <- reactiveValues(df_student = NULL
                     , df_homework = NULL
@@ -59,6 +59,7 @@ r <- reactiveValues(df_student = NULL
                     , df_topic = NULL
                     , df_review = NULL
                     , df_cal_item = NULL
+                    , df_review_table = NULL
 )
 
 r$df_student <- ls_all_data$student
@@ -74,6 +75,8 @@ r$df_review_to_topic <- ls_all_data$review_to_topic
 r$df_topic <- ls_all_data$topic
 
 r$df_review <- ls_all_data$review
+
+r$df_review_table <-  ls_all_data$review_table
 
 #default:
 #database: "template_gradebook_database"
