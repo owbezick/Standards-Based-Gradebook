@@ -25,22 +25,9 @@ course_calendar_server <- function(id, r){
       
       if (item_type == "r"){
         title <- paste0("Review ", item_id)
-          
-        ls_review_topics <- r$df_review_to_topic %>%
-          filter(review_id == item_id) %>%
-          select(topic_id) %>%
-          unique() %>%
-          as.list()
-        
-        
-        
-        df_item <- r$df_review %>%
-                    filter(id == item_id) %>%
-                    mutate(`Review Number` = id) %>%
-                    mutate(`Review Date` = date) %>%
-                    mutate(`Topics` = ls_review_topics) %>%
-                    select(`Review Number`, `Review Date`, `Topics`)
-                
+
+        df_item <- r$df_review_table %>%
+          filter(`Review ID` == item_id)
           
       }
       else{
@@ -68,11 +55,11 @@ course_calendar_server <- function(id, r){
                , className = "homework"
                ) %>%
         select(id, start, content, group, className)
-      
-      df_timevis_review <- r$df_review %>%
-        mutate(content = paste("Review", id)
-               , start = as.character(date)
-               , id = paste0("r_", id)
+      #browser()
+      df_timevis_review <- r$df_review_table %>%
+        mutate(content = `Review Name`
+               , start = as.character(`Review Date`)
+               , id = paste0("r_", `Review ID`)
                , group = "review"
                , className = "review"
         ) %>%
