@@ -1,8 +1,12 @@
 topics_UI <- function(id){
   box(width = 12, title = "Review Table", status = "primary"
-      , "Right click to add a row to the table."
-      , rHandsontableOutput(NS(id, "topicTable"))
-      , actionBttn(NS(id, "save"), "Save", style = "material-flat")
+      
+      , box(width = 12
+            , rHandsontableOutput(NS(id, "topicTable"))
+            , footer = "Right click to add a row to the table."
+      )
+      , actionBttn(NS(id, "save"), "Save", style = "material-flat", block = T)
+      
   )
 }
 
