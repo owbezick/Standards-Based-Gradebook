@@ -12,7 +12,7 @@ source("modules/course_information_button.R")
 source("modules/edit_roster.R")
 source("modules/topics.R")
 source("modules/view_calendar_item.R")
-source("modules/homework.R")
+source("modules/grade.R")
 source("data/data_intake.R")
 
 

@@ -1,10 +1,10 @@
 homework_UI <- function(id) {
   tabPanel(title = "Homework"
            , fluidRow(
-            box(width = 12
-                   , title = "Homework Grades"
-                   , rHandsontableOutput(NS(id, "homework_table"))
-                   , actionBttn(NS(id, "save"), "Save", style = "material-flat")
+             box(width = 12
+                 , title = "Homework Grades"
+                 , rHandsontableOutput(NS(id, "homework_table"))
+                 , actionBttn(NS(id, "save"), "Save", style = "material-flat")
              )
            )
   )
@@ -17,7 +17,8 @@ homework_server <- function(id, r){
     output$homework_table <- renderRHandsontable({
       df_homework_table <- r$df_homework_table 
       rhandsontable(df_homework_table
-                    , rowHeaders = NULL) 
+                    , rowHeaders = NULL) %>%
+        hot_heatmap()
     })  
     
     observeEvent(input$save,{
@@ -36,11 +37,12 @@ homework_server <- function(id, r){
 
 review_UI <- function(id) {
   tabPanel(title = "Reviews"
-             , box(width = 12, title = "View by student or review or select topics button/select"
-                   , "Data table of information"
-                   , "Graph of information"
-                   , "ways to edit")
-             
+           , fluidRow(
+             box(width = 12, title = "View by student or review or select topics button/select"
+                 , "Data table of information"
+                 , "Graph of information"
+                 , "ways to edit")
+           )
   )
 }
 

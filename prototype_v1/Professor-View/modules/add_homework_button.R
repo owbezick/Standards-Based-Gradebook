@@ -49,7 +49,6 @@ add_homework_button_Server <- function(id, r){
                      , value = max(r$df_homework$id) + 1)
     })
     observeEvent(input$save, {
-      browser()
 
       df_homework <- r$df_homework
       # Write to sheet ----
@@ -74,7 +73,7 @@ add_homework_button_Server <- function(id, r){
         
         # DF Homework Table
         df_homework_table <- r$df_homework_table
-        new_column <- c(rep(NA, nrow(df_homework_table)))
+        new_column <- c(rep("NA", nrow(df_homework_table)))
         new_column_name = paste("Homework", input$homeworkNumber)
         df_homework_table <- df_homework_table %>%
           mutate(init = new_column) 
