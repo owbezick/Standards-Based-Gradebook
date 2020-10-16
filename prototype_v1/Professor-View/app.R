@@ -12,6 +12,7 @@ source("modules/course_information_button.R")
 source("modules/edit_roster.R")
 source("modules/topics.R")
 source("modules/view_calendar_item.R")
+source("modules/homework.R")
 source("data/data_intake.R")
 
 
@@ -60,22 +61,11 @@ ui <- dashboardPage(
             )
             , tabItem(
                 tabName = "grades"
-                , box(width = 12
-                      , tabsetPanel(
-                          tabPanel(title = "Homeworks"
-                                   , box(width = 12, title = "View by student or homework button/select"
-                                         , "Data table of information"
-                                         , "Graph of information"
-                                         , "ways to edit")
-                          )
-                          , tabPanel(title = "Reviews"
-                                     , box(width = 12, title = "View by student or review or select topics button/select"
-                                           , "Data table of information"
-                                           , "Graph of information"
-                                           , "ways to edit")
-                          )
-                      )
+                , tabBox(title = "Grades", width = 12
+                    , homework_UI("homework")
+                    , review_UI("review")
                 )
+               
             )
         )
     )
@@ -89,6 +79,8 @@ server <- function(input, output) {
     edit_and_add_server("edit_and_add", r)
     topics_server("topics", r)
     view_calendar_item_Server("calendar_item", r)
+    homework_server("homework", r)
+    review_server("review", r)
 }
 
 # Run the application 
