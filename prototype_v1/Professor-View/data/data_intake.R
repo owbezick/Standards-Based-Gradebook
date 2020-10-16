@@ -47,7 +47,7 @@ read_all_database_sheets <- function(sheets){
   data
 }
 
-ls_sheets <- c("student", "homework", "homework_grade", "course_info", "review_to_topic", "topic", "review", "review_table")
+ls_sheets <- c("student", "homework", "homework_grade", "course_info", "review_to_topic", "topic", "review", "review_table", "homework_table")
 
 ls_all_data <- read_all_database_sheets(ls_sheets)
 
@@ -60,6 +60,7 @@ r <- reactiveValues(df_student = NULL
                     , df_review = NULL
                     , df_cal_item = NULL
                     , df_review_table = NULL
+                    , df_homework_two = NULL
 )
 
 r$df_student <- ls_all_data$student
@@ -78,5 +79,6 @@ r$df_review <- ls_all_data$review
 
 r$df_review_table <-  ls_all_data$review_table
 
+r$df_homework_table <- ls_all_data$homework_table
 #default:
 #database: "template_gradebook_database"

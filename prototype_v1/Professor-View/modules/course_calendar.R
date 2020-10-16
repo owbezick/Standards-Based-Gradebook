@@ -6,8 +6,6 @@ course_calendar_UI <- function(id){
 
 # Have to rework to use with reactive data 
 course_calendar_server <- function(id, r){
-  
-  
   moduleServer(id, function(input,output,session){
     
     observeEvent(input$course_schedule_selected, {
