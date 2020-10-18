@@ -116,5 +116,22 @@ review_server <- function(id, r){
         hot_col(col = "Student Name", readOnly = T, type = "character") %>%
         hot_cols(type = "dropdown", source = grade_types)
     })  
+    # Saving
+    observeEvent(input$saveTopic,{
+      df_student <- r$df_student
+      df_review_to_topic <- r$df_review_to_topic
+      df <- hot_to_r(input$review_table_student)
+      df_temp <- df %>%
+        pivot_longer(cols = c(3:ncol(df))) %>%
+        left_join(df_student, by = "name") %>%
+        select(review_id = `Review ID`, topic_id = `Topic ID`, student_id, grade = value)
+      r$df_review_to_topic <- df_temp
+      sheet_write(
+        ss =  "https://docs.google.com/spreadsheets/d/1xIC4pGhnnodwxqopHa45KRSHIVcOTxFSfJSEGPbQH20/edit#gid=2102408290"
+        , data = df_temp
+        , sheet = "review_to_topic"
+      )
+      showNotification("Saved to remote.")
+    })
   })
 }
