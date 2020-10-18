@@ -3,10 +3,7 @@ topics_UI <- function(id){
       
       , box(width = 12
             , rHandsontableOutput(NS(id, "topicTable"))
-            , footer = "Right click to add a row to the table."
       )
-      , actionBttn(NS(id, "save"), "Save", style = "material-flat", block = T)
-      
   )
 }
 
@@ -55,6 +52,7 @@ topics_server <- function(id, r){
     
     output$topicTable <- renderRHandsontable({
       df <- r$df_review_table
+      
       df <- df %>%
         mutate(`Review Date` = ymd(`Review Date`)
                , `Review ID` = as.character(`Review ID`))
@@ -63,7 +61,8 @@ topics_server <- function(id, r){
         , rowHeaders = NULL
         , stretchH = 'all'
       ) %>%
-        hot_context_menu(allowComments = T)
+        hot_context_menu(allowComments = F) %>%
+        hot_cols(readOnly = T)
     })
     
     observeEvent(input$save, {

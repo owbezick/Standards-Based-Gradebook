@@ -61,6 +61,8 @@ r <- reactiveValues(df_student = NULL
                     , df_cal_item = NULL
                     , df_review_table = NULL
                     , df_homework_two = NULL
+                    , is = NULL
+                    , auth_student_id = NULL
 )
 
 r$df_student <- ls_all_data$student
