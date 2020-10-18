@@ -41,18 +41,21 @@ review_UI <- function(id) {
   tabPanel(title = "Reviews"
            , fluidRow(
              tabBox(width = 12
-                    , tabPanel(title = "Student"
-                               , column(width = 6
-                                        , uiOutput(NS(id, "review_picker"))
-                               )
-                               , column(width = 6
-                                        , uiOutput(NS(id, "topic_picker"))
-                               )
+                    , tabPanel(title = "By Student"
                                , box(width = 12
-                                     , title = "Homework Grades"
+                                     , title = "Review Grade by Student"
                                      , rHandsontableOutput(NS(id, "review_table_student"))
+                                    
                                )
-                               , actionBttn(NS(id, "save"), "Save", style = "material-flat", block = T)
+                               , actionBttn(NS(id, "saveStudent"), "Save", style = "material-flat", block = T)
+                    )
+                    , tabPanel(title = "By Topic"
+                               , box(width = 12
+                                     , title = "Review Grade by Topic"
+                                 
+                                     , rHandsontableOutput(NS(id, "review_table_topic"))
+                               )
+                               , actionBttn(NS(id, "saveTopic"), "Save", style = "material-flat", block = T)
                     )
              )
            )
@@ -61,6 +64,7 @@ review_UI <- function(id) {
 
 review_server <- function(id, r){
   moduleServer(id, function(input, output, session){
+    #TODO: Think about filtering by review? ----
     output$review_table_student <- renderRHandsontable({
       grade_types <- c("NA", "Fluent", "Getting There", "Needs Work")
       df_review_to_topic <- r$df_review_to_topic
@@ -78,7 +82,7 @@ review_server <- function(id, r){
     })  
     
     # Saving
-    observeEvent(input$save,{
+    observeEvent(input$saveStudent,{
       df_student <- r$df_student
       df_review_to_topic <- r$df_review_to_topic
       df <- hot_to_r(input$review_table_student)
@@ -94,6 +98,23 @@ review_server <- function(id, r){
       )
       showNotification("Saved to remote.")
     })
-
+    
+    output$review_table_topic <- renderRHandsontable({
+      grade_types <- c("NA", "Fluent", "Getting There", "Needs Work")
+      df_review_to_topic <- r$df_review_to_topic
+      df_student <- r$df_student
+      df_review_topic <- df_review_to_topic %>%
+        left_join(df_student, by = "student_id") %>%
+        pivot_wider(id_cols = c(review_id, name, topic_id)
+                    , names_from = topic_id
+                    , values_from = grade) %>%
+        rename(`Review ID` = review_id, `Student Name` = name)
+      # TODO: Conditional formatting for cells that are actually NA vs character of NA ----
+      rhandsontable(df_review_topic
+                    , rowHeaders = NULL) %>%
+        hot_col(col = "Review ID", readOnly = T, type = "character") %>%
+        hot_col(col = "Student Name", readOnly = T, type = "character") %>%
+        hot_cols(type = "dropdown", source = grade_types)
+    })  
   })
 }
