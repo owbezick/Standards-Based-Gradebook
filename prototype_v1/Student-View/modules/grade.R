@@ -76,10 +76,10 @@ review_UI <- function(id) {
   tabPanel(title = "Reviews"
            , fluidRow(
              column(width = 12
-              , box(width = 12, title = "Review Grades"
+              , box(width = 12, status = "primary", title = "Review Grades"
                   , rHandsontableOutput(NS(id,"review_grades"))
               )
-              , box(width = 12, title = "Topic Proficiency"
+              , box(width = 12, status = "primary", title = "Topic Proficiency"
                     , rHandsontableOutput(NS(id,"topic_proficiency"))
               )
              )

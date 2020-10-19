@@ -8,6 +8,9 @@
 .box.box-primary {
     border-top-color: #222d32;
 }
+.nav-tabs-custom>.nav-tabs>li.active {
+    border-top-color: #c41230;
+}
 .bttn-material-flat {
     margin: 0;
     padding: 0;
