@@ -94,7 +94,8 @@ review_server <- function(id, r){
       req(r$is$auth)
       current_student <- r$auth_student_id()
       exam_grade <- r$df_review_to_topic %>%
-        filter(student_id == current_student)
+        filter(student_id == current_student
+               , grade != "NA")
     })
     
     df_filtered_homework_grades <- reactive({
@@ -112,7 +113,6 @@ review_server <- function(id, r){
     
     output$topic_proficiency <- renderRHandsontable({
       req(r$is$auth)
-      
       # Topics Completed
       df_overall_grades <- df_filtered_review_to_topic() %>% 
         group_by(grade) %>%
@@ -169,7 +169,7 @@ review_server <- function(id, r){
     
     output$review_grades <- renderRHandsontable({
       req(r$is$auth)
-      grade_types <- c("NA", "Fluent", "Getting There", "Needs Work")
+      grade_types <- c("NA", "NC", "Fluent", "Getting There", "Needs Work")
       df_review_to_topic <- df_filtered_review_to_topic()
       df_student <- r$df_student
       df_review_topic <- df_review_to_topic %>%
