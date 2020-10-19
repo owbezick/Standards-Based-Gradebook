@@ -49,7 +49,7 @@ read_all_database_sheets <- function(sheets){
 
 ls_sheets <- c("student", "homework", "homework_grade", "course_info", "review_to_topic", "topic", "review", "review_table", "homework_table")
 
-#ls_all_data <- read_all_database_sheets(ls_sheets)
+ls_all_data <- read_all_database_sheets(ls_sheets)
 
 r <- reactiveValues(df_student = NULL
                     , df_homework = NULL
@@ -61,6 +61,8 @@ r <- reactiveValues(df_student = NULL
                     , df_cal_item = NULL
                     , df_review_table = NULL
                     , df_homework_two = NULL
+                    , is = NULL
+                    , auth_student_id = NULL
 )
 
 r$df_student <- ls_all_data$student

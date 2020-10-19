@@ -38,7 +38,7 @@ course_calendar_server <- function(id, r){
       }
       
       #browser()
-      r$cal_item <- df_item
+      r$df_cal_item <- df_item
       view_calendar_item_UI("calendar_item", title)
       
       

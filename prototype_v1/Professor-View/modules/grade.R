@@ -66,7 +66,7 @@ review_server <- function(id, r){
   moduleServer(id, function(input, output, session){
     #TODO: Think about filtering by review? ----
     output$review_table_student <- renderRHandsontable({
-      grade_types <- c("NA", "Fluent", "Getting There", "Needs Work")
+      grade_types <- c("NA", "NC", "Fluent", "Getting There", "Needs Work")
       df_review_to_topic <- r$df_review_to_topic
       df_student <- r$df_student
       df_review <- df_review_to_topic %>%
