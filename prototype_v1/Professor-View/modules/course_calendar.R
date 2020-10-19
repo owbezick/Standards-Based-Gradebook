@@ -31,7 +31,7 @@ course_calendar_server <- function(id, r){
       else{
         df_item <- r$df_homework %>%
           filter(id == item_id) %>%
-          mutate(`Homework Number` = id) %>%
+          mutate(`Homework Number` = as.integer(id)) %>%
           mutate(`Date Assigned` = date_assigned) %>%
           mutate(`Date Due` = date_due) %>%
           select(`Homework Number`, `Date Assigned`, `Date Due`)

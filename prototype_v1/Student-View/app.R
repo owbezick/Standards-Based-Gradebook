@@ -8,6 +8,7 @@ source("utils/utils.R", local = TRUE)
 
 source("modules/course_info.R")
 source("modules/course_calendar.R")
+source("modules/view_calendar_item.R")
 source("modules/grade.R")
 source("modules/topics.R")
 
@@ -111,6 +112,7 @@ server <- function(input, output) {
   
   
   course_calendar_server("course_calendar", r)
+  view_calendar_item_server("calendar_item", r)
   topics_server("topics", r)
   course_info_server("courseinfo", r)
   homework_server("homework", r)

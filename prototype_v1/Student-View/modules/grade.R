@@ -26,6 +26,12 @@ homework_server <- function(id, r){
       
       homework_grade <- r$df_homework_table %>%
         filter(`Student Name` == student_name)
+      
+      cols <- c(2:ncol(homework_grade))
+      
+      homework_grade[,cols] <- lapply(homework_grade[,cols], as.double)
+      
+      df <- homework_grade
     })
     
     output$homework_grade_bar <- renderEcharts4r({
@@ -33,8 +39,9 @@ homework_server <- function(id, r){
         select(-c(`Student Name`))
       
       df <- as_tibble(cbind(Homework = names(df), t(df))) %>%
-        mutate(grade = as.numeric(V2)) %>%
-        mutate(grade = grade / 100)
+        mutate(grade = as.numeric(V2)/100)
+      
+      
       
       df %>%
         e_chart(Homework) %>%
@@ -46,6 +53,8 @@ homework_server <- function(id, r){
                                       return(parseFloat(params.value[1]*100).toFixed(2) +'%');
                                     }
                                     ")) %>%
+        #e_color(color = rgb(196, 18, 48, alpha = 230, max = 255)) %>%
+        e_color(color = "#c41230") %>%
         e_grid(left = "15%", right = "5%", top = "10%", bottom = "10%")
     })
     
@@ -94,6 +103,7 @@ review_server <- function(id, r){
         filter(student_id == r$auth_student_id()) %>%
         select(name) %>%
         pull()
+      
       
       homework_grade <- r$df_homework_table %>%
         filter(`Student Name` == student_name)

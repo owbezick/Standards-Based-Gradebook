@@ -1,9 +1,6 @@
 topics_UI <- function(id){
   box(width = 12, title = "Review Table", status = "primary"
-      
-      , box(width = 12
             , rHandsontableOutput(NS(id, "topicTable"))
-      )
   )
 }
 
