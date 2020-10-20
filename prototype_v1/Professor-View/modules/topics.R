@@ -66,7 +66,6 @@ topics_server <- function(id, r){
     })
     
     observeEvent(input$save, {
-      browser()
       df <- hot_to_r(input$topicTable)
       # Review Table
       r$df_review_table <- df
@@ -75,14 +74,60 @@ topics_server <- function(id, r){
         , data = df
         , sheet = "review_table"
       )
+      
+      `%notin%` <- Negate(`%in%`)
       # Review to Topic
-      temp <- df %>%
+      df_review_to_topic <- r$df_review_to_topic
+      
+      data_from_hot <- df %>%
         pivot_longer(cols = c(4:ncol(df))) %>%
-        na.omit() %>%
-        # apply
-        mutate(topic_id = strsplit(name, split = " ")[[1]][2]) %>%
+        na.omit()
+      
+      data_from_hot <- data_from_hot %>%
+        mutate(topic_id = str_split_fixed(data_from_hot$name, " ", 2)[,2]) %>%
         select(review_id = `Review ID`, topic_id)
-      # take review id and topic ids
+      
+      ls_distinct_new_review_id <- data_from_hot %>%
+        select(review_id) %>%
+        distinct() %>%
+        pull()
+      
+      
+      ls_distinct_old_review_id <-df_review_to_topic %>%
+        select(review_id) %>%
+        distinct() %>%
+        pull()
+      # Check for any deletions, and remove
+      temp <- subset(df_review_to_topic, review_id %in% ls_distinct_new_review_id)
+      
+      # Add in any new reviews with student grades as NA
+      new_review_data <- subset(data_from_hot, review_id %notin% ls_distinct_old_review_id)
+      
+      df_student_id <- r$df_student %>%
+        select(student_id) 
+      
+      # replicate review_id and topic_id for as many students that are in the class
+      new_review_rep <- do.call("rbind", replicate(nrow(df_student_id), new_review_data, simplify = FALSE))
+      
+      # replicate student_id the for as many topics being added
+      student_id <- do.call("rbind", replicate(nrow(new_review_data), df_student_id, simplify = FALSE)) %>%
+        arrange(student_id)
+      
+      df_new_review_data <- new_review_rep %>%
+        mutate(student_id = student_id$student_id
+               , grade = rep("NA", nrow(new_review_rep)))
+      
+      
+      temp <- rbind(temp, df_new_review_data) %>%
+        arrange(review_id, topic_id)
+      
+      r$df_review_to_topic <- temp
+      sheet_write(
+        ss =  "https://docs.google.com/spreadsheets/d/1xIC4pGhnnodwxqopHa45KRSHIVcOTxFSfJSEGPbQH20/edit#gid=2102408290"
+        , data = df
+        , sheet = "review_to_topic"
+      )
+      
       showNotification("Saved to remote.")
     })
     
