@@ -18,7 +18,7 @@ homework_UI <- function(id) {
 
 homework_server <- function(id, r){
   moduleServer(id, function(input, output, session){
-    
+    # Homework Bar Chart ----
     output$homework_bar <- renderEcharts4r({
       df <- r$df_homework_table %>%
         select(-c(`Student Name`))
@@ -55,6 +55,7 @@ homework_server <- function(id, r){
       
     })
     
+    # Homework Table ----
     output$homework_table <- renderRHandsontable({
       df_homework_table <- r$df_homework_table 
       rhandsontable(df_homework_table
@@ -63,6 +64,7 @@ homework_server <- function(id, r){
         hot_heatmap() 
     })  
     
+    # Saving ----
     observeEvent(input$save,{
       df_hot <- hot_to_r(input$homework_table)
       r$df_homework_table  <- df_hot
@@ -134,6 +136,7 @@ review_server <- function(id, r){
     
     # Review by Review ----
     output$review_table_review <- renderRHandsontable({
+      req(input$review_review_input)
       grade_types <- c("NA", "Not Completed", "Fluent", "Progressing", "Needs Work")
       df_review_to_topic <- r$df_review_to_topic
       df_student <- r$df_student
@@ -163,27 +166,27 @@ review_server <- function(id, r){
     
     # Saving
     observeEvent(input$saveReview,{
-      browser()
+      #browser()
       if (input$review_review_input == "All"){
         df_student <- r$df_student
         df_review_to_topic <- r$df_review_to_topic
-        df <- hot_to_r(input$review_table_review)
-        df_temp <- df %>%
-          pivot_longer(cols = c(3:ncol(df))) %>%
+        df_hot <- hot_to_r(input$review_table_review)
+        df_temp <- df_hot %>%
+          pivot_longer(cols = c(3:ncol(df_hot))) %>%
           left_join(df_student, by = "name") %>%
           select(review_id = `Review ID`, topic_id = `Topic ID`, student_id, grade = value)
-        r$df_review_to_topic <- df_temp
-        sheet_write(
-          ss =  "https://docs.google.com/spreadsheets/d/1xIC4pGhnnodwxqopHa45KRSHIVcOTxFSfJSEGPbQH20/edit#gid=2102408290"
-          , data = df_temp
-          , sheet = "review_to_topic"
-        )
-        showNotification("Saved to remote.")
       }
       else{
         df_review <- df_review %>%
           filter(`Review ID` == input$review_review_input)
       }
+      r$df_review_to_topic <- df_temp
+      sheet_write(
+        ss =  "https://docs.google.com/spreadsheets/d/1xIC4pGhnnodwxqopHa45KRSHIVcOTxFSfJSEGPbQH20/edit#gid=2102408290"
+        , data = df_temp
+        , sheet = "review_to_topic"
+      )
+      showNotification("Saved to remote.")
     })
     
     # Review by Student ----
