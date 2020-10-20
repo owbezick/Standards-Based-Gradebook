@@ -79,7 +79,7 @@ edit_roster_button_UI <- function(id) {
 
 edit_roster_button_Server <- function(id, r){
   moduleServer(id, function(input,output,session){
-    
+    # UI ----
     output$removeFromRoster <-  renderUI({
       checkboxGroupInput(
         inputId = NS(id, "removeFromRoster")
@@ -91,43 +91,69 @@ edit_roster_button_Server <- function(id, r){
     output$rosterList <- renderFormattable({
       columns = c("ID", "Name", "Email")
       formattable(data.frame(
-        ID = format(r$df_student$id, scientific=F)
+        ID = format(r$df_student$student_id, scientific=F)
         , Name = r$df_student$name
         , Email = r$df_student$email)
       )
     })
     
-    
+    # Remove Student Save ----
     observeEvent(input$removeSave, {
       ls_removed_names <- input$removeFromRoster
       
-      df_students <- r$df_student
-      df_new <- subset(df_students, !(name %in% ls_removed_names))
-      
+  
       if(length(ls_removed_names) == 0) {
         showNotification("No students selected to remove.")
         removeModal()
       }else{
+        # student sheet
+        df_students <- r$df_student
+        df_new_students <- subset(df_students, !(name %in% ls_removed_names))
+        
         sheet_write(
           ss = "https://docs.google.com/spreadsheets/d/1xIC4pGhnnodwxqopHa45KRSHIVcOTxFSfJSEGPbQH20/editgid=2102408290"
-          , data = df_new
+          , data = df_new_students
           , sheet = "student"
         ) 
         
-        r$df_student <- df_new
+        # homework sheet 
+        homework_table <- r$df_homework_table
+        temp <- subset(homework_table, !(`Student Name` %in% ls_removed_names))
+        r$df_homework_table <- temp
+        sheet_write(
+          ss = "https://docs.google.com/spreadsheets/d/1xIC4pGhnnodwxqopHa45KRSHIVcOTxFSfJSEGPbQH20/editgid=2102408290"
+          , data = temp
+          , sheet = "homework_table"
+        ) 
+        
+        # review sheet
+        df_review_to_topic <- r$df_review_to_topic %>%
+          left_join(r$df_student) %>%
+          select(-c(email))
+        
+        temp <- subset(df_review_to_topic, !(name %in% ls_removed_names)) %>%
+          select(-c(name))
+        
+        r$df_review_to_topic <- temp
+        sheet_write(
+          ss = "https://docs.google.com/spreadsheets/d/1xIC4pGhnnodwxqopHa45KRSHIVcOTxFSfJSEGPbQH20/editgid=2102408290"
+          , data = temp
+          , sheet = "review_to_topic"
+        ) 
         showNotification("Saved to remote.")
         removeModal()
       }
     })
     
+    # Add Student Save ----
     observeEvent(input$addSave, {
       df_prev_student <- r$df_student
-      new_row <- tibble("id" = input$addID
+      new_row <- tibble("student_id" = input$addID
                         , "name" = input$addName
                         , "email" = input$addEmail
       )
       
-      if(input$addID %in% df_student$id){
+      if(input$addID %in% r$df_student$student_id){
         showNotification("Student ID number already exists.")
         removeModal()
       }else{
@@ -140,6 +166,36 @@ edit_roster_button_Server <- function(id, r){
         new_df <- rbind(r$df_student, new_row)
         r$df_student <- new_df
         
+        # homework_table sheet
+        homework_table <- r$df_homework_table
+        new_row <- c(input$addName, rep(NA, ncol(r$df_homework_table) - 1))
+        temp <-rbind(homework_table, new_row)
+        r$df_homework_table <- temp
+        sheet_write(
+          ss = "https://docs.google.com/spreadsheets/d/1xIC4pGhnnodwxqopHa45KRSHIVcOTxFSfJSEGPbQH20/editgid=2102408290"
+          , data = temp
+          , sheet = "homework_table"
+        ) 
+      
+        # review to topic 
+        a_student_id <-  r$df_student[1,1] %>%
+          pull()
+        
+        review_to_topic <- r$df_review_to_topic
+        new_data <- review_to_topic %>%
+          filter(student_id == a_student_id) %>%
+          mutate(student_id = input$addID
+                 , grade = "NA")
+        
+        temp <- rbind(review_to_topic, new_data) %>%
+          arrange(review_id, topic_id)
+        
+        r$df_review_to_topic <- temp
+        sheet_write(
+          ss = "https://docs.google.com/spreadsheets/d/1xIC4pGhnnodwxqopHa45KRSHIVcOTxFSfJSEGPbQH20/editgid=2102408290"
+          , data = temp
+          , sheet = "review_to_topic"
+        ) 
         showNotification("Saved to remote.")
         removeModal()
       }
