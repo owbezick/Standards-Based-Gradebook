@@ -186,20 +186,22 @@ review_server <- function(id, r){
                , `Total Attempts` = as.integer(total)
                , `Remaining Attempts` = as.integer(remaining)) %>%
         select(Topic
-               , `Previous Attempts`
-               , `Total Attempts`
-               , `Remaining Attempts`)
+               , prev = `Previous Attempts` 
+               , total = `Total Attempts`
+               , remain = `Remaining Attempts`)
       
       df %>%
         e_charts(Topic) %>%
-        e_bar(`Previous Attempts`
+        e_bar(prev
               , stack = "Topics"
               , color = "#c41230"
-              , barWidth = "50%") %>%
-        e_bar(`Remaining Attempts`
+              , barWidth = "50%"
+              , name = "Previous Attempts") %>%
+        e_bar(remain
               , stack = "Topics"
               , color = "#222D32"
-              , barWidth = "50%") %>%
+              , barWidth = "50%"
+              , name = "Remaining Attempts") %>%
         e_legend(bottom = 'bottom') %>%
         e_grid(top = "15%", left= "10%", bottom = "20%", right = "5%")
       

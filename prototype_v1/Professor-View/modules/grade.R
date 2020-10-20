@@ -203,6 +203,8 @@ review_server <- function(id, r){
       }
       
       # TODO: Conditional formatting for cells that are actually NA vs character of NA ----
+      # Need actual NA cells to not be editable
+      
       rhandsontable(df_review_topic
                     , rowHeaders = NULL
                     , stretchH = 'all') %>%
@@ -210,6 +212,7 @@ review_server <- function(id, r){
         hot_col(col = "Student Name", readOnly = T, type = "character") %>%
         hot_cols(type = "dropdown", source = grade_types)
     })  
+    
     # Saving
     observeEvent(input$saveTopic,{
       df_student <- r$df_student
