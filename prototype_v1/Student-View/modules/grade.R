@@ -2,14 +2,14 @@ homework_UI <- function(id) {
   tabPanel(title = "Homework"
            , fluidRow(
              column(width = 12
-                   , box(width = 12, status = "primary"
-                      , rHandsontableOutput(NS(id,"homework_grades"))
-                   )
+                    , box(width = 12, status = "primary"
+                          , rHandsontableOutput(NS(id,"homework_grades"))
+                    )
              )
              , column(width = 12
-              , box(width = 12, status = "primary"
-                , echarts4rOutput(NS(id,"homework_grade_bar"), height = "300px")
-              )
+                      , box(width = 12, status = "primary"
+                            , echarts4rOutput(NS(id,"homework_grade_bar"), height = "300px")
+                      )
              )
            )
   )
@@ -76,12 +76,18 @@ review_UI <- function(id) {
   tabPanel(title = "Reviews"
            , fluidRow(
              column(width = 12
-              , box(width = 12, title = "Review Grades"
-                  , rHandsontableOutput(NS(id,"review_grades"))
-              )
-              , box(width = 12, title = "Topic Proficiency"
-                    , rHandsontableOutput(NS(id,"topic_proficiency"))
-              )
+                    , box(width = 12, status = "primary", title = "Review Grades"
+                          , rHandsontableOutput(NS(id,"review_grades"))
+                    )
+                    , box(width = 12, status = "primary", title = "Topic Proficiency"
+                          , column(width = 3
+                                   , "Topic Attempts"
+                                   , rHandsontableOutput(NS(id,"topic_proficiency"))
+                          )
+                          , column(width = 9
+                                   , echarts4rOutput(NS(id,"topic_proficiency_bar"), height = "250px")
+                          )
+                    )
              )
            )
   )
@@ -111,8 +117,8 @@ review_server <- function(id, r){
     })
     
     
-    output$topic_proficiency <- renderRHandsontable({
-      req(r$is$auth)
+    
+    df_remaining_attempts <- reactive({
       # Topics Completed
       df_overall_grades <- df_filtered_review_to_topic() %>% 
         group_by(grade) %>%
@@ -154,18 +160,69 @@ review_server <- function(id, r){
       
       df_remaining_attempts <- df_remaining_attempts %>%
         mutate(remaining = total - attempts)
-       
-        
-      df_remaining_attempts <- base::merge(df_remaining_attempts, r$df_topic, by = "topic_id", all.y = TRUE)
       
-      df <- df_remaining_attempts %>%
-        mutate(Topic = description, `Previous Attempts` = as.integer(attempts), `Total Attempts` = as.integer(total), `Remaining Attempts` = as.integer(remaining)) %>%
-        select(Topic, `Previous Attempts`, `Total Attempts`, `Remaining Attempts`)
-      rhandsontable(df
-                    , rowHeaders = NULL
-                    , stretchH = 'all') %>%
+      base::merge(df_remaining_attempts, r$df_topic, by = "topic_id", all.y = TRUE)
+      
+      return (df_remaining_attempts)
+      
+    }) 
+    
+    
+    output$topic_proficiency <- renderRHandsontable({
+      req(r$is$auth)
+      
+      df <- df_remaining_attempts() %>%
+        mutate(
+          Topic = topic_id, `Previous Attempts` = as.integer(attempts)
+          , `Total Attempts` = as.integer(total)
+          , `Remaining Attempts` = as.integer(remaining)
+        ) %>%
+        select(
+          Topic
+          , Previous = `Previous Attempts`
+          , Remaining = `Remaining Attempts`
+          , Total =  `Total Attempts`
+          )
+      rhandsontable(
+        df
+        , rowHeaders = NULL
+      ) %>%
         hot_cols(readOnly = T)
     })
+    
+    output$topic_proficiency_bar <- renderEcharts4r({
+      req(r$is$auth)
+      
+      df <- df_remaining_attempts()
+      
+      df <- df %>%
+        mutate(Topic = topic_id
+               , `Previous Attempts` = as.integer(attempts)
+               , `Total Attempts` = as.integer(total)
+               , `Remaining Attempts` = as.integer(remaining)) %>%
+        select(Topic
+               , prev = `Previous Attempts` 
+               , total = `Total Attempts`
+               , remain = `Remaining Attempts`)
+      
+      df %>%
+        e_charts(Topic) %>%
+        e_bar(prev
+              , stack = "Topics"
+              , color = "#c41230"
+              , barWidth = "50%"
+              , name = "Previous Attempts") %>%
+        e_bar(remain
+              , stack = "Topics"
+              , color = "#222D32"
+              , barWidth = "50%"
+              , name = "Remaining Attempts") %>%
+        e_legend(bottom = 'bottom') %>%
+        e_grid(top = "15%", left= "10%", bottom = "20%", right = "5%")
+      
+      
+    })
+    
     
     output$review_grades <- renderRHandsontable({
       req(r$is$auth)
