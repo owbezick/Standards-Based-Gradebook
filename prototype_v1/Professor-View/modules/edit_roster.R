@@ -96,55 +96,6 @@ edit_roster_button_Server <- function(id, r){
         , Email = r$df_student$email)
       )
     })
-    
-    # Remove Student Save ----
-    observeEvent(input$removeSave, {
-      ls_removed_names <- input$removeFromRoster
-      
-  
-      if(length(ls_removed_names) == 0) {
-        showNotification("No students selected to remove.")
-        removeModal()
-      }else{
-        # student sheet
-        df_students <- r$df_student
-        df_new_students <- subset(df_students, !(name %in% ls_removed_names))
-        
-        sheet_write(
-          ss = "https://docs.google.com/spreadsheets/d/1xIC4pGhnnodwxqopHa45KRSHIVcOTxFSfJSEGPbQH20/editgid=2102408290"
-          , data = df_new_students
-          , sheet = "student"
-        ) 
-        
-        # homework sheet 
-        homework_table <- r$df_homework_table
-        temp <- subset(homework_table, !(`Student Name` %in% ls_removed_names))
-        r$df_homework_table <- temp
-        sheet_write(
-          ss = "https://docs.google.com/spreadsheets/d/1xIC4pGhnnodwxqopHa45KRSHIVcOTxFSfJSEGPbQH20/editgid=2102408290"
-          , data = temp
-          , sheet = "homework_table"
-        ) 
-        
-        # review sheet
-        df_review_to_topic <- r$df_review_to_topic %>%
-          left_join(r$df_student) %>%
-          select(-c(email))
-        
-        temp <- subset(df_review_to_topic, !(name %in% ls_removed_names)) %>%
-          select(-c(name))
-        
-        r$df_review_to_topic <- temp
-        sheet_write(
-          ss = "https://docs.google.com/spreadsheets/d/1xIC4pGhnnodwxqopHa45KRSHIVcOTxFSfJSEGPbQH20/editgid=2102408290"
-          , data = temp
-          , sheet = "review_to_topic"
-        ) 
-        showNotification("Saved to remote.")
-        removeModal()
-      }
-    })
-    
     # Add Student Save ----
     observeEvent(input$addSave, {
       df_prev_student <- r$df_student
@@ -166,29 +117,87 @@ edit_roster_button_Server <- function(id, r){
         new_df <- rbind(r$df_student, new_row)
         r$df_student <- new_df
         
-        # homework_table sheet
-        homework_table <- r$df_homework_table
-        new_row <- c(input$addName, rep(NA, ncol(r$df_homework_table) - 1))
-        temp <-rbind(homework_table, new_row)
+        # Save in homework_grades Sheet ----
+        homework_grades <- r$df_homework_grades
+        
+        # catch for adding students when there are no homeworks
+        if (ncol(homework_grades) == 1){
+          new_row <- tibble("Student Name" = input$addName)
+        } else{
+          new_row <- c(input$addName, rep(NA, ncol(r$df_homework_grades) - 1))
+        }
+        temp <-rbind(homework_grades, new_row)
+        r$df_homework_grades <- temp
+        sheet_write(
+          ss = "https://docs.google.com/spreadsheets/d/1xIC4pGhnnodwxqopHa45KRSHIVcOTxFSfJSEGPbQH20/editgid=2102408290"
+          , data = temp
+          , sheet = "homework_grades"
+        ) 
+        
+        # Save to review_to_topic sheet ----
+        # catch for adding students when there are no reviews
+        if (nrow(r$df_review_to_topic) != 0){
+          a_student_id <-  r$df_student[1,1] %>%
+            pull()
+          
+          review_to_topic <- r$df_review_to_topic
+          new_data <- review_to_topic %>%
+            filter(student_id == a_student_id) %>%
+            mutate(student_id = input$addID
+                   , grade = "NA")
+          
+          temp <- rbind(review_to_topic, new_data) %>%
+            arrange(review_id, topic_id)
+          
+          r$df_review_to_topic <- temp
+          sheet_write(
+            ss = "https://docs.google.com/spreadsheets/d/1xIC4pGhnnodwxqopHa45KRSHIVcOTxFSfJSEGPbQH20/editgid=2102408290"
+            , data = temp
+            , sheet = "review_to_topic"
+          ) 
+        }
+        
+        showNotification("Saved to remote.")
+        removeModal()
+      }
+    })
+    
+    # Remove Student Save ----
+    observeEvent(input$removeSave, {
+      ls_removed_names <- input$removeFromRoster
+      
+  
+      if(length(ls_removed_names) == 0) {
+        showNotification("No students selected to remove.")
+        removeModal()
+      }else{
+        # student sheet
+        df_students <- r$df_student
+        df_new_students <- subset(df_students, !(name %in% ls_removed_names))
+        
+        sheet_write(
+          ss = "https://docs.google.com/spreadsheets/d/1xIC4pGhnnodwxqopHa45KRSHIVcOTxFSfJSEGPbQH20/editgid=2102408290"
+          , data = df_new_students
+          , sheet = "student"
+        ) 
+        
+        # homework sheet 
+        df_homework_grades <- r$df_homework_grades
+        temp <- subset(df_homework_grades, !(`Student Name` %in% ls_removed_names))
         r$df_homework_table <- temp
         sheet_write(
           ss = "https://docs.google.com/spreadsheets/d/1xIC4pGhnnodwxqopHa45KRSHIVcOTxFSfJSEGPbQH20/editgid=2102408290"
           , data = temp
-          , sheet = "homework_table"
+          , sheet = "df_homework_grades"
         ) 
-      
-        # review to topic 
-        a_student_id <-  r$df_student[1,1] %>%
-          pull()
         
-        review_to_topic <- r$df_review_to_topic
-        new_data <- review_to_topic %>%
-          filter(student_id == a_student_id) %>%
-          mutate(student_id = input$addID
-                 , grade = "NA")
+        # review sheet
+        df_review_to_topic <- r$df_review_to_topic %>%
+          left_join(r$df_student) %>%
+          select(-c(email))
         
-        temp <- rbind(review_to_topic, new_data) %>%
-          arrange(review_id, topic_id)
+        temp <- subset(df_review_to_topic, !(name %in% ls_removed_names)) %>%
+          select(-c(name))
         
         r$df_review_to_topic <- temp
         sheet_write(
