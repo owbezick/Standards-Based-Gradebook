@@ -47,7 +47,7 @@ read_all_database_sheets <- function(sheets){
   data
 }
 
-ls_sheets <- c("student", "homework", "homework_grade", "course_info", "review_to_topic", "topic", "review", "review_table", "homework_table")
+ls_sheets <- c("student", "course_info", "homework", "topic", "review", "review_table", "homework_grades", "review_grades")
 
 #ls_all_data <- read_all_database_sheets(ls_sheets)
 
@@ -67,11 +67,11 @@ r$df_student <- ls_all_data$student
 
 r$df_homework <- ls_all_data$homework
 
-r$df_homework_grade <- ls_all_data$homework_grade
+r$df_homework_grades <- ls_all_data$homework_grade
 
 r$df_course_info <- ls_all_data$course_info
 
-r$df_review_to_topic <- ls_all_data$review_to_topic
+r$df_review_to_topic <- ls_all_data$review_grades
 
 r$df_topic <- ls_all_data$topic
 
@@ -79,6 +79,5 @@ r$df_review <- ls_all_data$review
 
 r$df_review_table <-  ls_all_data$review_table
 
-r$df_homework_table <- ls_all_data$homework_table
 #default:
 #database: "template_gradebook_database"
