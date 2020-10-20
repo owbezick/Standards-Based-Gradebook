@@ -4,32 +4,33 @@ add_topic_button_UI <- function(id) {
   showModal(
     modalDialog(title = "Add Topic", size = "m"
                 , fluidRow(
-                  column(width = 2
+                  column(width = 3
                          , tags$b("Topic Number: ")
                          , uiOutput(NS(id, "topic_input"))
                   )
-                  , column(width = 10
+                  , column(width = 9
                            , tags$b("Topic Description: ")
                            , textAreaInput(inputId = NS(id, "topicDescription")
-                                           , label = NULL)
+                                           , label = NULL
+                           )
                   ))
-                  , footer = fluidRow(
-                    column(width = 6
+                , footer = fluidRow(
+                  column(width = 6
+                         , actionBttn(
+                           inputId = NS(id,"save")
+                           , label = "Save Topic"
+                           , style = "material-flat"
+                           , block = T
+                         )
+                  )
+                  , column(width = 6
                            , actionBttn(
-                             inputId = NS(id,"save")
-                             , label = "Save Topic"
+                             inputId = NS(id, "close")
+                             , label = "Close"
                              , style = "material-flat"
                              , block = T
                            )
-                    )
-                    , column(width = 6
-                             , actionBttn(
-                               inputId = NS(id, "close")
-                               , label = "Close"
-                               , style = "material-flat"
-                               , block = T
-                             )
-                    )
+                  )
                 )
     )
   )
@@ -37,11 +38,11 @@ add_topic_button_UI <- function(id) {
 
 add_topic_button_Server <- function(id, r){
   moduleServer(id, function(input,output,session){
-  
+    
     output$topic_input <- renderUI({
       numericInput(inputId = NS(id, "topicNumber")
-                     , label = NULL
-                     , value =  max(r$df_topic$topic_id) + 1)
+                   , label = NULL
+                   , value =  max(r$df_topic$topic_id) + 1)
     })
     
     observeEvent(input$save, {
@@ -61,7 +62,7 @@ add_topic_button_Server <- function(id, r){
           , data = new_row
           , sheet = "topic"
         )
-        # Update df_review_table
+        # Save & refresh data ----
         df_review_table <- r$df_review_table
         new_column <- c(rep(NA, nrow(df_review_table)))
         new_column_name = paste("Topic", input$topicNumber)
@@ -73,16 +74,27 @@ add_topic_button_Server <- function(id, r){
           , data = df_review_table
           , sheet = "review_table"
         )
-        # Update reactive 
         new_df <- rbind(df_topic, new_row)
         r$df_topic <- new_df
         r$df_review_table <- df_review_table
         
-        removeModal()
+        # Update Inputs ----
+        updateTextAreaInput(
+          session = session
+          , inputId = "topicDescription"
+          , label = NULL
+          , value = "New Description"
+        )
+        
+        updateNumericInput(session = session
+                           , inputId = "topicNumber"
+                           , label = NULL
+                           , value =  max(r$df_topic$topic_id) + 1)
+        
         showNotification("Saved to remote.")
       }
-
-
+      
+      
       
       
       
