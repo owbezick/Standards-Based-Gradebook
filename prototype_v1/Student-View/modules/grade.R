@@ -63,8 +63,6 @@ homework_server <- function(id, r){
       req(r$is$auth)
       
       df_hw <- df_filtered_homework_grades()
-      
-      # TODO: Conditional formatting for cells that are actually NA vs character of NA ----
       rhandsontable(df_hw
                     , rowHeaders = NULL
                     , stretchH = 'all') 
@@ -218,7 +216,8 @@ review_server <- function(id, r){
               , barWidth = "50%"
               , name = "Remaining Attempts") %>%
         e_legend(bottom = 'bottom') %>%
-        e_grid(top = "15%", left= "10%", bottom = "20%", right = "5%")
+        e_grid(top = "15%", left= "10%", bottom = "20%", right = "5%") %>%
+        e_tooltip()
       
       
     })
@@ -235,7 +234,7 @@ review_server <- function(id, r){
                     , names_from = topic_id
                     , values_from = grade) %>%
         rename(`Review ID` = review_id)
-      # TODO: Conditional formatting for cells that are actually NA vs character of NA ----
+      
       rhandsontable(df_review_topic
                     , rowHeaders = NULL
                     , stretchH = 'all') %>%

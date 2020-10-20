@@ -9,7 +9,7 @@ homework_UI <- function(id) {
              )
              , br()
              , box(width = 12, status = "primary"
-                   , title = "Average Homework Grade"
+                   , title = textOutput(NS(id, "title"))
                    , echarts4rOutput(NS(id,'homework_bar'))
              )
            )
@@ -18,10 +18,29 @@ homework_UI <- function(id) {
 
 homework_server <- function(id, r){
   moduleServer(id, function(input, output, session){
+    # Average Homework ----
+    avg_homework_grade <- reactive({
+      df <- r$df_homework_table %>%
+        select(-c(`Student Name`)) %>%
+        na.omit()
+      
+      
+      cols <- c(1:ncol(df))
+      df[,cols] <- lapply(df[,cols], as.double)
+      
+      round(mean(as.matrix(df)))
+      
+    })
+    
+    output$title <- renderText(
+      paste0("Average Homework Grade: ", avg_homework_grade(), "%")
+    )
     # Homework Bar Chart ----
     output$homework_bar <- renderEcharts4r({
+      #browser()
       df <- r$df_homework_table %>%
-        select(-c(`Student Name`))
+        select(-c(`Student Name`)) %>%
+        na.omit()
       
       cols <- c(1:ncol(df))
       df[,cols] <- lapply(df[,cols], as.double)
@@ -38,21 +57,20 @@ homework_server <- function(id, r){
       
       df$id <- rownames(df)
       
-      df %>%
+      chart <- df %>%
         e_chart(id) %>%
         e_bar(average, barWidth = "50%") %>%
         e_legend(show = F) %>%
         e_y_axis(formatter = e_axis_formatter("percent", digits = 2)) %>%
+        e_color(color = "#c41230") %>%
+        e_grid(left = "15%", right = "5%", top = "10%", bottom = "10%") %>%
         e_labels(position = "top", formatter  = htmlwidgets::JS("
                                     function(params){
                                       return(parseFloat(params.value[1]*100).toFixed(2) +'%');
                                     }
-                                    ")
-        ) %>%
-        #e_color(color = rgb(196, 18, 48, alpha = 230, max = 255)) %>%
-        e_color(color = "#c41230") %>%
-        e_grid(left = "15%", right = "5%", top = "10%", bottom = "10%")
-      
+                                    ")) %>%
+        e_tooltip()
+      #e_color(color = rgb(196, 18, 48, alpha = 230, max = 255)) %>%
     })
     
     # Homework Table ----
@@ -61,7 +79,7 @@ homework_server <- function(id, r){
       rhandsontable(df_homework_table
                     , rowHeaders = NULL
                     , stretchH = 'all') %>%
-        hot_heatmap() 
+        hot_heatmap(cols = c(2:ncol(df_homework_table)))
     })  
     
     # Saving ----
@@ -273,7 +291,7 @@ review_server <- function(id, r){
           }
 
         }")
-
+      
     })  
     
     # Saving
