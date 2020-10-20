@@ -1,18 +1,18 @@
 homework_UI <- function(id) {
   tabPanel(title = "Homework"
            , fluidRow(
-                 box(width = 12, status = "primary"
-                       , title = "Homework Grades"
-                       , rHandsontableOutput(NS(id, "homework_table"))
-                       , br()
-                       , actionBttn(NS(id, "save"), "Save", style = "material-flat", block = T)
-                 )
+             box(width = 12, status = "primary"
+                 , title = "Homework Grades"
+                 , rHandsontableOutput(NS(id, "homework_table"))
                  , br()
-                 , box(width = 12, status = "primary"
-                       , title = "Average Homework Grade"
-                       , echarts4rOutput(NS(id,'homework_bar'))
-                 )
+                 , actionBttn(NS(id, "save"), "Save", style = "material-flat", block = T)
              )
+             , br()
+             , box(width = 12, status = "primary"
+                   , title = "Average Homework Grade"
+                   , echarts4rOutput(NS(id,'homework_bar'))
+             )
+           )
   )
 }
 
@@ -37,7 +37,7 @@ homework_server <- function(id, r){
         select(average, chart = Chart)
       
       df$id <- rownames(df)
-        
+      
       df %>%
         e_chart(id) %>%
         e_bar(average, barWidth = "50%") %>%
@@ -47,7 +47,8 @@ homework_server <- function(id, r){
                                     function(params){
                                       return(parseFloat(params.value[1]*100).toFixed(2) +'%');
                                     }
-                                    ")) %>%
+                                    ")
+        ) %>%
         #e_color(color = rgb(196, 18, 48, alpha = 230, max = 255)) %>%
         e_color(color = "#c41230") %>%
         e_grid(left = "15%", right = "5%", top = "10%", bottom = "10%")
@@ -84,18 +85,18 @@ review_UI <- function(id) {
                                , box(width = 12, status = "primary"
                                      , title = "Review Grade by Review"
                                      , uiOutput(NS(id, "review_picker"))
-                                     , rHandsontableOutput(NS(id, "review_table_student"))
-                                    
+                                     , rHandsontableOutput(NS(id, "review_table_review"))
+                                     
                                )
-                               , actionBttn(NS(id, "saveStudent"), "Save", style = "material-flat", block = T)
+                               , actionBttn(NS(id, "saveReview"), "Save", style = "material-flat", block = T)
                     )
                     , tabPanel(title = "By Student"
                                , box(width = 12, status = "primary"
                                      , title = "Review Grade by Student"
                                      , uiOutput(NS(id, "student_picker"))
-                                     , rHandsontableOutput(NS(id, "review_table_topic"))
+                                     , rHandsontableOutput(NS(id, "review_table_student"))
                                )
-                               , actionBttn(NS(id, "saveTopic"), "Save", style = "material-flat", block = T)
+                               , actionBttn(NS(id, "saveStudent"), "Save", style = "material-flat", block = T)
                     )
              )
            )
@@ -104,6 +105,7 @@ review_UI <- function(id) {
 
 review_server <- function(id, r){
   moduleServer(id, function(input, output, session){
+    # Filters ----
     ls_students <- reactive({
       students <- r$df_student %>%
         select(name) %>%
@@ -130,10 +132,9 @@ review_server <- function(id, r){
       )
     })
     
-    
-    #TODO: Think about filtering by review? ----
-    output$review_table_student <- renderRHandsontable({
-      grade_types <- c("NA", "NC", "Fluent", "Getting There", "Needs Work")
+    # Review by Review ----
+    output$review_table_review <- renderRHandsontable({
+      grade_types <- c("NA", "Not Completed", "Fluent", "Progressing", "Needs Work")
       df_review_to_topic <- r$df_review_to_topic
       df_student <- r$df_student
       df_review <- df_review_to_topic %>%
@@ -141,8 +142,7 @@ review_server <- function(id, r){
         pivot_wider(id_cols = c(review_id, topic_id), names_from = name, values_from = grade) %>%
         rename(`Review ID` = review_id, `Topic ID` = topic_id)
       
-      #browser()
-      # Filter by picker input
+      # browser()
       if (input$review_review_input == "All"){
         df_review <- df_review %>%
           group_by(`Review ID`) %>%
@@ -162,26 +162,34 @@ review_server <- function(id, r){
     })  
     
     # Saving
-    observeEvent(input$saveStudent,{
-      df_student <- r$df_student
-      df_review_to_topic <- r$df_review_to_topic
-      df <- hot_to_r(input$review_table_student)
-      df_temp <- df %>%
-        pivot_longer(cols = c(3:ncol(df))) %>%
-        left_join(df_student, by = "name") %>%
-        select(review_id = `Review ID`, topic_id = `Topic ID`, student_id, grade = value)
-      r$df_review_to_topic <- df_temp
-      sheet_write(
-        ss =  "https://docs.google.com/spreadsheets/d/1xIC4pGhnnodwxqopHa45KRSHIVcOTxFSfJSEGPbQH20/edit#gid=2102408290"
-        , data = df_temp
-        , sheet = "review_to_topic"
-      )
-      showNotification("Saved to remote.")
+    observeEvent(input$saveReview,{
+      browser()
+      if (input$review_review_input == "All"){
+        df_student <- r$df_student
+        df_review_to_topic <- r$df_review_to_topic
+        df <- hot_to_r(input$review_table_review)
+        df_temp <- df %>%
+          pivot_longer(cols = c(3:ncol(df))) %>%
+          left_join(df_student, by = "name") %>%
+          select(review_id = `Review ID`, topic_id = `Topic ID`, student_id, grade = value)
+        r$df_review_to_topic <- df_temp
+        sheet_write(
+          ss =  "https://docs.google.com/spreadsheets/d/1xIC4pGhnnodwxqopHa45KRSHIVcOTxFSfJSEGPbQH20/edit#gid=2102408290"
+          , data = df_temp
+          , sheet = "review_to_topic"
+        )
+        showNotification("Saved to remote.")
+      }
+      else{
+        df_review <- df_review %>%
+          filter(`Review ID` == input$review_review_input)
+      }
     })
     
-    output$review_table_topic <- renderRHandsontable({
+    # Review by Student ----
+    output$review_table_student <- renderRHandsontable({
       req(input$review_student_input)
-      grade_types <- c("NA", "Fluent", "Getting There", "Needs Work")
+      grade_types <- c("NA", "Not Completed", "Fluent", "Progressing", "Needs Work")
       df_review_to_topic <- r$df_review_to_topic
       df_student <- r$df_student
       df_review_topic <- df_review_to_topic %>%
@@ -191,7 +199,6 @@ review_server <- function(id, r){
                     , values_from = grade) %>%
         rename(`Review ID` = review_id, `Student Name` = name)
       
-      # Filter by picker input
       if (input$review_student_input == "All"){
         df_review_topic <- df_review_topic %>%
           group_by(`Student Name`) %>%
@@ -202,9 +209,6 @@ review_server <- function(id, r){
           filter(`Student Name` == input$review_student_input)
       }
       
-      # TODO: Conditional formatting for cells that are actually NA vs character of NA ----
-      # Need actual NA cells to not be editable
-      
       rhandsontable(df_review_topic
                     , rowHeaders = NULL
                     , stretchH = 'all') %>%
@@ -214,14 +218,22 @@ review_server <- function(id, r){
     })  
     
     # Saving
-    observeEvent(input$saveTopic,{
-      df_student <- r$df_student
-      df_review_to_topic <- r$df_review_to_topic
-      df <- hot_to_r(input$review_table_student)
-      df_temp <- df %>%
-        pivot_longer(cols = c(3:ncol(df))) %>%
-        left_join(df_student, by = "name") %>%
-        select(review_id = `Review ID`, topic_id = `Topic ID`, student_id, grade = value)
+    observeEvent(input$saveStudent,{
+      if (input$review_student_input == "All"){
+        df_student <- r$df_student
+        df_review_to_topic <- r$df_review_to_topic
+        df <- hot_to_r(input$review_table_review)
+        df_temp <- df %>%
+          pivot_longer(cols = c(3:ncol(df))) %>%
+          left_join(df_student, by = "name") %>%
+          select(review_id = `Review ID`, topic_id = `Topic ID`, student_id, grade = value)
+        
+      }
+      else{
+        df_review_topic <- df_review_topic %>%
+          filter(`Student Name` == input$review_student_input)
+      }
+      
       r$df_review_to_topic <- df_temp
       sheet_write(
         ss =  "https://docs.google.com/spreadsheets/d/1xIC4pGhnnodwxqopHa45KRSHIVcOTxFSfJSEGPbQH20/edit#gid=2102408290"
