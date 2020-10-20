@@ -83,19 +83,21 @@ review_UI <- function(id) {
   tabPanel(title = "Reviews"
            , fluidRow(
              tabBox(width = 12
+                    # Review by Review ----
                     , tabPanel(title = "By Review"
                                , box(width = 12, status = "primary"
                                      , title = "Review Grade by Review"
-                                     , uiOutput(NS(id, "review_picker"))
+                                     #, uiOutput(NS(id, "review_picker"))
                                      , rHandsontableOutput(NS(id, "review_table_review"))
                                      
                                )
                                , actionBttn(NS(id, "saveReview"), "Save", style = "material-flat", block = T)
                     )
+                    # Review by Student ----
                     , tabPanel(title = "By Student"
                                , box(width = 12, status = "primary"
                                      , title = "Review Grade by Student"
-                                     , uiOutput(NS(id, "student_picker"))
+                                     #, uiOutput(NS(id, "student_picker"))
                                      , rHandsontableOutput(NS(id, "review_table_student"))
                                )
                                , actionBttn(NS(id, "saveStudent"), "Save", style = "material-flat", block = T)
@@ -108,35 +110,35 @@ review_UI <- function(id) {
 review_server <- function(id, r){
   moduleServer(id, function(input, output, session){
     # Filters ----
-    ls_students <- reactive({
-      students <- r$df_student %>%
-        select(name) %>%
-        pull()
-    })
-    
-    ls_reviews <- reactive({
-      students <- r$df_review %>%
-        select(id) %>%
-        pull()
-    })
-    
-    output$student_picker <- renderUI({
-      pickerInput(inputId = NS(id, "review_student_input")
-                  , label = "Filter by Student"
-                  , choices = c("All", ls_students())
-      )
-    })
-    
-    output$review_picker <- renderUI({
-      pickerInput(inputId = NS(id, "review_review_input")
-                  , label = "Filter by Review"
-                  , choices = c("All", ls_reviews())
-      )
-    })
+    # ls_students <- reactive({
+    #   students <- r$df_student %>%
+    #     select(name) %>%
+    #     pull()
+    # })
+    # 
+    # ls_reviews <- reactive({
+    #   students <- r$df_review %>%
+    #     select(id) %>%
+    #     pull()
+    # })
+    # 
+    # output$student_picker <- renderUI({
+    #   pickerInput(inputId = NS(id, "review_student_input")
+    #               , label = "Filter by Student"
+    #               , choices = c("All", ls_students())
+    #   )
+    # })
+    # 
+    # output$review_picker <- renderUI({
+    #   pickerInput(inputId = NS(id, "review_review_input")
+    #               , label = "Filter by Review"
+    #               , choices = c("All", ls_reviews())
+    #   )
+    # })
     
     # Review by Review ----
     output$review_table_review <- renderRHandsontable({
-      req(input$review_review_input)
+      #req(input$review_review_input)
       grade_types <- c("NA", "Not Completed", "Fluent", "Progressing", "Needs Work")
       df_review_to_topic <- r$df_review_to_topic
       df_student <- r$df_student
@@ -146,40 +148,66 @@ review_server <- function(id, r){
         rename(`Review ID` = review_id, `Topic ID` = topic_id)
       
       # browser()
-      if (input$review_review_input == "All"){
-        df_review <- df_review %>%
-          group_by(`Review ID`) %>%
-          arrange(`Review ID`)
-      }
-      else{
-        df_review <- df_review %>%
-          filter(`Review ID` == input$review_review_input)
-      }
+      # if (input$review_review_input == "All"){
+      #   df_review <- df_review %>%
+      #     group_by(`Review ID`) %>%
+      #     arrange(`Review ID`)
+      # }
+      # else{
+      #   df_review <- df_review %>%
+      #     filter(`Review ID` == input$review_review_input)
+      # }
+      df_review <- df_review %>%
+        group_by(`Review ID`) %>%
+        arrange(`Review ID`)
       
       rhandsontable(df_review
                     , rowHeaders = NULL
                     , stretchH = 'all') %>%
         hot_col(col = "Review ID", readOnly = T) %>%
         hot_col(col = "Topic ID", readOnly = T) %>%
-        hot_cols(type = "dropdown", source = grade_types)
+        hot_cols(type = "dropdown", source = grade_types)%>%
+        hot_cols(renderer = "
+        function(instance, td, row, col, prop, value, cellProperties) {
+          Handsontable.renderers.TextRenderer.apply(this, arguments);
+           if (value == 'Fluent'){
+          td.style.background = 'lightgreen';
+          } 
+          else if (value == 'Progressing'){
+          td.style.background = 'lightyellow';
+          } else if (value == 'Needs Work'){
+          td.style.background = 'pink';
+          } else if (value == 'Not Completed'){
+          td.style.background = 'lightgrey';
+          } 
+        }
+          ")
     })  
     
     # Saving
     observeEvent(input$saveReview,{
       #browser()
-      if (input$review_review_input == "All"){
-        df_student <- r$df_student
-        df_review_to_topic <- r$df_review_to_topic
-        df_hot <- hot_to_r(input$review_table_review)
-        df_temp <- df_hot %>%
-          pivot_longer(cols = c(3:ncol(df_hot))) %>%
-          left_join(df_student, by = "name") %>%
-          select(review_id = `Review ID`, topic_id = `Topic ID`, student_id, grade = value)
-      }
-      else{
-        df_review <- df_review %>%
-          filter(`Review ID` == input$review_review_input)
-      }
+      # if (input$review_review_input == "All"){
+      #   df_student <- r$df_student
+      #   df_review_to_topic <- r$df_review_to_topic
+      #   df_hot <- hot_to_r(input$review_table_review)
+      #   df_temp <- df_hot %>%
+      #     pivot_longer(cols = c(3:ncol(df_hot))) %>%
+      #     left_join(df_student, by = "name") %>%
+      #     select(review_id = `Review ID`, topic_id = `Topic ID`, student_id, grade = value)
+      # }
+      # else{
+      #   df_review <- df_review %>%
+      #     filter(`Review ID` == input$review_review_input)
+      # }
+      # 
+      df_student <- r$df_student
+      df_review_to_topic <- r$df_review_to_topic
+      df_hot <- hot_to_r(input$review_table_review)
+      df_temp <- df_hot %>%
+        pivot_longer(cols = c(3:ncol(df_hot))) %>%
+        left_join(df_student, by = "name") %>%
+        select(review_id = `Review ID`, topic_id = `Topic ID`, student_id, grade = value)
       r$df_review_to_topic <- df_temp
       sheet_write(
         ss =  "https://docs.google.com/spreadsheets/d/1xIC4pGhnnodwxqopHa45KRSHIVcOTxFSfJSEGPbQH20/edit#gid=2102408290"
@@ -191,7 +219,8 @@ review_server <- function(id, r){
     
     # Review by Student ----
     output$review_table_student <- renderRHandsontable({
-      req(input$review_student_input)
+      # browser()
+      #req(input$review_student_input)
       grade_types <- c("NA", "Not Completed", "Fluent", "Progressing", "Needs Work")
       df_review_to_topic <- r$df_review_to_topic
       df_student <- r$df_student
@@ -202,22 +231,49 @@ review_server <- function(id, r){
                     , values_from = grade) %>%
         rename(`Review ID` = review_id, `Student Name` = name)
       
-      if (input$review_student_input == "All"){
-        df_review_topic <- df_review_topic %>%
-          group_by(`Student Name`) %>%
-          arrange(`Student Name`)
-      }
-      else{
-        df_review_topic <- df_review_topic %>%
-          filter(`Student Name` == input$review_student_input)
-      }
+      # if (input$review_student_input == "All"){
+      #   df_review_topic <- df_review_topic %>%
+      #     group_by(`Student Name`) %>%
+      #     arrange(`Student Name`)
+      # }
+      # else{
+      #   df_review_topic <- df_review_topic %>%
+      #     filter(`Student Name` == input$review_student_input)
+      # }
+      df_review_topic <- df_review_topic %>%
+        group_by(`Student Name`) %>%
+        arrange(`Student Name`) 
       
       rhandsontable(df_review_topic
                     , rowHeaders = NULL
-                    , stretchH = 'all') %>%
+                    , stretchH = 'all'
+                    , options = c(filters = T)) %>%
         hot_col(col = "Review ID", readOnly = T, type = "character") %>%
         hot_col(col = "Student Name", readOnly = T, type = "character") %>%
-        hot_cols(type = "dropdown", source = grade_types)
+        hot_cols(type = "dropdown", source = grade_types)  %>%
+        hot_cols(renderer = "
+        function(instance, td, row, col, prop, value, cellProperties) {
+          Handsontable.renderers.TextRenderer.apply(this, arguments);
+          if (value == 'Fluent'){
+          td.style.background = 'lightgreen';
+          } 
+          else if (value == 'Progressing'){
+          td.style.background = 'lightyellow';
+          } else if (value == 'Needs Work'){
+          td.style.background = 'pink';
+          } else if (value == 'Not Completed'){
+          td.style.background = 'lightgrey';
+          } 
+          
+          if (col > 1){
+                 if (!isNaN(value)) {
+          td.style.background = 'grey';
+          cellProperties.readOnly = true;
+          }
+          }
+
+        }")
+
     })  
     
     # Saving
