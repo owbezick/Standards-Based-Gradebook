@@ -20,7 +20,7 @@ homework_server <- function(id, r){
   moduleServer(id, function(input, output, session){
     # Average Homework ----
     avg_homework_grade <- reactive({
-      df <- r$df_homework_table %>%
+      df <- r$df_homework_grades %>%
         select(-c(`Student Name`)) %>%
         na.omit()
       
@@ -37,8 +37,7 @@ homework_server <- function(id, r){
     )
     # Homework Bar Chart ----
     output$homework_bar <- renderEcharts4r({
-      #browser()
-      df <- r$df_homework_table %>%
+      df <- r$df_homework_grades %>%
         select(-c(`Student Name`)) %>%
         na.omit()
       
@@ -75,17 +74,17 @@ homework_server <- function(id, r){
     
     # Homework Table ----
     output$homework_table <- renderRHandsontable({
-      df_homework_table <- r$df_homework_table 
-      rhandsontable(df_homework_table
+      df_homework_grades <- r$df_homework_grades 
+      rhandsontable(df_homework_grades
                     , rowHeaders = NULL
                     , stretchH = 'all') %>%
-        hot_heatmap(cols = c(2:ncol(df_homework_table)))
+        hot_heatmap(cols = c(2:ncol(df_homework_grades)))
     })  
     
     # Saving ----
     observeEvent(input$save,{
       df_hot <- hot_to_r(input$homework_table)
-      r$df_homework_table  <- df_hot
+      r$df_homework_grades  <- df_hot
       sheet_write(
         ss =  "https://docs.google.com/spreadsheets/d/1xIC4pGhnnodwxqopHa45KRSHIVcOTxFSfJSEGPbQH20/edit#gid=2102408290"
         , data = df_hot

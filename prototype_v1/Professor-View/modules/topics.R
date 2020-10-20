@@ -66,13 +66,23 @@ topics_server <- function(id, r){
     })
     
     observeEvent(input$save, {
+      browser()
       df <- hot_to_r(input$topicTable)
+      # Review Table
       r$df_review_table <- df
       sheet_write(
         ss =  "https://docs.google.com/spreadsheets/d/1xIC4pGhnnodwxqopHa45KRSHIVcOTxFSfJSEGPbQH20/edit#gid=2102408290"
         , data = df
         , sheet = "review_table"
       )
+      # Review to Topic
+      temp <- df %>%
+        pivot_longer(cols = c(4:ncol(df))) %>%
+        na.omit() %>%
+        # apply
+        mutate(topic_id = strsplit(name, split = " ")[[1]][2]) %>%
+        select(review_id = `Review ID`, topic_id)
+      # take review id and topic ids
       showNotification("Saved to remote.")
     })
     
