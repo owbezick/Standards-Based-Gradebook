@@ -11,7 +11,7 @@ library(lubridate)
 library(openxlsx)
 library(tidyverse)
 library(readxl)
-
+library(rhandsontable)
 # Viz
 library(echarts4r)
 library(timevis)

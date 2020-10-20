@@ -2,12 +2,14 @@ homework_UI <- function(id) {
   tabPanel(title = "Homework"
            , fluidRow(
              column(width = 12
-                    , box(width = 12, status = "primary"
+                    , box(width = 12
+                          , status = "primary"
+                          , title = "Homework Grades"
                           , rHandsontableOutput(NS(id,"homework_grades"))
                     )
              )
              , column(width = 12
-                      , box(width = 12, status = "primary"
+                      , box(width = 12, status = "primary", title = textOutput(NS(id, "title"))
                             , echarts4rOutput(NS(id,"homework_grade_bar"), height = "300px")
                       )
              )
@@ -17,6 +19,7 @@ homework_UI <- function(id) {
 
 homework_server <- function(id, r){
   moduleServer(id, function(input, output, session){
+    # Reactive Data ----
     df_filtered_homework_grades <- reactive({
       req(r$is$auth)
       student_name <- r$df_student %>%
@@ -33,7 +36,15 @@ homework_server <- function(id, r){
       
       df <- homework_grade
     })
-    
+    # Average ----
+    output$title <- renderText({
+      avg <- df_filtered_homework_grades() %>%
+        select(c(2:ncol(df_filtered_homework_grades()))) %>%
+        rowMeans()
+      paste0("Average Homework: ", avg, "%")
+      
+    })
+    # Bar Chart ----
     output$homework_grade_bar <- renderEcharts4r({
       df <- df_filtered_homework_grades() %>%
         select(-c(`Student Name`))
@@ -53,12 +64,12 @@ homework_server <- function(id, r){
                                       return(parseFloat(params.value[1]*100).toFixed(2) +'%');
                                     }
                                     ")) %>%
-        #e_color(color = rgb(196, 18, 48, alpha = 230, max = 255)) %>%
         e_color(color = "#c41230") %>%
-        e_grid(left = "15%", right = "5%", top = "10%", bottom = "10%")
+        e_grid(left = "15%", right = "5%", top = "10%", bottom = "10%") %>%
+        e_tooltip()
     })
     
-    
+    # Table ----
     output$homework_grades <- renderRHandsontable({
       req(r$is$auth)
       
@@ -180,7 +191,7 @@ review_server <- function(id, r){
           , Previous = `Previous Attempts`
           , Remaining = `Remaining Attempts`
           , Total =  `Total Attempts`
-          )
+        )
       rhandsontable(
         df
         , rowHeaders = NULL
