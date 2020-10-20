@@ -11,11 +11,13 @@ add_homework_button_UI <- function(id) {
                                          , label = "Homework Description: ")
                   )
                   , column(width = 6
-                           , dateInput(inputId = NS(id, "homeworkDateDue")
-                                       , label = "Date Due: ")
-                           , br()
-                           , dateInput(inputId = NS(id, "homeworkDateAssigned")
-                                       , label = "Date Assigned: ")
+                           , div(class = "date_inputs", id = "date-inputs"
+                             , dateInput(inputId = NS(id, "homeworkDateDue")
+                                         , label = "Date Due: ")
+                             , br()
+                             , dateInput(inputId = NS(id, "homeworkDateAssigned")
+                                         , label = "Date Assigned: ")
+                           )
                   )
                 )
                   , footer = fluidRow(

@@ -2,6 +2,10 @@
     background: #fff;
     color: black;
 }
+.datepicker { 
+  z-index: 99999 !important; 
+}
+
 .skin-black .main-header .navbar {
     background-color: #222d32;
 }
