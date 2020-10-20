@@ -78,7 +78,8 @@ server <- function(input, output) {
     course_info_server("courseinfo", r)
     edit_and_add_server("edit_and_add", r)
     topics_server("topics", r)
-    view_calendar_item_Server("calendar_item", r)
+    view_calendar_hw_Server("calendar_hw", r)
+    view_calendar_review_Server("calendar_review", r)
     homework_server("homework", r)
     review_server("review", r)
 }
