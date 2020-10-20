@@ -99,6 +99,7 @@ view_calendar_review_UI <- function(id, title){
   )
 }
 
+# View Review Item Server ----
 view_calendar_review_Server <- function(id, r){
   moduleServer(id, function(input,output,session){
     
@@ -113,10 +114,10 @@ view_calendar_review_Server <- function(id, r){
     observeEvent(input$close, {
       removeModal()
     })
+    # Deletion ---- 
     observeEvent(input$delete, {
       cal_item <- r$cal_item
-      id <- cal_item[1,2] %>%
-        pull()
+      id <- as.numeric(cal_item[1,2]) 
       
       # Review to Topic
       df_review_to_topic <- r$df_review_to_topic
