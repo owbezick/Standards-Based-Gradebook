@@ -180,6 +180,7 @@ review_server <- function(id, r){
     })
     
     output$review_table_topic <- renderRHandsontable({
+      req(input$review_student_input)
       grade_types <- c("NA", "Fluent", "Getting There", "Needs Work")
       df_review_to_topic <- r$df_review_to_topic
       df_student <- r$df_student
