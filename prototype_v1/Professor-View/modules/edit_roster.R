@@ -12,6 +12,14 @@ edit_roster_button_UI <- function(id) {
                              , box(width = 12, status = "primary"
                                    , formattableOutput(NS(id,"rosterList"))
                              )
+                             , fluidRow(
+                               actionBttn(
+                                 inputId = NS(id,"rosterClose")
+                                 , label = "Close"
+                                 , style = "material-flat"
+                                 , block = T
+                               )
+                             )
                            )
                            , tabPanel(
                              title = "Add to Roster"
@@ -44,13 +52,21 @@ edit_roster_button_UI <- function(id) {
                                )
                              )
                              , fluidRow(
-                               column(width = 12
+                               column(width = 6
                                       , actionBttn(
                                         inputId = NS(id,"addSave")
                                         , label = "Add Student"
                                         , style = "material-flat"
                                         , block = T
                                       )
+                               )
+                               , column(width = 6
+                                        , actionBttn(
+                                          inputId = NS(id,"addClose")
+                                          , label = "Close"
+                                          , style = "material-flat"
+                                          , block = T
+                                        )
                                )
                              )
                            )
@@ -96,7 +112,8 @@ edit_roster_button_Server <- function(id, r){
         , Email = r$df_student$email)
       )
     })
-    # Add Student Save ----
+    
+    # BTN Add Student Save ----
     observeEvent(input$addSave, {
       df_prev_student <- r$df_student
       new_row <- tibble("student_id" = input$addID
@@ -104,9 +121,16 @@ edit_roster_button_Server <- function(id, r){
                         , "email" = input$addEmail
       )
       
+      # catch for if student id already exists
       if(input$addID %in% r$df_student$student_id){
-        showNotification("Student ID number already exists.")
-        removeModal()
+        updateNumericInput(
+          session = session
+          , inputId = "addID"
+          , label = "Student ID: "
+          , value = 801000000
+        )
+        showNotification("Student ID number already exists.", type = "warning")
+       
       }else{
         sheet_append(
           ss = "https://docs.google.com/spreadsheets/d/1xIC4pGhnnodwxqopHa45KRSHIVcOTxFSfJSEGPbQH20/editgid=2102408290"
@@ -120,7 +144,7 @@ edit_roster_button_Server <- function(id, r){
         # Save in homework_grades Sheet ----
         homework_grades <- r$df_homework_grades
         
-        # catch for adding students when there are no homeworks
+        # catch for adding students when there are no homeworks 
         if (ncol(homework_grades) == 1){
           new_row <- tibble("Student Name" = input$addName)
         } else{
@@ -157,16 +181,38 @@ edit_roster_button_Server <- function(id, r){
           ) 
         }
         
+        # Update Inputs & show notification ----
+        updateNumericInput(
+          session = session
+          , inputId = "addID"
+          , label = "Student ID: "
+          , value = 801000000
+        )
+        
+        updateTextInput(
+          session = session
+          , inputId = "addName"
+          , value = "New Name"
+          , placeholder = "New Name"
+          , label = "Student Name: "
+        )
+        
+        updateTextInput(
+          session = session
+          , inputId = "addEmail"
+          , value = "New Email"
+          , placeholder = "New Email"
+          , label = "Student Email: "
+        )
         showNotification("Saved to remote.")
-        removeModal()
       }
     })
     
-    # Remove Student Save ----
+    # BTN Remove Student Save ----
     observeEvent(input$removeSave, {
       ls_removed_names <- input$removeFromRoster
       
-  
+      
       if(length(ls_removed_names) == 0) {
         showNotification("No students selected to remove.")
         removeModal()
@@ -206,13 +252,20 @@ edit_roster_button_Server <- function(id, r){
           , sheet = "review_to_topic"
         ) 
         showNotification("Saved to remote.")
-        removeModal()
+        # Update Numeric Inputs for more entries ----
+        
       }
     })
     
+    # BTN closing -----
+    observeEvent(input$addClose, {
+      removeModal()
+    })
+    observeEvent(input$rosterClose, {
+      removeModal()
+    })
     observeEvent(input$close, {
       removeModal()
     })
-    
   })
 }
