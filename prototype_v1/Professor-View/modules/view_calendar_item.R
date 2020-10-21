@@ -26,6 +26,7 @@ view_calendar_hw_UI <- function(id, title){
   )
 }
 
+# Homework Item Server ----
 view_calendar_hw_Server <- function(id, r){
   moduleServer(id, function(input,output,session){
     
@@ -41,23 +42,21 @@ view_calendar_hw_Server <- function(id, r){
     })
     
     observeEvent(input$delete, {
-      # Homework_table
+      # Save df_homework_grades ----
       cal_item <- r$cal_item
       drop <- c(paste("Homework", cal_item[1,1]))
-      df_homework_table <- r$df_homework_table
-      temp <- df_homework_table[,!(names(df_homework_table) %in% drop)]
-      r$df_homework_table <- temp
-      
+      df_homework_grades <- r$df_homework_grades
+      temp <- df_homework_grades[,!(names(df_homework_grades) %in% drop)]
+      r$df_homework_grades <- temp
       sheet_write(
         ss = "https://docs.google.com/spreadsheets/d/1xIC4pGhnnodwxqopHa45KRSHIVcOTxFSfJSEGPbQH20/editgid=2102408290"
         , data = temp
-        , sheet = "homework_table"
+        , sheet = "homework_grades"
       ) 
       
-      # df homework
+      # Save df_homework ----
       df_homework <- r$df_homework
-      hw_id <- cal_item[1,1] %>%
-        pull()
+      hw_id <- as.numeric(cal_item[1,1])
       temp <- subset(df_homework, id != hw_id)
       r$df_homework <- temp
       sheet_write(
@@ -116,6 +115,7 @@ view_calendar_review_Server <- function(id, r){
     })
     # Deletion ---- 
     observeEvent(input$delete, {
+     
       cal_item <- r$cal_item
       id <- as.numeric(cal_item[1,2]) 
       

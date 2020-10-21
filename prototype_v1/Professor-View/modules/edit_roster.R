@@ -10,15 +10,27 @@ edit_roster_button_UI <- function(id) {
                              title = "Current Roster"
                              , br()
                              , box(width = 12, status = "primary"
-                                   , formattableOutput(NS(id,"rosterList"))
+                                   , rHandsontableOutput(NS(id,"rosterList"))
                              )
+                             , br()
                              , fluidRow(
-                               actionBttn(
-                                 inputId = NS(id,"rosterClose")
-                                 , label = "Close"
-                                 , style = "material-flat"
-                                 , block = T
+                               column(width = 6
+                                      , actionBttn(
+                                        inputId = NS(id,"editSave")
+                                        , label = "Save"
+                                        , style = "material-flat"
+                                        , block = T
+                                      )
                                )
+                               , column(width = 6
+                                        , actionBttn(
+                                          inputId = NS(id,"rosterClose")
+                                          , label = "Close"
+                                          , style = "material-flat"
+                                          , block = T
+                                        )
+                               )
+                               
                              )
                            )
                            , tabPanel(
@@ -104,13 +116,27 @@ edit_roster_button_Server <- function(id, r){
       )
     })
     
-    output$rosterList <- renderFormattable({
-      columns = c("ID", "Name", "Email")
-      formattable(data.frame(
-        ID = format(r$df_student$student_id, scientific=F)
-        , Name = r$df_student$name
-        , Email = r$df_student$email)
-      )
+    output$rosterList <- renderRHandsontable({
+      df <- r$df_student %>%
+        mutate(student_id = as.character(student_id)) %>%
+        rename(`Student ID` = student_id
+               , Name = name
+               , Email = email)
+      rhandsontable(df, rowHeaders = F, stretchH = 'all')
+    })
+    # BTN: Save edits ----
+    observeEvent(input$editSave, {
+      temp <- hot_to_r(input$rosterList) %>%
+        rename(student_id = `Student ID`
+               , name = Name
+               , email = Email) %>%
+        mutate(student_id = as.numeric(student_id))
+      r$df_student <- temp
+      sheet_write(
+        ss = "https://docs.google.com/spreadsheets/d/1xIC4pGhnnodwxqopHa45KRSHIVcOTxFSfJSEGPbQH20/editgid=2102408290"
+        , data = temp
+        , sheet = "student"
+      ) 
     })
     
     # BTN Add Student Save ----
@@ -121,7 +147,7 @@ edit_roster_button_Server <- function(id, r){
                         , "email" = input$addEmail
       )
       
-      # catch for if student id already exists
+      # CATCH:student id already exists ----
       if(input$addID %in% r$df_student$student_id){
         updateNumericInput(
           session = session
@@ -129,8 +155,8 @@ edit_roster_button_Server <- function(id, r){
           , label = "Student ID: "
           , value = 801000000
         )
-        showNotification("Student ID number already exists.", type = "warning")
-       
+        showNotification("Student ID number already exists.", type = "error")
+        
       }else{
         sheet_append(
           ss = "https://docs.google.com/spreadsheets/d/1xIC4pGhnnodwxqopHa45KRSHIVcOTxFSfJSEGPbQH20/editgid=2102408290"
@@ -144,13 +170,13 @@ edit_roster_button_Server <- function(id, r){
         # Save in homework_grades Sheet ----
         homework_grades <- r$df_homework_grades
         
-        # catch for adding students when there are no homeworks 
+        # CATCH: adding students when there are no homeworks ----
         if (ncol(homework_grades) == 1){
-          new_row <- tibble("Student Name" = input$addName)
+          temp <- tibble("Student Name" = input$addName)
         } else{
           new_row <- c(input$addName, rep(NA, ncol(r$df_homework_grades) - 1))
+          temp <-rbind(homework_grades, new_row)
         }
-        temp <-rbind(homework_grades, new_row)
         r$df_homework_grades <- temp
         sheet_write(
           ss = "https://docs.google.com/spreadsheets/d/1xIC4pGhnnodwxqopHa45KRSHIVcOTxFSfJSEGPbQH20/editgid=2102408290"

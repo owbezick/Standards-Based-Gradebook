@@ -27,7 +27,7 @@ topics_server <- function(id, r){
     
     observeEvent(input$save, {
       df <- hot_to_r(input$topicTable)
-      # Review Table
+      # Review Table ----
       r$df_review_table <- df
       sheet_write(
         ss =  "https://docs.google.com/spreadsheets/d/1xIC4pGhnnodwxqopHa45KRSHIVcOTxFSfJSEGPbQH20/edit#gid=2102408290"
@@ -36,7 +36,7 @@ topics_server <- function(id, r){
       )
       
       `%notin%` <- Negate(`%in%`)
-      # Review to Topic
+      # Review grades ----
       df_review_to_topic <- r$df_review_to_topic
       
       data_from_hot <- df %>%
@@ -88,7 +88,7 @@ topics_server <- function(id, r){
       sheet_write(
         ss =  "https://docs.google.com/spreadsheets/d/1xIC4pGhnnodwxqopHa45KRSHIVcOTxFSfJSEGPbQH20/edit#gid=2102408290"
         , data = df
-        , sheet = "review_to_topic"
+        , sheet = "review_grades"
       )
       
       showNotification("Saved to remote.")

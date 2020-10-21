@@ -74,6 +74,7 @@ homework_server <- function(id, r){
     
     # Homework Table ----
     output$homework_table <- renderRHandsontable({
+      # TODO: add catch for empty table
       df_homework_grades <- r$df_homework_grades 
       rhandsontable(df_homework_grades
                     , rowHeaders = NULL
