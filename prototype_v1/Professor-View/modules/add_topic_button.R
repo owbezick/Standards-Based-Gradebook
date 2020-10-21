@@ -103,7 +103,7 @@ add_topic_button_Server <- function(id, r){
     output$topic_input <- renderUI({
       numericInput(inputId = NS(id, "topicNumber")
                    , label = NULL
-                   , value =  max(r$df_topic$topic_id) + 1)
+                   , value = as.numeric(max(r$df_topic$topic_id)) + 1)
     })
     
     observeEvent(input$save, {
