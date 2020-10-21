@@ -68,6 +68,12 @@ homework_server <- function(id, r){
                                       return(parseFloat(params.value[1]*100).toFixed(2) +'%');
                                     }
                                     ")) %>%
+        e_mark_line(title = "Average Score"
+                    , data = list(type = "average", name = "Average Score")
+                    , animation = FALSE
+                    , lineStyle = c(color = "#444")
+                    , symbol = "circle"
+        ) %>%
         e_tooltip()
       #e_color(color = rgb(196, 18, 48, alpha = 230, max = 255)) %>%
     })
@@ -157,7 +163,7 @@ review_server <- function(id, r){
     # Review by Review ----
     output$review_table_review <- renderRHandsontable({
       #req(input$review_review_input)
-      browser()
+      
       grade_types <- c("NA", "Not Completed", "Fluent", "Progressing", "Needs Work")
       df_review_grades <- r$df_review_grades
       df_student <- r$df_student
