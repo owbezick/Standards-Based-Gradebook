@@ -39,7 +39,7 @@ edit_roster_button_UI <- function(id) {
                              title = "Add to Roster"
                              , br()
                              , fluidRow(
-                               column(width = 4
+                               column(width = 6
                                       , box(width = 12, status = "primary"
                                             , numericInput(
                                               inputId = NS(id, "addID")
@@ -48,19 +48,11 @@ edit_roster_button_UI <- function(id) {
                                             )
                                       )   
                                )
-                               , column(width = 4
+                               , column(width = 6
                                         , box(width = 12, status = "primary"
                                               , textInput(
                                                 inputId = NS(id, "addName")
                                                 , label = "Student Name: "
-                                              )
-                                        )
-                               )
-                               , column(width = 4
-                                        , box(width = 12, status = "primary"
-                                              , textInput(
-                                                inputId = NS(id, "addEmail")
-                                                , label = "Student Email: "
                                               )
                                         )
                                )
@@ -124,7 +116,7 @@ edit_roster_button_Server <- function(id, r){
         mutate(student_id = as.character(student_id)) %>%
         rename(`Student ID` = student_id
                , Name = name
-               , Email = email)
+              )
       formattable(df)
     })
     # TODO: save edits
@@ -151,7 +143,6 @@ edit_roster_button_Server <- function(id, r){
       df_prev_student <- r$df_student
       new_row <- tibble("student_id" = input$addID
                         , "name" = input$addName
-                        , "email" = input$addEmail
       )
       
       # CATCH:student id already exists ----
@@ -314,19 +305,19 @@ edit_roster_button_Server <- function(id, r){
           , sheet = "homework_grades"
         ) 
         
-        # save review sheet ----
+        # save df_review_grades ----
         df_review_grades <- r$df_review_grades 
         if (ncol(df_review_grades) == 0){
           
         } else{
-          df_review_to_topic <- df_review_grades %>%
+          df_review_grades <- df_review_grades %>%
             left_join(df_students) %>%
             select(-c(email))
           
-          temp <- subset(df_review_to_topic, !(name %in% ls_removed_names)) %>%
+          temp <- subset(df_review_grades, !(name %in% ls_removed_names)) %>%
             select(-c(name))
           
-          r$df_review_to_topic <- temp
+          r$df_review_grades <- temp
           sheet_write(
             ss = "https://docs.google.com/spreadsheets/d/1xIC4pGhnnodwxqopHa45KRSHIVcOTxFSfJSEGPbQH20/editgid=2102408290"
             , data = temp

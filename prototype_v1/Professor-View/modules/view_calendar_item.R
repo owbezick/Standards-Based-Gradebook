@@ -42,7 +42,6 @@ view_calendar_hw_Server <- function(id, r){
     })
     
     observeEvent(input$delete, {
-      browser()
       # Save df_homework_grades ----
       cal_item <- r$cal_item
       drop <- c(paste("Homework", cal_item[1,1]))
@@ -116,14 +115,13 @@ view_calendar_review_Server <- function(id, r){
     })
     # Deletion ---- 
     observeEvent(input$delete, {
-     
       cal_item <- r$cal_item
       id <- as.numeric(cal_item[1,2]) 
       
-      # Review to Topic
-      df_review_to_topic <- r$df_review_to_topic
-      temp <- subset(df_review_to_topic, review_id != id)
-      r$df_review_to_topic <- temp
+      # df_review_grades
+      df_review_grades <- r$df_review_grades
+      temp <- subset(df_review_grades, review_id != id)
+      r$df_review_grades <- temp
       sheet_write(
         ss = "https://docs.google.com/spreadsheets/d/1xIC4pGhnnodwxqopHa45KRSHIVcOTxFSfJSEGPbQH20/editgid=2102408290"
         , data = temp
