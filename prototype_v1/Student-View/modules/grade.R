@@ -218,7 +218,28 @@ review_server <- function(id, r){
                     , stretchH = 'all') %>%
         hot_col(col = "Review ID", type = "character") %>%
         hot_cols(type = "dropdown", source = grade_types, readOnly = T) %>%
-        hot_heatmap(cols = c(2:ncol(df_review_topic)))
+        hot_cols(renderer = "
+        function(instance, td, row, col, prop, value, cellProperties) {
+          Handsontable.renderers.TextRenderer.apply(this, arguments);
+          if (value == 'Fluent'){
+          td.style.background = 'lightgreen';
+          }
+          else if (value == 'Progressing'){
+          td.style.background = 'lightyellow';
+          } else if (value == 'Needs Work'){
+          td.style.background = 'pink';
+          } else if (value == 'Not Completed'){
+          td.style.background = 'lightgrey';
+          }
+
+          if (col > 1){
+                 if (!isNaN(value)) {
+          td.style.background = 'grey';
+          cellProperties.readOnly = true;
+          }
+          }
+
+        }")
     })
   })
 }
