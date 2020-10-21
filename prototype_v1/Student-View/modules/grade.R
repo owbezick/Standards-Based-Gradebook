@@ -27,7 +27,7 @@ homework_server <- function(id, r){
         select(name) %>%
         pull()
       
-      homework_grade <- r$df_homework_table %>%
+      homework_grade <- r$df_homework_grades %>%
         filter(`Student Name` == student_name)
       
       cols <- c(2:ncol(homework_grade))
@@ -108,7 +108,7 @@ review_server <- function(id, r){
     df_filtered_review_to_topic <- reactive({
       req(r$is$auth)
       current_student <- r$auth_student_id()
-      exam_grade <- r$df_review_to_topic %>%
+      exam_grade <- r$df_review_grades %>%
         filter(student_id == current_student
                , grade != "NA")
     })
@@ -140,7 +140,7 @@ review_server <- function(id, r){
       
       
       # Topic attempts total
-      df_total_attempts <- r$df_review_table %>%
+      df_total_attempts <- r$df_review_grades %>%
         subset(select = -c(`Review Name`, `Review ID`, `Review Date`))
       
       df_total_attempts[is.na(df_total_attempts)] <- 0
