@@ -267,13 +267,6 @@ edit_roster_button_Server <- function(id, r){
           , label = "Student Name: "
         )
         
-        updateTextInput(
-          session = session
-          , inputId = "addEmail"
-          , value = "New Email"
-          , placeholder = "New Email"
-          , label = "Student Email: "
-        )
         showNotification("Saved to remote.")
       }
     })
@@ -311,8 +304,7 @@ edit_roster_button_Server <- function(id, r){
           
         } else{
           df_review_grades <- df_review_grades %>%
-            left_join(df_students) %>%
-            select(-c(email))
+            left_join(df_students) 
           
           temp <- subset(df_review_grades, !(name %in% ls_removed_names)) %>%
             select(-c(name))

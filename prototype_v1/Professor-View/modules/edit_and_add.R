@@ -24,10 +24,6 @@ edit_and_add_UI <- function(id){
                , actionBttn(inputId = NS(id, "addTopic")
                             , label = "Topic", style = "material-flat", block = T)
         )
-        # , column(width = 4
-        #          , actionBttn(inputId = NS(id, "addReview")
-        #                       , label = "Review", style = "material-flat", block = T)
-        # )
         , column(width = 6
                  , actionBttn(inputId = NS(id, "addHomework")
                               , label = "Homework", style = "material-flat", block = T)
@@ -47,10 +43,6 @@ edit_and_add_server <- function(id, r){
       add_homework_button_UI("add_homework")
     }, ignoreInit = T)
     
-    # observeEvent(NS(id, input$addReview), {
-    #   add_review_button_UI("add_review")
-    # }, ignoreInit = T)
-    
     observeEvent(NS(id, input$addTopic), {
       add_topic_button_UI("add_topic")
     }, ignoreInit = T)
@@ -61,7 +53,6 @@ edit_and_add_server <- function(id, r){
   })
   add_homework_button_Server("add_homework", r)
   course_information_button_Server("course_info_button", r)
-  add_review_button_Server("add_review", r)
   add_topic_button_Server("add_topic", r)
   edit_roster_button_Server("edit_roster", r)
 }

@@ -47,9 +47,9 @@ homework_server <- function(id, r){
       df <- df[,1] %>%
         as.data.frame() %>%
         rename(Average = ".") %>%
-        mutate(Average = Average / 100) %>%
+        mutate(average = Average / 100) %>%
         mutate(Chart = "chart") %>%
-        select(average, chart = Chart)
+        select(Average = average, chart = Chart)
 
       df$id <- rownames(df)
 
