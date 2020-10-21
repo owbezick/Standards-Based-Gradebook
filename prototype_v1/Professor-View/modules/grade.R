@@ -97,11 +97,11 @@ homework_server <- function(id, r){
     observeEvent(input$save,{
       df_hot <- hot_to_r(input$homework_table)
       r$df_homework_grades  <- df_hot
-      sheet_write(
-        ss =  "https://docs.google.com/spreadsheets/d/1xIC4pGhnnodwxqopHa45KRSHIVcOTxFSfJSEGPbQH20/edit#gid=2102408290"
-        , data = df_hot
-        , sheet = "homework_grades"
-      )
+      # sheet_write(
+      #   ss =  "https://docs.google.com/spreadsheets/d/1xIC4pGhnnodwxqopHa45KRSHIVcOTxFSfJSEGPbQH20/edit#gid=2102408290"
+      #   , data = df_hot
+      #   , sheet = "homework_grades"
+      # )
       showNotification("Saved to remote.")
     })
 
@@ -186,11 +186,11 @@ review_server <- function(id, r){
         left_join(df_student, by = "name") %>%
         select(review_id = `Review ID`, topic_id = `Topic ID`, student_id, grade = value)
       r$df_review_grades <- df_temp
-      sheet_write(
-        ss =  "https://docs.google.com/spreadsheets/d/1xIC4pGhnnodwxqopHa45KRSHIVcOTxFSfJSEGPbQH20/edit#gid=2102408290"
-        , data = df_temp
-        , sheet = "review_grades"
-      )
+      # sheet_write(
+      #   ss =  "https://docs.google.com/spreadsheets/d/1xIC4pGhnnodwxqopHa45KRSHIVcOTxFSfJSEGPbQH20/edit#gid=2102408290"
+      #   , data = df_temp
+      #   , sheet = "review_grades"
+      # )
       showNotification("Saved to remote.")
     })
 
@@ -261,11 +261,11 @@ review_server <- function(id, r){
         select(review_id = `Review ID`, topic_id, student_id, grade = value)
 
       r$df_review_grades <- df_temp
-      sheet_write(
-        ss =  "https://docs.google.com/spreadsheets/d/1xIC4pGhnnodwxqopHa45KRSHIVcOTxFSfJSEGPbQH20/edit#gid=2102408290"
-        , data = df_temp
-        , sheet = "review_grades"
-      )
+      # sheet_write(
+      #   ss =  "https://docs.google.com/spreadsheets/d/1xIC4pGhnnodwxqopHa45KRSHIVcOTxFSfJSEGPbQH20/edit#gid=2102408290"
+      #   , data = df_temp
+      #   , sheet = "review_grades"
+      # )
       showNotification("Saved to remote.")
     })
   })

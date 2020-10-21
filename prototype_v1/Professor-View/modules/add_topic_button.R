@@ -87,15 +87,15 @@ add_topic_button_Server <- function(id, r){
     })
     
     observeEvent(input$save_edits, {
-      browser()
+      #browser()
       df <- hot_to_r(input$edit_topics) %>%
         select(topic_id = id, description = Description)
       
-      sheet_write(
-        ss =  "https://docs.google.com/spreadsheets/d/1xIC4pGhnnodwxqopHa45KRSHIVcOTxFSfJSEGPbQH20/edit#gid=2102408290"
-        , data = df
-        , sheet = "topic"
-      )
+      # sheet_write(
+      #   ss =  "https://docs.google.com/spreadsheets/d/1xIC4pGhnnodwxqopHa45KRSHIVcOTxFSfJSEGPbQH20/edit#gid=2102408290"
+      #   , data = df
+      #   , sheet = "topic"
+      # )
       removeModal()
       showNotification("Saved to remote.")
     })
@@ -118,11 +118,11 @@ add_topic_button_Server <- function(id, r){
                           , "description" = input$topicDescription
         )
         
-        sheet_append(
-          ss = "https://docs.google.com/spreadsheets/d/1xIC4pGhnnodwxqopHa45KRSHIVcOTxFSfJSEGPbQH20/edit#gid=2102408290"
-          , data = new_row
-          , sheet = "topic"
-        )
+        # sheet_append(
+        #   ss = "https://docs.google.com/spreadsheets/d/1xIC4pGhnnodwxqopHa45KRSHIVcOTxFSfJSEGPbQH20/edit#gid=2102408290"
+        #   , data = new_row
+        #   , sheet = "topic"
+        # )
         # Save & refresh data ----
         df_review_table <- r$df_review_table
         new_column <- c(rep(NA, nrow(df_review_table)))
@@ -130,11 +130,11 @@ add_topic_button_Server <- function(id, r){
         df_review_table <- df_review_table %>%
           mutate(init = new_column) 
         names(df_review_table)[names(df_review_table) == "init"] <- new_column_name
-        sheet_write(
-          ss =  "https://docs.google.com/spreadsheets/d/1xIC4pGhnnodwxqopHa45KRSHIVcOTxFSfJSEGPbQH20/edit#gid=2102408290"
-          , data = df_review_table
-          , sheet = "review_table"
-        )
+        # sheet_write(
+        #   ss =  "https://docs.google.com/spreadsheets/d/1xIC4pGhnnodwxqopHa45KRSHIVcOTxFSfJSEGPbQH20/edit#gid=2102408290"
+        #   , data = df_review_table
+        #   , sheet = "review_table"
+        # )
         new_df <- rbind(df_topic, new_row)
         r$df_topic <- new_df
         r$df_review_table <- df_review_table

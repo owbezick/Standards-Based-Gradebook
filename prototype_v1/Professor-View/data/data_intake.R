@@ -1,42 +1,42 @@
-library(config)
-# Warning in readLines(con) :
-# incomplete final line found on '/Users/owenbezick/Documents/GitHub/Standards-Based-Gradebook/prototype_v1/Professor-View/config.yml'
-config <- config::get()
-
-# # Initial authentication caching ----
-# options(gargle_oauth_cache = ".cache") # designate project-specific cache
-# gargle::gargle_oauth_cache() # check the value of the option
-# googledrive::drive_auth() # trigger auth on purpose to store a token in the specified cache
-# cache_directory <- ".secrets/" # can add to config file
-# list.files(cache_directory) # see your token file in the cache
-# drive_deauth() # de auth
-
-library(googlesheets4)
-library(googledrive)
-
-# Authenticate drive/ sheets ----
-drive_auth(cache = ".cache",
-           email = "caspencer@davidson.edu")
-
-gs4_auth(cache = ".cache",
-         email = "caspencer@davidson.edu")
-
-# Read in data ----
-read_database_sheet <- function(sheet){
-  df <- drive_get(config$database) %>%
-    read_sheet(sheet)
-}
-
-read_all_database_sheets <- function(sheets){
-  data <- lapply(ls_sheets, read_database_sheet)
-  names(data) <- ls_sheets
-  data
-}
-
-ls_sheets <- c("student", "course_info", "homework", "homework_grades", "topic", "review_table", "review_grades")
-
-ls_all_data <- read_all_database_sheets(ls_sheets)
-
+# library(config)
+# # Warning in readLines(con) :
+# # incomplete final line found on '/Users/owenbezick/Documents/GitHub/Standards-Based-Gradebook/prototype_v1/Professor-View/config.yml'
+# config <- config::get()
+# 
+# # # Initial authentication caching ----
+# # options(gargle_oauth_cache = ".cache") # designate project-specific cache
+# # gargle::gargle_oauth_cache() # check the value of the option
+# # googledrive::drive_auth() # trigger auth on purpose to store a token in the specified cache
+# # cache_directory <- ".secrets/" # can add to config file
+# # list.files(cache_directory) # see your token file in the cache
+# # drive_deauth() # de auth
+# 
+# library(googlesheets4)
+# library(googledrive)
+# 
+# # Authenticate drive/ sheets ----
+# drive_auth(cache = ".cache",
+#            email = "caspencer@davidson.edu")
+# 
+# gs4_auth(cache = ".cache",
+#          email = "caspencer@davidson.edu")
+# 
+# # Read in data ----
+# read_database_sheet <- function(sheet){
+#   df <- drive_get(config$database) %>%
+#     read_sheet(sheet)
+# }
+# 
+# read_all_database_sheets <- function(sheets){
+#   data <- lapply(ls_sheets, read_database_sheet)
+#   names(data) <- ls_sheets
+#   data
+# }
+# 
+# ls_sheets <- c("student", "course_info", "homework", "homework_grades", "topic", "review_table", "review_grades")
+# 
+# ls_all_data <- read_all_database_sheets(ls_sheets)
+# 
 r <- reactiveValues(df_student = NULL
                     , df_course_info = NULL
                     , df_homework = NULL
@@ -45,17 +45,11 @@ r <- reactiveValues(df_student = NULL
                     , df_review_table = NULL
                     , df_cal_item = NULL
 )
+r$df_student <- readRDS("data/student.RDS")
+r$df_course_info <- readRDS("data/course_info.RDS")
+r$df_homework <- readRDS("data/homework.RDS")
+r$df_homework_grades <- readRDS("data/homework_grades.RDS")
+r$df_topic <- readRDS("data/topic.RDS")
+r$df_review_table <- readRDS("data/review_table.RDS")
+r$df_review_grades <-  readRDS("data/review_grades.RDS")
 
-r$df_student <- ls_all_data$student
-
-r$df_course_info <- ls_all_data$course_info
-
-r$df_homework <- ls_all_data$homework
-
-r$df_homework_grades <- ls_all_data$homework_grades
-
-r$df_topic <- ls_all_data$topic
-
-r$df_review_table <-  ls_all_data$review_table
-
-r$df_review_grades <- ls_all_data$review_grades

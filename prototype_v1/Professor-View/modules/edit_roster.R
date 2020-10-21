@@ -281,22 +281,22 @@ edit_roster_button_Server <- function(id, r){
         # save student sheet ----
         df_students <- r$df_student
         df_new_students <- subset(df_students, !(name %in% ls_removed_names))
-        sheet_write(
-          ss = "https://docs.google.com/spreadsheets/d/1xIC4pGhnnodwxqopHa45KRSHIVcOTxFSfJSEGPbQH20/editgid=2102408290"
-          , data = df_new_students
-          , sheet = "student"
-        ) 
+        # sheet_write(
+        #   ss = "https://docs.google.com/spreadsheets/d/1xIC4pGhnnodwxqopHa45KRSHIVcOTxFSfJSEGPbQH20/editgid=2102408290"
+        #   , data = df_new_students
+        #   , sheet = "student"
+        # ) 
         r$df_student <- df_new_students
         
         # save homework_grades sheet ----
         df_homework_grades <- r$df_homework_grades
         temp <- subset(df_homework_grades, !(`Student Name` %in% ls_removed_names))
         r$df_homework_grades <- temp
-        sheet_write(
-          ss = "https://docs.google.com/spreadsheets/d/1xIC4pGhnnodwxqopHa45KRSHIVcOTxFSfJSEGPbQH20/editgid=2102408290"
-          , data = temp
-          , sheet = "homework_grades"
-        ) 
+        # sheet_write(
+        #   ss = "https://docs.google.com/spreadsheets/d/1xIC4pGhnnodwxqopHa45KRSHIVcOTxFSfJSEGPbQH20/editgid=2102408290"
+        #   , data = temp
+        #   , sheet = "homework_grades"
+        # ) 
         
         # save df_review_grades ----
         df_review_grades <- r$df_review_grades 
@@ -310,11 +310,11 @@ edit_roster_button_Server <- function(id, r){
             select(-c(name))
           
           r$df_review_grades <- temp
-          sheet_write(
-            ss = "https://docs.google.com/spreadsheets/d/1xIC4pGhnnodwxqopHa45KRSHIVcOTxFSfJSEGPbQH20/editgid=2102408290"
-            , data = temp
-            , sheet = "review_grades"
-          ) 
+          # sheet_write(
+          #   ss = "https://docs.google.com/spreadsheets/d/1xIC4pGhnnodwxqopHa45KRSHIVcOTxFSfJSEGPbQH20/editgid=2102408290"
+          #   , data = temp
+          #   , sheet = "review_grades"
+          # ) 
         }
         
         showNotification("Saved to remote.")

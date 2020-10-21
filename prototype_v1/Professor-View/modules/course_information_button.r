@@ -75,11 +75,11 @@ course_information_button_Server <- function(id, r){
       )
       
       # Write to sheet ----
-      sheet_write(
-        ss = "https://docs.google.com/spreadsheets/d/1xIC4pGhnnodwxqopHa45KRSHIVcOTxFSfJSEGPbQH20/edit#gid=2102408290"
-        , data = new_df
-        , sheet = "course_info"
-      )
+      # sheet_write(
+      #   ss = "https://docs.google.com/spreadsheets/d/1xIC4pGhnnodwxqopHa45KRSHIVcOTxFSfJSEGPbQH20/edit#gid=2102408290"
+      #   , data = new_df
+      #   , sheet = "course_info"
+      # )
       
       # Update reactive ----
       r$df_course_info <- new_df

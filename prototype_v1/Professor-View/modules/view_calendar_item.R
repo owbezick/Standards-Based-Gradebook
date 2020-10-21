@@ -71,11 +71,11 @@ view_calendar_hw_Server <- function(id, r){
       df_hw[match(df_item$id, df_hw$id), ] <- df_item
       
       r$df_homework <- df_hw
-      sheet_write(
-        ss = "https://docs.google.com/spreadsheets/d/1xIC4pGhnnodwxqopHa45KRSHIVcOTxFSfJSEGPbQH20/editgid=2102408290"
-        , data = r$df_homework
-        , sheet = "homework"
-      ) 
+      # sheet_write(
+      #   ss = "https://docs.google.com/spreadsheets/d/1xIC4pGhnnodwxqopHa45KRSHIVcOTxFSfJSEGPbQH20/editgid=2102408290"
+      #   , data = r$df_homework
+      #   , sheet = "homework"
+      # ) 
       removeModal()
       showNotification("Saved to remote.")
     })
@@ -87,11 +87,11 @@ view_calendar_hw_Server <- function(id, r){
       df_homework_grades <- r$df_homework_grades
       temp <- df_homework_grades[,!(names(df_homework_grades) %in% drop)]
       r$df_homework_grades <- temp
-      sheet_write(
-        ss = "https://docs.google.com/spreadsheets/d/1xIC4pGhnnodwxqopHa45KRSHIVcOTxFSfJSEGPbQH20/editgid=2102408290"
-        , data = temp
-        , sheet = "homework_grades"
-      ) 
+      # sheet_write(
+      #   ss = "https://docs.google.com/spreadsheets/d/1xIC4pGhnnodwxqopHa45KRSHIVcOTxFSfJSEGPbQH20/editgid=2102408290"
+      #   , data = temp
+      #   , sheet = "homework_grades"
+      # ) 
       
       
       # Save df_homework ----
@@ -99,11 +99,11 @@ view_calendar_hw_Server <- function(id, r){
       hw_id <- as.numeric(cal_item[1,1])
       temp <- subset(df_homework, id != hw_id)
       r$df_homework <- temp
-      sheet_write(
-        ss = "https://docs.google.com/spreadsheets/d/1xIC4pGhnnodwxqopHa45KRSHIVcOTxFSfJSEGPbQH20/editgid=2102408290"
-        , data = temp
-        , sheet = "homework"
-      ) 
+      # sheet_write(
+      #   ss = "https://docs.google.com/spreadsheets/d/1xIC4pGhnnodwxqopHa45KRSHIVcOTxFSfJSEGPbQH20/editgid=2102408290"
+      #   , data = temp
+      #   , sheet = "homework"
+      # ) 
       removeModal()
       showNotification("Saved to remote.")
     })
@@ -162,21 +162,21 @@ view_calendar_review_Server <- function(id, r){
       df_review_grades <- r$df_review_grades
       temp <- subset(df_review_grades, review_id != id)
       r$df_review_grades <- temp
-      sheet_write(
-        ss = "https://docs.google.com/spreadsheets/d/1xIC4pGhnnodwxqopHa45KRSHIVcOTxFSfJSEGPbQH20/editgid=2102408290"
-        , data = temp
-        , sheet = "review_grades"
-      ) 
+      # sheet_write(
+      #   ss = "https://docs.google.com/spreadsheets/d/1xIC4pGhnnodwxqopHa45KRSHIVcOTxFSfJSEGPbQH20/editgid=2102408290"
+      #   , data = temp
+      #   , sheet = "review_grades"
+      # ) 
       
       # Review Table
       df_review_table <- r$df_review_table
       temp <- subset(df_review_table, `Review ID` != id)
       r$df_review_table <- temp
-      sheet_write(
-        ss = "https://docs.google.com/spreadsheets/d/1xIC4pGhnnodwxqopHa45KRSHIVcOTxFSfJSEGPbQH20/editgid=2102408290"
-        , data = temp
-        , sheet = "review_table"
-      ) 
+      # sheet_write(
+      #   ss = "https://docs.google.com/spreadsheets/d/1xIC4pGhnnodwxqopHa45KRSHIVcOTxFSfJSEGPbQH20/editgid=2102408290"
+      #   , data = temp
+      #   , sheet = "review_table"
+      # ) 
       showNotification("Saved to remote.")
       removeModal()
     })
