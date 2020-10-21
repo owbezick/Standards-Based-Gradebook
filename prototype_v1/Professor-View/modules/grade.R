@@ -1,12 +1,12 @@
 homework_UI <- function(id) {
   tabPanel(title = "Homework"
            , fluidRow(
-             #box(width = 12, status = "primary"
-                 # , title = "Homework Grades"
-                 rHandsontableOutput(NS(id, "homework_table"))
+             box(width = 12, status = "primary"
+                 , title = "Edit Homework Grades"
+                 , rHandsontableOutput(NS(id, "homework_table"))
                  , br()
                  , actionBttn(NS(id, "save"), "Save", style = "material-flat", block = T)
-             #)
+             )
              , br()
              , box(width = 12, status = "primary"
                    , title = textOutput(NS(id, "title"))
@@ -108,23 +108,21 @@ review_UI <- function(id) {
              tabBox(width = 12
                     # Review by Review ----
                     , tabPanel(title = "Review Grade by Student"
-                               # , box(width = 12, status = "primary"
-                               #       , title = "Review Grade by Student"
-                                     #, uiOutput(NS(id, "review_picker"))
-                                     , fluidRow(
-                                       rHandsontableOutput(NS(id, "review_table_review"))
-                                       )
+                               , box(width = 12, status = "primary"
+                                     , title = "Review Grade by Student"
                                      
-                               # )
+                                       , rHandsontableOutput(NS(id, "review_table_review"))
+                                     
+                                     
+                               )
                                , actionBttn(NS(id, "saveReview"), "Save", style = "material-flat", block = T)
                     )
                     # Review by Student ----
                     , tabPanel(title = "Review Grade by Topic"
-                               # , box(width = 12, status = "primary"
-                               #       , title = "Review Grade by Topic"
-                                     #, uiOutput(NS(id, "student_picker"))
-                                     , fluidRow(rHandsontableOutput(NS(id, "review_table_student")))
-                               # )
+                               , box(width = 12, status = "primary"
+                                     , title = "Review Grade by Topic"
+                                     , rHandsontableOutput(NS(id, "review_table_student"))
+                               )
                                , actionBttn(NS(id, "saveStudent"), "Save", style = "material-flat", block = T)
                     )
              )
