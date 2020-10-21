@@ -75,7 +75,7 @@ course_calendar_server <- function(id, r){
           mutate(`Homework Number` = as.integer(id)) %>%
           mutate(`Date Assigned` = date_assigned) %>%
           mutate(`Date Due` = date_due) %>%
-          select(`Homework Number`, `Date Assigned`, `Date Due`)
+          select(`Homework Number`, Description = description, `Date Assigned`, `Date Due`)
         r$cal_item <- df_item
         view_calendar_hw_UI("calendar_hw", title)
       }

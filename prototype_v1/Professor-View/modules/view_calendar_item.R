@@ -1,9 +1,17 @@
 view_calendar_hw_UI <- function(id, title){
   showModal(
     modalDialog(title = title, size = "l"
-                , formattableOutput(NS(id, "item_info_table"))
+                , rHandsontableOutput(NS(id, "item_info_table"))
                 , footer = fluidRow(
-                  column(width = 6
+                  column(width = 4
+                           , actionBttn(
+                             inputId = NS(id, "save")
+                             , label = "save"
+                             , style = "material-flat"
+                             , block = T
+                           )
+                  )
+                  , column(width = 4
                          , actionBttn(
                            inputId = NS(id, "delete")
                            , label = "Delete"
@@ -11,7 +19,7 @@ view_calendar_hw_UI <- function(id, title){
                            , block = T
                          )
                   )
-                  , column(width = 6
+                  , column(width = 4
                            , actionBttn(
                              inputId = NS(id, "close")
                              , label = "Close"
@@ -30,15 +38,46 @@ view_calendar_hw_UI <- function(id, title){
 view_calendar_hw_Server <- function(id, r){
   moduleServer(id, function(input,output,session){
     
-    output$item_info_table <- renderFormattable({
-      aligns <- c(rep("c", NCOL(r$cal_item)))
+    output$item_info_table <- renderRHandsontable({
+      df <- r$cal_item
       
-      formattable(r$cal_item, align = aligns)
+      df <- df %>%
+        mutate(`Date Assigned` = ymd(`Date Assigned`)
+               , `Date Due` = ymd(`Date Due`))
       
+      rhandsontable(
+        df
+        , rowHeaders = NULL
+        , stretchH = 'all'
+      ) %>%
+      hot_col("Homework Number", readOnly = TRUE)
     })
     
     observeEvent(input$close, {
       removeModal()
+    })
+    
+    observeEvent(input$save, {
+      r$cal_item <- hot_to_r(input$item_info_table)
+      
+      df_item <- r$cal_item %>%
+        select(id = `Homework Number`
+               , description = Description
+               , date_assigned = `Date Assigned`
+               , date_due = `Date Due`)
+      
+      df_hw <- r$df_homework
+      
+      df_hw[match(df_item$id, df_hw$id), ] <- df_item
+      
+      r$df_homework <- df_hw
+      sheet_write(
+        ss = "https://docs.google.com/spreadsheets/d/1xIC4pGhnnodwxqopHa45KRSHIVcOTxFSfJSEGPbQH20/editgid=2102408290"
+        , data = r$df_homework
+        , sheet = "homework"
+      ) 
+      removeModal()
+      showNotification("Saved to remote.")
     })
     
     observeEvent(input$delete, {
@@ -53,6 +92,7 @@ view_calendar_hw_Server <- function(id, r){
         , data = temp
         , sheet = "homework_grades"
       ) 
+      
       
       # Save df_homework ----
       df_homework <- r$df_homework

@@ -1,6 +1,5 @@
 topics_UI <- function(id){
   box(width = 12, title = "Review Table", status = "primary"
-      
             , rHandsontableOutput(NS(id, "topicTable"))
             , footer = "Right click to add a row to the table."
       
@@ -24,6 +23,8 @@ topics_server <- function(id, r){
       ) %>%
         hot_context_menu(allowComments = T)
     })
+    
+    
     
     observeEvent(input$save, {
       df <- hot_to_r(input$topicTable)
