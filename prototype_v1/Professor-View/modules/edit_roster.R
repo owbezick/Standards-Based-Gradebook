@@ -186,6 +186,16 @@ edit_roster_button_Server <- function(id, r){
             , sheet = "homework_grades"
           ) 
           
+        } else if (nrow(homework_grades) == 0){
+          temp <- r$df_homework_grades[1,] %>%
+            mutate(`Student Name` = input$addName) %>%
+            mutate_at(.vars = c(2:ncol(r$df_homework_grades[1,])), .funs = as.character)
+          temp[1,2:ncol(temp)] <- "NA"
+          sheet_append(
+            ss = "https://docs.google.com/spreadsheets/d/1xIC4pGhnnodwxqopHa45KRSHIVcOTxFSfJSEGPbQH20/editgid=2102408290"
+            , data = temp
+            , sheet = "homework_grades"
+          ) 
         } else{
           temp <- r$df_homework_grades[1,] %>%
             mutate(`Student Name` = input$addName) 
@@ -201,6 +211,7 @@ edit_roster_button_Server <- function(id, r){
         
         
         # Save to review_grades sheet ----
+        
         # catch for adding students when there are no reviews
         if (nrow(r$df_review_grades) != 0){
           a_student_id <-  r$df_student[1,1] %>%

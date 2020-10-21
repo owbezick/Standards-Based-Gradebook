@@ -157,10 +157,11 @@ review_server <- function(id, r){
     # Review by Review ----
     output$review_table_review <- renderRHandsontable({
       #req(input$review_review_input)
+      browser()
       grade_types <- c("NA", "Not Completed", "Fluent", "Progressing", "Needs Work")
-      df_review_to_topic <- r$df_review_to_topic
+      df_review_grades <- r$df_review_grades
       df_student <- r$df_student
-      df_review <- df_review_to_topic %>%
+      df_review <- df_review_grades %>%
         left_join(df_student, by = "student_id") %>%
         pivot_wider(id_cols = c(review_id, topic_id), names_from = name, values_from = grade) %>%
         rename(`Review ID` = review_id, `Topic ID` = topic_id)
@@ -220,13 +221,13 @@ review_server <- function(id, r){
       # }
       # 
       df_student <- r$df_student
-      df_review_to_topic <- r$df_review_to_topic
+      df_review_grades <- r$df_review_grades
       df_hot <- hot_to_r(input$review_table_review)
       df_temp <- df_hot %>%
         pivot_longer(cols = c(3:ncol(df_hot))) %>%
         left_join(df_student, by = "name") %>%
         select(review_id = `Review ID`, topic_id = `Topic ID`, student_id, grade = value)
-      r$df_review_to_topic <- df_temp
+      r$df_review_grades <- df_temp
       sheet_write(
         ss =  "https://docs.google.com/spreadsheets/d/1xIC4pGhnnodwxqopHa45KRSHIVcOTxFSfJSEGPbQH20/edit#gid=2102408290"
         , data = df_temp
@@ -240,9 +241,9 @@ review_server <- function(id, r){
       # browser()
       #req(input$review_student_input)
       grade_types <- c("NA", "Not Completed", "Fluent", "Progressing", "Needs Work")
-      df_review_to_topic <- r$df_review_to_topic
+      df_review_grades <- r$df_review_grades
       df_student <- r$df_student
-      df_review_topic <- df_review_to_topic %>%
+      df_review_topic <- df_review_grades %>%
         left_join(df_student, by = "student_id") %>%
         pivot_wider(id_cols = c(review_id, name, topic_id)
                     , names_from = topic_id
@@ -298,7 +299,7 @@ review_server <- function(id, r){
     observeEvent(input$saveStudent,{
       if (input$review_student_input == "All"){
         df_student <- r$df_student
-        df_review_to_topic <- r$df_review_to_topic
+        df_review_grades <- r$df_review_grades
         df <- hot_to_r(input$review_table_review)
         df_temp <- df %>%
           pivot_longer(cols = c(3:ncol(df))) %>%
@@ -311,7 +312,7 @@ review_server <- function(id, r){
           filter(`Student Name` == input$review_student_input)
       }
       
-      r$df_review_to_topic <- df_temp
+      r$df_review_grades <- df_temp
       sheet_write(
         ss =  "https://docs.google.com/spreadsheets/d/1xIC4pGhnnodwxqopHa45KRSHIVcOTxFSfJSEGPbQH20/edit#gid=2102408290"
         , data = df_temp
