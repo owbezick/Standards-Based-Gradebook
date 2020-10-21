@@ -15,15 +15,15 @@ edit_roster_button_UI <- function(id) {
                              )
                              , br()
                              , fluidRow(
-                               column(width = 6
-                                      , actionBttn(
-                                        inputId = NS(id,"editSave")
-                                        , label = "Save"
-                                        , style = "material-flat"
-                                        , block = T
-                                      )
-                               )
-                               , column(width = 6
+                               # column(width = 6
+                               #        , actionBttn(
+                               #          inputId = NS(id,"editSave")
+                               #          , label = "Save"
+                               #          , style = "material-flat"
+                               #          , block = T
+                               #        )
+                               # )
+                               column(width = 12
                                         , actionBttn(
                                           inputId = NS(id,"editClose")
                                           , label = "Close"
@@ -187,8 +187,9 @@ edit_roster_button_Server <- function(id, r){
           ) 
           temp <-rbind(homework_grades, temp)
         } else{
-          new_row <- c(input$addName, rep(NA, ncol(r$df_homework_grades) - 1))
-          temp <-rbind(homework_grades, new_row)
+          temp <- r$df_homework_grades[1,] %>%
+            mutate(`Student Name` = input$addName) 
+          temp[1,2:ncol(temp)] <- "NA"
           sheet_append(
             ss = "https://docs.google.com/spreadsheets/d/1xIC4pGhnnodwxqopHa45KRSHIVcOTxFSfJSEGPbQH20/editgid=2102408290"
             , data = temp
@@ -259,12 +260,12 @@ edit_roster_button_Server <- function(id, r){
         # save student sheet ----
         df_students <- r$df_student
         df_new_students <- subset(df_students, !(name %in% ls_removed_names))
-        
         sheet_write(
           ss = "https://docs.google.com/spreadsheets/d/1xIC4pGhnnodwxqopHa45KRSHIVcOTxFSfJSEGPbQH20/editgid=2102408290"
           , data = df_new_students
           , sheet = "student"
         ) 
+        r$df_student <- df_new_students
         
         # save homework_grades sheet ----
         df_homework_grades <- r$df_homework_grades

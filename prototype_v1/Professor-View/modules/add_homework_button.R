@@ -82,7 +82,6 @@ add_homework_button_Server <- function(id, r){
         
         
         # Save to df_homework_grades ----
-       
         df_homework_grades <- r$df_homework_grades
         new_column <- c(rep("NA", nrow(df_homework_grades)))
         new_column_name = paste("Homework", input$homeworkNumber)
