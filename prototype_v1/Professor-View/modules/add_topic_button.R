@@ -4,10 +4,11 @@ add_topic_button_UI <- function(id) {
   showModal(
     modalDialog(title = "Edit Topics", size = "l"
                 , tabBox(width = 12
-                  , tabPanel("Edit Topics"
+                  , tabPanel("Edit Topic Descriptions"
                           , fluidRow(
                             rHandsontableOutput(NS(id, "edit_topics"))
                           )
+                          , br()
                           , fluidRow(
                             column(width = 6
                                    , actionBttn(
@@ -159,8 +160,11 @@ add_topic_button_Server <- function(id, r){
       
       
     })
-    
+
     observeEvent(input$close, {
+      removeModal()
+    })
+    observeEvent(input$close_edits, {
       removeModal()
     })
   })

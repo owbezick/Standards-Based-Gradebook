@@ -47,7 +47,7 @@ homework_server <- function(id, r){
       df <- df[,1] %>%
         as.data.frame() %>%
         rename(Average = ".") %>%
-        mutate(average = Average / 100) %>%
+        mutate(Average = Average / 100) %>%
         mutate(Chart = "chart") %>%
         select(average, chart = Chart)
 
@@ -55,7 +55,7 @@ homework_server <- function(id, r){
 
       chart <- df %>%
         e_chart(id) %>%
-        e_bar(average, barWidth = "50%") %>%
+        e_bar(Average, barWidth = "50%") %>%
         e_legend(show = F) %>%
         e_y_axis(formatter = e_axis_formatter("percent", digits = 2)) %>%
         e_color(color = "#c41230") %>%
@@ -65,7 +65,7 @@ homework_server <- function(id, r){
                                       return(parseFloat(params.value[1]*100).toFixed(2) +'%');
                                     }
                                     ")) %>%
-        e_mark_line(title = "Average Score"
+        e_mark_line(title = ""
                     , data = list(type = "average", name = "Average Score")
                     , animation = FALSE
                     , lineStyle = c(color = "#444")
