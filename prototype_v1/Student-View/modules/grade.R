@@ -17,6 +17,7 @@ homework_UI <- function(id) {
   )
 }
 
+# Homework server ----
 homework_server <- function(id, r){
   moduleServer(id, function(input, output, session){
     # Reactive Data ----
@@ -87,6 +88,7 @@ homework_server <- function(id, r){
   }) #end module server
 }
 
+# Review UI ----
 review_UI <- function(id) {
   tabPanel(title = "Reviews"
            , fluidRow(
@@ -108,9 +110,10 @@ review_UI <- function(id) {
   )
 }
 
+# Review Server
 review_server <- function(id, r){
   moduleServer(id, function(input, output, session){
-    # Creates student data frames
+    # Review grade data -----
     df_review_grades <- reactive({
       req(r$is$auth)
       current_student <- r$auth_student_id()
@@ -119,20 +122,8 @@ review_server <- function(id, r){
                , grade != "NA")
     })
     
-    df_filtered_homework_grades <- reactive({
-      req(r$is$auth)
-      student_name <- r$df_student %>%
-        filter(student_id == r$auth_student_id()) %>%
-        select(name) %>%
-        pull()
-      
-      
-      homework_grade <- r$df_homework_table %>%
-        filter(`Student Name` == student_name)
-    })
     
-    
-    
+    # Calculate attempt chart ----
     df_attempts <- reactive({
       # Total attempts for each topic
       attempts_topic_total <- r$df_review_table %>%
@@ -152,20 +143,16 @@ review_server <- function(id, r){
         mutate(grade = TRUE) %>%
         tally() 
       
-      # Attempts left 
-     # merge or left join, replace those NA's with 0s, and subtract
-      
-      # create data frame
-     
-
+      attempts_df <- left_join(attempts_topic_total, df_attempts) %>%
+        rename(attempts = n, total = total_attempts) %>%
+        mutate(remaining = total - attempts)
       
     }) 
     
-    
+    # Topic table ----
     output$topic_proficiency <- renderRHandsontable({
       req(r$is$auth)
-      
-      df <- df_remaining_attempts() %>%
+      df <- df_attempts() %>%
         mutate(
           Topic = as.integer(topic_id), `Previous Attempts` = as.integer(attempts)
           , `Total Attempts` = as.integer(total)
@@ -173,9 +160,10 @@ review_server <- function(id, r){
         ) %>%
         select(
           Topic
+          , Total =  `Total Attempts`
           , Previous = `Previous Attempts`
           , Remaining = `Remaining Attempts`
-          , Total =  `Total Attempts`
+         
         )
       rhandsontable(
         df
@@ -184,10 +172,11 @@ review_server <- function(id, r){
         hot_cols(readOnly = T)
     })
     
+    # Topic bar -----
     output$topic_proficiency_bar <- renderEcharts4r({
       req(r$is$auth)
       
-      df <- df_remaining_attempts()
+      df <- df_attempts()
       
       df <- df %>%
         mutate(Topic = topic_id
@@ -219,17 +208,18 @@ review_server <- function(id, r){
       
     })
     
-    
+    # grades table ----
     output$review_grades <- renderRHandsontable({
       req(r$is$auth)
       grade_types <- c("NA", "NC", "Fluent", "Getting There", "Needs Work")
-      df_review_to_topic <- df_filtered_review_to_topic()
+      df_review_to_topic <- df_review_grades()
       df_student <- r$df_student
       df_review_topic <- df_review_to_topic %>%
         left_join(df_student, by = "student_id") %>%
         pivot_wider(id_cols = c(review_id, topic_id)
                     , names_from = topic_id
-                    , values_from = grade) %>%
+                    , values_from = grade
+                    , names_prefix = "Topic ") %>%
         rename(`Review ID` = review_id)
       
       rhandsontable(df_review_topic

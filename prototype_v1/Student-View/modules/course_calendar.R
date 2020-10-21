@@ -45,8 +45,6 @@ course_calendar_server <- function(id, r){
     }, ignoreInit = T)
     
     output$course_schedule <- renderTimevis({
-      browser()
-      
       df_timevis_homework <-  r$df_homework %>%
         mutate(content = paste("Homework", id)
                , start = as.character(date_assigned)
