@@ -185,6 +185,7 @@ edit_roster_button_Server <- function(id, r){
             , data = temp
             , sheet = "homework_grades"
           ) 
+          temp <-rbind(homework_grades, temp)
         } else{
           new_row <- c(input$addName, rep(NA, ncol(r$df_homework_grades) - 1))
           temp <-rbind(homework_grades, new_row)
@@ -194,6 +195,7 @@ edit_roster_button_Server <- function(id, r){
             , sheet = "homework_grades"
           ) 
         }
+       
         r$df_homework_grades <- temp
         
         
