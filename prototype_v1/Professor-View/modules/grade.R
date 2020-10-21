@@ -1,12 +1,12 @@
 homework_UI <- function(id) {
   tabPanel(title = "Homework"
            , fluidRow(
-             box(width = 12, status = "primary"
-                 , title = "Homework Grades"
-                 , rHandsontableOutput(NS(id, "homework_table"))
+             #box(width = 12, status = "primary"
+                 # , title = "Homework Grades"
+                 rHandsontableOutput(NS(id, "homework_table"))
                  , br()
                  , actionBttn(NS(id, "save"), "Save", style = "material-flat", block = T)
-             )
+             #)
              , br()
              , box(width = 12, status = "primary"
                    , title = textOutput(NS(id, "title"))
@@ -71,9 +71,10 @@ homework_server <- function(id, r){
     
     # Homework Table ----
     output$homework_table <- renderRHandsontable({
+      
       # TODO: add catch for empty table
       df_homework_grades <- r$df_homework_grades 
-      if (nrow(df_homework_grades) == 0){
+      if (ncol(df_homework_grades) == 1){
         rhandsontable(df_homework_grades
                       , rowHeaders = NULL
                       , stretchH = 'all') 
@@ -106,22 +107,24 @@ review_UI <- function(id) {
            , fluidRow(
              tabBox(width = 12
                     # Review by Review ----
-                    , tabPanel(title = "By Student"
-                               , box(width = 12, status = "primary"
-                                     , title = "Review Grade by Student"
+                    , tabPanel(title = "Review Grade by Student"
+                               # , box(width = 12, status = "primary"
+                               #       , title = "Review Grade by Student"
                                      #, uiOutput(NS(id, "review_picker"))
-                                     , rHandsontableOutput(NS(id, "review_table_review"))
+                                     , fluidRow(
+                                       rHandsontableOutput(NS(id, "review_table_review"))
+                                       )
                                      
-                               )
+                               # )
                                , actionBttn(NS(id, "saveReview"), "Save", style = "material-flat", block = T)
                     )
                     # Review by Student ----
-                    , tabPanel(title = "By Topic"
-                               , box(width = 12, status = "primary"
-                                     , title = "Review Grade by Topic"
+                    , tabPanel(title = "Review Grade by Topic"
+                               # , box(width = 12, status = "primary"
+                               #       , title = "Review Grade by Topic"
                                      #, uiOutput(NS(id, "student_picker"))
-                                     , rHandsontableOutput(NS(id, "review_table_student"))
-                               )
+                                     , fluidRow(rHandsontableOutput(NS(id, "review_table_student")))
+                               # )
                                , actionBttn(NS(id, "saveStudent"), "Save", style = "material-flat", block = T)
                     )
              )
@@ -145,7 +148,6 @@ review_server <- function(id, r){
       
       column_names <- names(df_review)
       student_names <- column_names[3:length(column_names)]
-      grade_types <- factor(c("NA", "Not Completed", "Fluent", "Progressing", "Needs Work"))
       
       grade_types <- c("NA", "Not Completed", "Fluent", "Progressing", "Needs Work")
       rhandsontable(df_review
@@ -247,7 +249,8 @@ review_server <- function(id, r){
       df <- hot_to_r(input$review_table_student)
       df_temp <- df %>%
         pivot_longer(cols = c(3:ncol(df))) %>%
-        left_join(df_student, by = c("Student Name" = "name"))
+        left_join(df_student, by = c("Student Name" = "name")) %>%
+        na.omit()
       
       df_temp <- df_temp %>%
         mutate(topic_id = str_split_fixed(df_temp$name, " ", 2)[,2]) %>%
