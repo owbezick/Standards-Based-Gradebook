@@ -121,7 +121,7 @@ review_server <- function(id, r){
         pull()
       
       
-      homework_grade <- r$df_homework_table %>%
+      homework_grade <- r$df_homework_grades %>%
         filter(`Student Name` == student_name)
     })
     
