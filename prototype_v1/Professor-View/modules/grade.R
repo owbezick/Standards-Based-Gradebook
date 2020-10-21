@@ -76,10 +76,17 @@ homework_server <- function(id, r){
     output$homework_table <- renderRHandsontable({
       # TODO: add catch for empty table
       df_homework_grades <- r$df_homework_grades 
-      rhandsontable(df_homework_grades
-                    , rowHeaders = NULL
-                    , stretchH = 'all') %>%
-        hot_heatmap(cols = c(2:ncol(df_homework_grades)))
+      if (nrow(df_homework_grades) == 0){
+        rhandsontable(df_homework_grades
+                      , rowHeaders = NULL
+                      , stretchH = 'all') 
+      } else{
+        rhandsontable(df_homework_grades
+                      , rowHeaders = NULL
+                      , stretchH = 'all') %>%
+          hot_heatmap(cols = c(2:ncol(df_homework_grades)))
+      }
+      
     })  
     
     # Saving ----
@@ -89,7 +96,7 @@ homework_server <- function(id, r){
       sheet_write(
         ss =  "https://docs.google.com/spreadsheets/d/1xIC4pGhnnodwxqopHa45KRSHIVcOTxFSfJSEGPbQH20/edit#gid=2102408290"
         , data = df_hot
-        , sheet = "homework_table"
+        , sheet = "homework_grades"
       )
       showNotification("Saved to remote.")
     })
@@ -157,7 +164,6 @@ review_server <- function(id, r){
     # Review by Review ----
     output$review_table_review <- renderRHandsontable({
       #req(input$review_review_input)
-      browser()
       grade_types <- c("NA", "Not Completed", "Fluent", "Progressing", "Needs Work")
       df_review_grades <- r$df_review_grades
       df_student <- r$df_student
@@ -166,7 +172,6 @@ review_server <- function(id, r){
         pivot_wider(id_cols = c(review_id, topic_id), names_from = name, values_from = grade) %>%
         rename(`Review ID` = review_id, `Topic ID` = topic_id)
       
-      # browser()
       # if (input$review_review_input == "All"){
       #   df_review <- df_review %>%
       #     group_by(`Review ID`) %>%
@@ -262,7 +267,7 @@ review_server <- function(id, r){
       df_review_topic <- df_review_topic %>%
         group_by(`Student Name`) %>%
         arrange(`Student Name`) 
-      
+      #TODO: add Topic before ID # in columns
       rhandsontable(df_review_topic
                     , rowHeaders = NULL
                     , stretchH = 'all'

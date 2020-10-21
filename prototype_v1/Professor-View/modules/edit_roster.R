@@ -211,19 +211,44 @@ edit_roster_button_Server <- function(id, r){
         
         
         # Save to review_grades sheet ----
-        
-        # catch for adding students when there are no reviews
-        if (nrow(r$df_review_grades) != 0){
+        # CATCH: if there are no reviews ----
+        # Should not be the case if starting with an initial review (for the time being)
+        if (nrow(r$df_review_table) != 0){
           a_student_id <-  r$df_student[1,1] %>%
             pull()
           
-          review_to_topic <- r$df_review_grades
-          new_data <- review_to_topic %>%
+          review_grades <- r$df_review_grades
+          # If first student being added to review_grades
+          if (nrow(review_grades) == 0){
+            df_review <- r$df_review_table %>%
+              pivot_longer(cols = (4:ncol(r$df_review_table))) %>%
+              filter(value == "TRUE")
+            
+            review_ids <- df_review %>%
+              select(`Review ID`) %>%
+              distinct() %>%
+              pull()
+            
+            topics <- str_split_fixed(df_review$name, " ", n = 2)[,2]
+           
+            temp <- tibble(review_id = df_review$`Review ID`
+                   , topic_id = topics
+                   , student_id = rep(input$addID, length(topics))
+                   , grade = rep("NA", length(topics)))
+            
+            r$df_review_grades <- temp
+            sheet_append(
+              ss = "https://docs.google.com/spreadsheets/d/1xIC4pGhnnodwxqopHa45KRSHIVcOTxFSfJSEGPbQH20/editgid=2102408290"
+              , data = temp
+              , sheet = "review_grades"
+            ) 
+          } else{
+          new_data <- review_grades %>%
             filter(student_id == a_student_id) %>%
             mutate(student_id = input$addID
                    , grade = "NA")
           
-          temp <- rbind(review_to_topic, new_data) %>%
+          temp <- rbind(review_grades, new_data) %>%
             arrange(review_id, topic_id)
           
           r$df_review_grades <- temp
@@ -232,6 +257,7 @@ edit_roster_button_Server <- function(id, r){
             , data = temp
             , sheet = "review_grades"
           ) 
+          }
         }
         
         # Update Inputs & show notification ----

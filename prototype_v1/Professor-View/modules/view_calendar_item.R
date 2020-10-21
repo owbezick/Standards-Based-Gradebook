@@ -42,6 +42,7 @@ view_calendar_hw_Server <- function(id, r){
     })
     
     observeEvent(input$delete, {
+      browser()
       # Save df_homework_grades ----
       cal_item <- r$cal_item
       drop <- c(paste("Homework", cal_item[1,1]))
