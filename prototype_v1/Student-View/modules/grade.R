@@ -9,7 +9,7 @@ homework_UI <- function(id) {
                     )
              )
              , column(width = 12
-                      , box(width = 12, status = "primary", title = textOutput(NS(id, "title"))
+                      , box(width = 12, status = "primary", title = NULL
                             , echarts4rOutput(NS(id,"homework_grade_bar"), height = "300px")
                       )
              )
@@ -64,6 +64,12 @@ homework_server <- function(id, r){
                                       return(parseFloat(params.value[1]*100).toFixed(2) +'%');
                                     }
                                     ")) %>%
+        e_mark_line(title = "Average Score"
+                    , data = list(type = "average", name = "Average Score")
+                    , animation = FALSE
+                    , lineStyle = c(color = "#444")
+                    , symbol = "circle"
+        ) %>%
         e_color(color = "#c41230") %>%
         e_grid(left = "15%", right = "5%", top = "10%", bottom = "10%") %>%
         e_tooltip()
@@ -161,7 +167,7 @@ review_server <- function(id, r){
       
       df <- df_remaining_attempts() %>%
         mutate(
-          Topic = topic_id, `Previous Attempts` = as.integer(attempts)
+          Topic = as.integer(topic_id), `Previous Attempts` = as.integer(attempts)
           , `Total Attempts` = as.integer(total)
           , `Remaining Attempts` = as.integer(remaining)
         ) %>%
@@ -206,6 +212,7 @@ review_server <- function(id, r){
               , barWidth = "50%"
               , name = "Remaining Attempts") %>%
         e_legend(bottom = 'bottom') %>%
+        e_y_axis(formatter = e_axis_formatter("decimal", digits = 0))
         e_grid(top = "15%", left= "10%", bottom = "20%", right = "5%") %>%
         e_tooltip()
       
@@ -229,7 +236,8 @@ review_server <- function(id, r){
                     , rowHeaders = NULL
                     , stretchH = 'all') %>%
         hot_col(col = "Review ID", type = "character") %>%
-        hot_cols(type = "dropdown", source = grade_types, readOnly = T)
+        hot_cols(type = "dropdown", source = grade_types, readOnly = T) %>%
+        hot_heatmap(cols = c(2:ncol(df_review_topic)))
     })
   })
 }

@@ -45,23 +45,27 @@ course_calendar_server <- function(id, r){
     }, ignoreInit = T)
     
     output$course_schedule <- renderTimevis({
+      browser()
+      
       df_timevis_homework <-  r$df_homework %>%
         mutate(content = paste("Homework", id)
                , start = as.character(date_assigned)
+               , end = as.character(date_due)
                , id = paste0("h_", id)
                , group = "homework"
                , className = "homework"
                ) %>%
-        select(id, start, content, group, className)
-      #browser()
+        select(id, start, end, content, group, className)
+      
       df_timevis_review <- r$df_review_table %>%
         mutate(content = `Review Name`
                , start = as.character(`Review Date`)
+               , end = NA
                , id = paste0("r_", `Review ID`)
                , group = "review"
                , className = "review"
         ) %>%
-        select(id, start, content, group, className)
+        select(id, start, end, content, group, className)
       
       groups <- data.frame(
         id = c("review", "homework")

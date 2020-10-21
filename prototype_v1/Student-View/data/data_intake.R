@@ -35,7 +35,7 @@ read_all_database_sheets <- function(sheets){
 
 ls_sheets <- c("student", "course_info", "homework", "homework_grades", "topic", "review_table", "review_grades")
 
-ls_all_data <- read_all_database_sheets(ls_sheets)
+#ls_all_data <- read_all_database_sheets(ls_sheets)
 
 r <- reactiveValues(df_student = NULL
                     , df_course_info = NULL
