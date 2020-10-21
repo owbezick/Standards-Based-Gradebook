@@ -177,7 +177,7 @@ review_server <- function(id, r){
       req(r$is$auth)
       
       df <- df_attempts()
-      
+      browser()
       df <- df %>%
         mutate(Topic = topic_id
                , `Previous Attempts` = as.integer(attempts)
