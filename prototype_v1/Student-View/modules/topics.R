@@ -6,8 +6,6 @@ topics_UI <- function(id){
 
 topics_server <- function(id, r){
   moduleServer(id, function(input,output,session){
-    
-    
     output$topicTable <- renderRHandsontable({
       df <- r$df_review_table
       

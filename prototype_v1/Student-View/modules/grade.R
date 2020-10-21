@@ -105,7 +105,7 @@ review_UI <- function(id) {
 review_server <- function(id, r){
   moduleServer(id, function(input, output, session){
     # Creates student data frames
-    df_filtered_review_to_topic <- reactive({
+    df_review_grades <- reactive({
       req(r$is$auth)
       current_student <- r$auth_student_id()
       exam_grade <- r$df_review_grades %>%
@@ -121,58 +121,37 @@ review_server <- function(id, r){
         pull()
       
       
-      homework_grade <- r$df_homework_grades %>%
+      homework_grade <- r$df_homework_table %>%
         filter(`Student Name` == student_name)
     })
     
     
     
-    df_remaining_attempts <- reactive({
-      # Topics Completed
-      df_overall_grades <- df_filtered_review_to_topic() %>% 
-        group_by(grade) %>%
-        tally()
+    df_attempts <- reactive({
+      # Total attempts for each topic
+      attempts_topic_total <- r$df_review_table %>%
+        pivot_longer(cols = c(4:ncol(r$df_review_table))) %>%
+        group_by(name) %>%
+        tally(value) %>%
+        rename(topic = name, total_attempts = n)
       
-      # Topic attempts so far
-      df_attempts <- df_filtered_review_to_topic() %>% 
+      topics <- str_split_fixed(attempts_topic_total$topic, " ", 2)[,2]
+      attempts_topic_total <- attempts_topic_total %>%
+        mutate(topic = topics) %>%
+        rename(topic_id = topic)
+      
+      # Attempts taken for each topic 
+      df_attempts <- df_review_grades() %>% 
         group_by(topic_id) %>%
+        mutate(grade = TRUE) %>%
         tally() 
       
+      # Attempts left 
+     # merge or left join, replace those NA's with 0s, and subtract
       
-      # Topic attempts total
-      df_total_attempts <- r$df_review_grades %>%
-        subset(select = -c(`Review Name`, `Review ID`, `Review Date`))
-      
-      df_total_attempts[is.na(df_total_attempts)] <- 0
-      
-      df_total_attempts <- df_total_attempts %>%
-        colSums()
-      
-      df_total_attempts <- df_total_attempts %>%
-        as.matrix() %>%
-        as.data.frame()
-      
-      df_total_attempts$topic_id <- rownames(df_total_attempts)
-      
-      justNum <- function(str){
-        return(str_remove_all(str, "Topic "))
-      }
-      
-      df_total_attempts <- df_total_attempts %>%
-        select(topic_id, total = V1) %>%
-        mutate(topic_id = justNum(topic_id))
-      
-      df_remaining_attempts <- base::merge(x = df_total_attempts, y = df_attempts, by = "topic_id", all.x = TRUE) %>%
-        select(topic_id, total, attempts = n)
-      
-      df_remaining_attempts[is.na(df_remaining_attempts)] <- 0
-      
-      df_remaining_attempts <- df_remaining_attempts %>%
-        mutate(remaining = total - attempts)
-      
-      base::merge(df_remaining_attempts, r$df_topic, by = "topic_id", all.y = TRUE)
-      
-      return (df_remaining_attempts)
+      # create data frame
+     
+
       
     }) 
     
