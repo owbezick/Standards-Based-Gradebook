@@ -1,19 +1,4 @@
-# df_homework_data <- read.xlsx("example_data.xlsx", sheet = "homework") %>%
-#   mutate(homework_date = as.Date(homework_date, origin = "1900-01-01"))
-# 
-# df_review_data <- read.xlsx("example_data.xlsx", sheet = "review")%>%
-#   mutate(review_date = as.Date(review_date, origin = "1900-01-01"))
-# # 
-# df_course_info <- tibble(
-#   location = "Chambers 2187"
-#   , meeting_times = "Tuesday and Thursday, 9:40am - 10:55am"
-#   , office_hours = "Monday and Wednesday, 10:00am - 12:30pm"
-#   , link = "https://mastering-shiny.org/"
-#   , link_description = "Davidson Website"
-# )
-
 library(config)
-# TODO: Warning in  config file:
 # Warning in readLines(con) :
 # incomplete final line found on '/Users/owenbezick/Documents/GitHub/Standards-Based-Gradebook/prototype_v1/Professor-View/config.yml'
 config <- config::get()
@@ -29,6 +14,7 @@ config <- config::get()
 library(googlesheets4)
 library(googledrive)
 
+# Authenticate drive/ sheets ----
 drive_auth(cache = ".cache",
            email = "caspencer@davidson.edu")
 
@@ -47,34 +33,29 @@ read_all_database_sheets <- function(sheets){
   data
 }
 
-ls_sheets <- c("student", "course_info", "homework", "topic", "review_table", "homework_grades", "review_grades")
+ls_sheets <- c("student", "course_info", "homework", "homework_grades", "topic", "review_table", "review_grades")
 
 ls_all_data <- read_all_database_sheets(ls_sheets)
 
 r <- reactiveValues(df_student = NULL
-                    , df_homework = NULL
-                    , df_homework_grade = NULL
                     , df_course_info = NULL
-                    , df_review_to_topic = NULL
+                    , df_homework = NULL
+                    , df_homework_grades = NULL
                     , df_topic = NULL
-                    , df_cal_item = NULL
                     , df_review_table = NULL
-                    , df_homework_two = NULL
+                    , df_cal_item = NULL
 )
 
 r$df_student <- ls_all_data$student
 
-r$df_homework <- ls_all_data$homework
-
-r$df_homework_grades <- ls_all_data$homework_grade
-
 r$df_course_info <- ls_all_data$course_info
 
-r$df_review_to_topic <- ls_all_data$review_grades
+r$df_homework <- ls_all_data$homework
+
+r$df_homework_grades <- ls_all_data$homework_grades
 
 r$df_topic <- ls_all_data$topic
 
 r$df_review_table <-  ls_all_data$review_table
 
-#default:
-#database: "template_gradebook_database"
+r$df_review_grades <- ls_all_data$review_grades

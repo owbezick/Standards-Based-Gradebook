@@ -7,10 +7,11 @@ edit_roster_button_UI <- function(id) {
                   column(width = 12
                          , tabsetPanel(
                            tabPanel(
+                             # Current Roster ----
                              title = "Current Roster"
                              , br()
                              , box(width = 12, status = "primary"
-                                   , rHandsontableOutput(NS(id,"rosterList"))
+                                   , formattableOutput(NS(id,"rosterList"))
                              )
                              , br()
                              , fluidRow(
@@ -24,7 +25,7 @@ edit_roster_button_UI <- function(id) {
                                )
                                , column(width = 6
                                         , actionBttn(
-                                          inputId = NS(id,"rosterClose")
+                                          inputId = NS(id,"editClose")
                                           , label = "Close"
                                           , style = "material-flat"
                                           , block = T
@@ -34,6 +35,7 @@ edit_roster_button_UI <- function(id) {
                              )
                            )
                            , tabPanel(
+                             # Add to roster ----
                              title = "Add to Roster"
                              , br()
                              , fluidRow(
@@ -83,6 +85,7 @@ edit_roster_button_UI <- function(id) {
                              )
                            )
                            , tabPanel(title = "Remove from Roster"
+                                      # Remove from roster ----
                                       , br()
                                       , box(width = 12, status = "primary"
                                             , uiOutput(NS(id, "removeFromRoster"))
@@ -116,29 +119,33 @@ edit_roster_button_Server <- function(id, r){
       )
     })
     
-    output$rosterList <- renderRHandsontable({
+    output$rosterList <- renderFormattable({
       df <- r$df_student %>%
         mutate(student_id = as.character(student_id)) %>%
         rename(`Student ID` = student_id
                , Name = name
                , Email = email)
-      rhandsontable(df, rowHeaders = F, stretchH = 'all')
+      formattable(df)
     })
-    # BTN: Save edits ----
-    observeEvent(input$editSave, {
-      temp <- hot_to_r(input$rosterList) %>%
-        rename(student_id = `Student ID`
-               , name = Name
-               , email = Email) %>%
-        mutate(student_id = as.numeric(student_id))
-      r$df_student <- temp
-      sheet_write(
-        ss = "https://docs.google.com/spreadsheets/d/1xIC4pGhnnodwxqopHa45KRSHIVcOTxFSfJSEGPbQH20/editgid=2102408290"
-        , data = temp
-        , sheet = "student"
-      ) 
-    })
-    
+    # TODO: save edits
+    # # BTN: Save edits ----
+    # observeEvent(input$editSave, {
+    #   # save to df_student ----
+    #   temp <- hot_to_r(input$rosterList) %>%
+    #     rename(student_id = `Student ID`
+    #            , name = Name
+    #            , email = Email) %>%
+    #     mutate(student_id = as.numeric(student_id))
+    #   r$df_student <- temp
+    #   sheet_write(
+    #     ss = "https://docs.google.com/spreadsheets/d/1xIC4pGhnnodwxqopHa45KRSHIVcOTxFSfJSEGPbQH20/editgid=2102408290"
+    #     , data = temp
+    #     , sheet = "student"
+    #   ) 
+    #   # save to homework_grades ----
+    #   # save to review_grades ----
+    # })
+    # 
     # BTN Add Student Save ----
     observeEvent(input$addSave, {
       df_prev_student <- r$df_student
@@ -173,24 +180,30 @@ edit_roster_button_Server <- function(id, r){
         # CATCH: adding students when there are no homeworks ----
         if (ncol(homework_grades) == 1){
           temp <- tibble("Student Name" = input$addName)
+          sheet_append(
+            ss = "https://docs.google.com/spreadsheets/d/1xIC4pGhnnodwxqopHa45KRSHIVcOTxFSfJSEGPbQH20/editgid=2102408290"
+            , data = temp
+            , sheet = "homework_grades"
+          ) 
         } else{
           new_row <- c(input$addName, rep(NA, ncol(r$df_homework_grades) - 1))
           temp <-rbind(homework_grades, new_row)
+          sheet_append(
+            ss = "https://docs.google.com/spreadsheets/d/1xIC4pGhnnodwxqopHa45KRSHIVcOTxFSfJSEGPbQH20/editgid=2102408290"
+            , data = temp
+            , sheet = "homework_grades"
+          ) 
         }
         r$df_homework_grades <- temp
-        sheet_write(
-          ss = "https://docs.google.com/spreadsheets/d/1xIC4pGhnnodwxqopHa45KRSHIVcOTxFSfJSEGPbQH20/editgid=2102408290"
-          , data = temp
-          , sheet = "homework_grades"
-        ) 
         
-        # Save to review_to_topic sheet ----
+        
+        # Save to review_grades sheet ----
         # catch for adding students when there are no reviews
-        if (nrow(r$df_review_to_topic) != 0){
+        if (nrow(r$df_review_grades) != 0){
           a_student_id <-  r$df_student[1,1] %>%
             pull()
           
-          review_to_topic <- r$df_review_to_topic
+          review_to_topic <- r$df_review_grades
           new_data <- review_to_topic %>%
             filter(student_id == a_student_id) %>%
             mutate(student_id = input$addID
@@ -199,11 +212,11 @@ edit_roster_button_Server <- function(id, r){
           temp <- rbind(review_to_topic, new_data) %>%
             arrange(review_id, topic_id)
           
-          r$df_review_to_topic <- temp
+          r$df_review_grades <- temp
           sheet_write(
             ss = "https://docs.google.com/spreadsheets/d/1xIC4pGhnnodwxqopHa45KRSHIVcOTxFSfJSEGPbQH20/editgid=2102408290"
             , data = temp
-            , sheet = "review_to_topic"
+            , sheet = "review_grades"
           ) 
         }
         
@@ -237,13 +250,11 @@ edit_roster_button_Server <- function(id, r){
     # BTN Remove Student Save ----
     observeEvent(input$removeSave, {
       ls_removed_names <- input$removeFromRoster
-      
-      
       if(length(ls_removed_names) == 0) {
         showNotification("No students selected to remove.")
         removeModal()
       }else{
-        # student sheet
+        # save student sheet ----
         df_students <- r$df_student
         df_new_students <- subset(df_students, !(name %in% ls_removed_names))
         
@@ -253,33 +264,37 @@ edit_roster_button_Server <- function(id, r){
           , sheet = "student"
         ) 
         
-        # homework sheet 
+        # save homework_grades sheet ----
         df_homework_grades <- r$df_homework_grades
         temp <- subset(df_homework_grades, !(`Student Name` %in% ls_removed_names))
-        r$df_homework_table <- temp
+        r$df_homework_grades <- temp
         sheet_write(
           ss = "https://docs.google.com/spreadsheets/d/1xIC4pGhnnodwxqopHa45KRSHIVcOTxFSfJSEGPbQH20/editgid=2102408290"
           , data = temp
-          , sheet = "df_homework_grades"
+          , sheet = "homework_grades"
         ) 
         
-        # review sheet
-        df_review_to_topic <- r$df_review_to_topic %>%
-          left_join(r$df_student) %>%
-          select(-c(email))
+        # save review sheet ----
+        df_review_grades <- r$df_review_grades 
+        if (ncol(df_review_grades) == 0){
+          
+        } else{
+          df_review_to_topic <- df_review_grades %>%
+            left_join(df_students) %>%
+            select(-c(email))
+          
+          temp <- subset(df_review_to_topic, !(name %in% ls_removed_names)) %>%
+            select(-c(name))
+          
+          r$df_review_to_topic <- temp
+          sheet_write(
+            ss = "https://docs.google.com/spreadsheets/d/1xIC4pGhnnodwxqopHa45KRSHIVcOTxFSfJSEGPbQH20/editgid=2102408290"
+            , data = temp
+            , sheet = "review_grades"
+          ) 
+        }
         
-        temp <- subset(df_review_to_topic, !(name %in% ls_removed_names)) %>%
-          select(-c(name))
-        
-        r$df_review_to_topic <- temp
-        sheet_write(
-          ss = "https://docs.google.com/spreadsheets/d/1xIC4pGhnnodwxqopHa45KRSHIVcOTxFSfJSEGPbQH20/editgid=2102408290"
-          , data = temp
-          , sheet = "review_to_topic"
-        ) 
         showNotification("Saved to remote.")
-        # Update Numeric Inputs for more entries ----
-        
       }
     })
     
@@ -290,7 +305,7 @@ edit_roster_button_Server <- function(id, r){
     observeEvent(input$rosterClose, {
       removeModal()
     })
-    observeEvent(input$close, {
+    observeEvent(input$editClose, {
       removeModal()
     })
   })
