@@ -176,32 +176,23 @@ review_server <- function(id, r){
     output$topic_proficiency_bar <- renderEcharts4r({
       req(r$is$auth)
       
-      df <- df_attempts()
-      browser()
-      df <- df %>%
-        mutate(Topic = topic_id
-               , `Previous Attempts` = as.integer(attempts)
-               , `Total Attempts` = as.integer(total)
-               , `Remaining Attempts` = as.integer(remaining)) %>%
-        select(Topic
-               , prev = `Previous Attempts` 
-               , total = `Total Attempts`
-               , remain = `Remaining Attempts`)
+      df <- df_attempts() %>%
+        rename(Topic = topic_id)
+
       
       df %>%
         e_charts(Topic) %>%
-        e_bar(prev
+        e_bar(attempts
               , stack = "Topics"
               , color = "#c41230"
               , barWidth = "50%"
               , name = "Previous Attempts") %>%
-        e_bar(remain
+        e_bar(remaining
               , stack = "Topics"
               , color = "#222D32"
               , barWidth = "50%"
               , name = "Remaining Attempts") %>%
         e_legend(bottom = 'bottom') %>%
-        e_y_axis(formatter = e_axis_formatter("decimal", digits = 0))
         e_grid(top = "15%", left= "10%", bottom = "20%", right = "5%") %>%
         e_tooltip()
       
