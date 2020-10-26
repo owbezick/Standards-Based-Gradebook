@@ -5,9 +5,9 @@ account: owen-bezick
 server: shinyapps.io
 hostUrl: https://api.shinyapps.io/v1
 appId: 3068188
-bundleId: 3767790
+bundleId: 3767932
 url: https://owen-bezick.shinyapps.io/Professor-View/
-when: 1603309020.19134
+when: 1603311728.39647
 asMultiple: FALSE
 asStatic: FALSE
 ignoredFiles: config.yml|.cache/6c91f3dd95c2217959d38f926b96d7bb_caspencer@davidson.edu|.cache/cd26ed5dc626f11802a652e81d02762e_caspencer@davidson.edu

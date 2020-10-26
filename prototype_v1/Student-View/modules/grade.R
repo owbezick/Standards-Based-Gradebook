@@ -163,7 +163,7 @@ review_server <- function(id, r){
           , Total =  `Total Attempts`
           , Previous = `Previous Attempts`
           , Remaining = `Remaining Attempts`
-         
+          
         )
       rhandsontable(
         df
@@ -178,7 +178,7 @@ review_server <- function(id, r){
       
       df <- df_attempts() %>%
         rename(Topic = topic_id)
-
+      
       
       df %>%
         e_charts(Topic) %>%
@@ -193,6 +193,12 @@ review_server <- function(id, r){
               , barWidth = "50%"
               , name = "Remaining Attempts") %>%
         e_legend(bottom = 'bottom') %>%
+        e_tooltip(formatter = htmlwidgets::JS("
+function(params){
+return('value: ' +
+parseFloat((params.value[1] * 10) / 10).toFixed(1))
+}
+")) %>%
         e_grid(top = "15%", left= "10%", bottom = "20%", right = "5%") %>%
         e_tooltip()
       

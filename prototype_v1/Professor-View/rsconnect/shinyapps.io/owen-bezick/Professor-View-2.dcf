@@ -1,0 +1,13 @@
+name: Professor-View-2
+title: Professor-View-2
+username:
+account: owen-bezick
+server: shinyapps.io
+hostUrl: https://api.shinyapps.io/v1
+appId: 3068590
+bundleId: 3767942
+url: https://owen-bezick.shinyapps.io/Professor-View-2/
+when: 1603312020.1382
+asMultiple: FALSE
+asStatic: FALSE
+ignoredFiles: .cache/6c91f3dd95c2217959d38f926b96d7bb_caspencer@davidson.edu|.cache/cd26ed5dc626f11802a652e81d02762e_caspencer@davidson.edu
