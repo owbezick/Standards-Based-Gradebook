@@ -12,3 +12,4 @@ grade_max <- function(x){
   return(max)
 }
 
+`%notin%` <- Negate(`%in%`)

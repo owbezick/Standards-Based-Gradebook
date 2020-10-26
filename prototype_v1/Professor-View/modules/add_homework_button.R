@@ -72,11 +72,6 @@ add_homework_button_Server <- function(id, r){
                           , "date_due" = input$homeworkDateDue
         )
         # Save and refresh 
-        # sheet_append(
-        #   ss = "https://docs.google.com/spreadsheets/d/1xIC4pGhnnodwxqopHa45KRSHIVcOTxFSfJSEGPbQH20/edit#gid=2102408290"
-        #   , data = new_row
-        #   , sheet = "homework"
-        # )
         new_df <- rbind(df_homework, new_row)
         r$df_homework <- new_df
         
@@ -90,12 +85,8 @@ add_homework_button_Server <- function(id, r){
         names(df_homework_grades)[names(df_homework_grades) == "init"] <- new_column_name
         
         # Save and refresh 
-        r$df_homework_grades <- df_homework_grades
-        # sheet_write(
-        #   ss =  "https://docs.google.com/spreadsheets/d/1xIC4pGhnnodwxqopHa45KRSHIVcOTxFSfJSEGPbQH20/edit#gid=2102408290"
-        #   , data = df_homework_grades
-        #   , sheet = "homework_grades"
-        # )
+        r$df_homework_grades <- df_homework_grades 
+        
         # Show notification & Update Inputs ----
         updateNumericInput(
           session = session
@@ -120,7 +111,7 @@ add_homework_button_Server <- function(id, r){
                             , label = "Homework Description: "
                             , value = " ")
           
-        showNotification("Saved to remote.")
+        showNotification("Saved in session.")
         
       }
       

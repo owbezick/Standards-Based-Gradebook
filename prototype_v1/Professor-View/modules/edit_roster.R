@@ -156,12 +156,6 @@ edit_roster_button_Server <- function(id, r){
         showNotification("Student ID number already exists.", type = "error")
         
       }else{
-        sheet_append(
-          ss = "https://docs.google.com/spreadsheets/d/1xIC4pGhnnodwxqopHa45KRSHIVcOTxFSfJSEGPbQH20/editgid=2102408290"
-          , data = new_row
-          , sheet = "student"
-        ) 
-        
         new_df <- rbind(r$df_student, new_row)
         r$df_student <- new_df
         
@@ -171,35 +165,18 @@ edit_roster_button_Server <- function(id, r){
         # CATCH: adding students when there are no homeworks ----
         if (ncol(homework_grades) == 1){
           temp <- tibble("Student Name" = input$addName)
-          sheet_append(
-            ss = "https://docs.google.com/spreadsheets/d/1xIC4pGhnnodwxqopHa45KRSHIVcOTxFSfJSEGPbQH20/editgid=2102408290"
-            , data = temp
-            , sheet = "homework_grades"
-          ) 
-          
         } else if (nrow(homework_grades) == 0){
           temp <- r$df_homework_grades[1,] %>%
             mutate(`Student Name` = input$addName) %>%
             mutate_at(.vars = c(2:ncol(r$df_homework_grades[1,])), .funs = as.character)
           temp[1,2:ncol(temp)] <- "NA"
-          sheet_append(
-            ss = "https://docs.google.com/spreadsheets/d/1xIC4pGhnnodwxqopHa45KRSHIVcOTxFSfJSEGPbQH20/editgid=2102408290"
-            , data = temp
-            , sheet = "homework_grades"
-          ) 
         } else{
           temp <- r$df_homework_grades[1,] %>%
             mutate(`Student Name` = input$addName) 
           temp[1,2:ncol(temp)] <- "NA"
-          sheet_append(
-            ss = "https://docs.google.com/spreadsheets/d/1xIC4pGhnnodwxqopHa45KRSHIVcOTxFSfJSEGPbQH20/editgid=2102408290"
-            , data = temp
-            , sheet = "homework_grades"
-          ) 
         }
         temp <-rbind(homework_grades, temp)
         r$df_homework_grades <- temp
-        
         
         # Save to review_grades sheet ----
         # CATCH: if there are no reviews ----
@@ -228,11 +205,6 @@ edit_roster_button_Server <- function(id, r){
                    , grade = rep("NA", length(topics)))
             
             r$df_review_grades <- temp
-            sheet_append(
-              ss = "https://docs.google.com/spreadsheets/d/1xIC4pGhnnodwxqopHa45KRSHIVcOTxFSfJSEGPbQH20/editgid=2102408290"
-              , data = temp
-              , sheet = "review_grades"
-            ) 
           } else{
           new_data <- review_grades %>%
             filter(student_id == a_student_id) %>%
@@ -243,11 +215,6 @@ edit_roster_button_Server <- function(id, r){
             arrange(review_id, topic_id)
           
           r$df_review_grades <- temp
-          sheet_write(
-            ss = "https://docs.google.com/spreadsheets/d/1xIC4pGhnnodwxqopHa45KRSHIVcOTxFSfJSEGPbQH20/editgid=2102408290"
-            , data = temp
-            , sheet = "review_grades"
-          ) 
           }
         }
         
@@ -266,8 +233,7 @@ edit_roster_button_Server <- function(id, r){
           , placeholder = "New Name"
           , label = "Student Name: "
         )
-        
-        showNotification("Saved to remote.")
+        showNotification("Saved in session.")
       }
     })
     
@@ -281,22 +247,12 @@ edit_roster_button_Server <- function(id, r){
         # save student sheet ----
         df_students <- r$df_student
         df_new_students <- subset(df_students, !(name %in% ls_removed_names))
-        # sheet_write(
-        #   ss = "https://docs.google.com/spreadsheets/d/1xIC4pGhnnodwxqopHa45KRSHIVcOTxFSfJSEGPbQH20/editgid=2102408290"
-        #   , data = df_new_students
-        #   , sheet = "student"
-        # ) 
         r$df_student <- df_new_students
         
         # save homework_grades sheet ----
         df_homework_grades <- r$df_homework_grades
         temp <- subset(df_homework_grades, !(`Student Name` %in% ls_removed_names))
         r$df_homework_grades <- temp
-        # sheet_write(
-        #   ss = "https://docs.google.com/spreadsheets/d/1xIC4pGhnnodwxqopHa45KRSHIVcOTxFSfJSEGPbQH20/editgid=2102408290"
-        #   , data = temp
-        #   , sheet = "homework_grades"
-        # ) 
         
         # save df_review_grades ----
         df_review_grades <- r$df_review_grades 
@@ -310,14 +266,9 @@ edit_roster_button_Server <- function(id, r){
             select(-c(name))
           
           r$df_review_grades <- temp
-          # sheet_write(
-          #   ss = "https://docs.google.com/spreadsheets/d/1xIC4pGhnnodwxqopHa45KRSHIVcOTxFSfJSEGPbQH20/editgid=2102408290"
-          #   , data = temp
-          #   , sheet = "review_grades"
-          # ) 
         }
         
-        showNotification("Saved to remote.")
+        showNotification("Saved in session.")
       }
     })
     

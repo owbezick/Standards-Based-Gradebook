@@ -4,63 +4,64 @@ add_topic_button_UI <- function(id) {
   showModal(
     modalDialog(title = "Edit Topics", size = "l"
                 , tabBox(width = 12
-                  , tabPanel("Edit Topic Descriptions"
-                          , fluidRow(
-                            rHandsontableOutput(NS(id, "edit_topics"))
-                          )
-                          , br()
-                          , fluidRow(
-                            column(width = 6
-                                   , actionBttn(
-                                     inputId = NS(id,"save_edits")
-                                     , label = "Save Edits"
-                                     , style = "material-flat"
-                                     , block = T
-                                   )
-                            )
-                            , column(width = 6
-                                     , actionBttn(
-                                       inputId = NS(id, "close_edits")
-                                       , label = "Close"
-                                       , style = "material-flat"
-                                       , block = T
-                                     )
-                            )
-                          )
-                           
-                           
-                  )
-                  , tabPanel("Add Topics"
-                             , fluidRow(
-                               column(width = 3
-                                      , tags$b("Topic Number: ")
-                                      , uiOutput(NS(id, "topic_input"))
-                               )
-                               , column(width = 9
-                                        , tags$b("Topic Description: ")
-                                        , textAreaInput(inputId = NS(id, "topicDescription")
-                                                        , label = NULL
-                                        )
-                               ))
-                             , fluidRow(
-                               column(width = 6
-                                      , actionBttn(
-                                        inputId = NS(id,"save")
-                                        , label = "Save Topic"
-                                        , style = "material-flat"
-                                        , block = T
+                         , tabPanel("Edit Topic Descriptions"
+                                    , fluidRow(
+                                      rHandsontableOutput(NS(id, "edit_topics"))
+                                    )
+                                    , br()
+                                    , fluidRow(
+                                      column(width = 6
+                                             , actionBttn(
+                                               inputId = NS(id,"save_edits")
+                                               , label = "Save Edits"
+                                               , style = "material-flat"
+                                               , block = T
+                                             )
                                       )
-                               )
-                               , column(width = 6
-                                        , actionBttn(
-                                          inputId = NS(id, "close")
-                                          , label = "Close"
-                                          , style = "material-flat"
-                                          , block = T
-                                        )
-                               )
-                             ) 
-                  )
+                                      , column(width = 6
+                                               , actionBttn(
+                                                 inputId = NS(id, "close_edits")
+                                                 , label = "Close"
+                                                 , style = "material-flat"
+                                                 , block = T
+                                               )
+                                      )
+                                    )
+                                    
+                                    
+                         )
+                         , tabPanel("Add Topics"
+                                    , fluidRow(
+                                      column(width = 3
+                                             , tags$b("Topic Number: ")
+                                             , uiOutput(NS(id, "topic_input"))
+                                      )
+                                      , column(width = 9
+                                               , tags$b("Topic Description: ")
+                                               , textAreaInput(inputId = NS(id, "topicDescription")
+                                                               , label = NULL
+                                               )
+                                      )
+                                    )
+                                    , fluidRow(
+                                      column(width = 6
+                                             , actionBttn(
+                                               inputId = NS(id,"save")
+                                               , label = "Save Topic"
+                                               , style = "material-flat"
+                                               , block = T
+                                             )
+                                      )
+                                      , column(width = 6
+                                               , actionBttn(
+                                                 inputId = NS(id, "close")
+                                                 , label = "Close"
+                                                 , style = "material-flat"
+                                                 , block = T
+                                               )
+                                      )
+                                    ) 
+                         )
                 )
                 , footer = fluidRow()
     )
@@ -87,17 +88,11 @@ add_topic_button_Server <- function(id, r){
     })
     
     observeEvent(input$save_edits, {
-      #browser()
       df <- hot_to_r(input$edit_topics) %>%
         select(topic_id = id, description = Description)
       
-      # sheet_write(
-      #   ss =  "https://docs.google.com/spreadsheets/d/1xIC4pGhnnodwxqopHa45KRSHIVcOTxFSfJSEGPbQH20/edit#gid=2102408290"
-      #   , data = df
-      #   , sheet = "topic"
-      # )
       removeModal()
-      showNotification("Saved to remote.")
+      showNotification("Saved in session.")
     })
     
     output$topic_input <- renderUI({
@@ -107,7 +102,6 @@ add_topic_button_Server <- function(id, r){
     })
     
     observeEvent(input$save, {
-      # browser()
       if(input$topicNumber %in% r$df_topic$topic_id){
         showNotification("Topic already exists.")
         removeModal()
@@ -118,11 +112,6 @@ add_topic_button_Server <- function(id, r){
                           , "description" = input$topicDescription
         )
         
-        # sheet_append(
-        #   ss = "https://docs.google.com/spreadsheets/d/1xIC4pGhnnodwxqopHa45KRSHIVcOTxFSfJSEGPbQH20/edit#gid=2102408290"
-        #   , data = new_row
-        #   , sheet = "topic"
-        # )
         # Save & refresh data ----
         df_review_table <- r$df_review_table
         new_column <- c(rep(NA, nrow(df_review_table)))
@@ -130,11 +119,6 @@ add_topic_button_Server <- function(id, r){
         df_review_table <- df_review_table %>%
           mutate(init = new_column) 
         names(df_review_table)[names(df_review_table) == "init"] <- new_column_name
-        # sheet_write(
-        #   ss =  "https://docs.google.com/spreadsheets/d/1xIC4pGhnnodwxqopHa45KRSHIVcOTxFSfJSEGPbQH20/edit#gid=2102408290"
-        #   , data = df_review_table
-        #   , sheet = "review_table"
-        # )
         new_df <- rbind(df_topic, new_row)
         r$df_topic <- new_df
         r$df_review_table <- df_review_table
@@ -152,15 +136,11 @@ add_topic_button_Server <- function(id, r){
                            , label = NULL
                            , value =  as.numeric(max(r$df_topic$topic_id)) + 1)
         
-        showNotification("Saved to remote.")
+        showNotification("Saved in session.")
       }
       
-      
-      
-      
-      
     })
-
+    
     observeEvent(input$close, {
       removeModal()
     })

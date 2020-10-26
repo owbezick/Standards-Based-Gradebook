@@ -30,13 +30,6 @@ topics_server <- function(id, r){
       df_hot <- hot_to_r(input$topicTable)
       # Save Review Table ----
       r$df_review_table <- df_hot
-      # sheet_write(
-      #   ss =  "https://docs.google.com/spreadsheets/d/1xIC4pGhnnodwxqopHa45KRSHIVcOTxFSfJSEGPbQH20/edit#gid=2102408290"
-      #   , data = df_hot
-      #   , sheet = "review_table"
-      # )
-
-      `%notin%` <- Negate(`%in%`)
 
       # Save review_grades ----
       df_review_grades <- r$df_review_grades
@@ -81,11 +74,6 @@ topics_server <- function(id, r){
 
       # Refresh and save data ----
       r$df_review_grades <- df_new_review_data
-      # sheet_write(
-      #   ss =  "https://docs.google.com/spreadsheets/d/1xIC4pGhnnodwxqopHa45KRSHIVcOTxFSfJSEGPbQH20/edit#gid=2102408290"
-      #   , data = df_new_review_data
-      #   , sheet = "review_grades"
-      # )
       showNotification("Saved to remote.")
     })
 
