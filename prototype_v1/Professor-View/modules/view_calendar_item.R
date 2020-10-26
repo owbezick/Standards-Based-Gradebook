@@ -4,20 +4,20 @@ view_calendar_hw_UI <- function(id, title){
                 , rHandsontableOutput(NS(id, "item_info_table"))
                 , footer = fluidRow(
                   column(width = 4
-                           , actionBttn(
-                             inputId = NS(id, "save")
-                             , label = "save"
-                             , style = "material-flat"
-                             , block = T
-                           )
-                  )
-                  , column(width = 4
                          , actionBttn(
-                           inputId = NS(id, "delete")
-                           , label = "Delete"
+                           inputId = NS(id, "save")
+                           , label = "save"
                            , style = "material-flat"
                            , block = T
                          )
+                  )
+                  , column(width = 4
+                           , actionBttn(
+                             inputId = NS(id, "delete")
+                             , label = "Delete"
+                             , style = "material-flat"
+                             , block = T
+                           )
                   )
                   , column(width = 4
                            , actionBttn(
@@ -50,7 +50,7 @@ view_calendar_hw_Server <- function(id, r){
         , rowHeaders = NULL
         , stretchH = 'all'
       ) %>%
-      hot_col("Homework Number", readOnly = TRUE)
+        hot_col("Homework Number", readOnly = TRUE)
     })
     
     observeEvent(input$close, {
@@ -155,30 +155,51 @@ view_calendar_review_Server <- function(id, r){
     })
     # Deletion ---- 
     observeEvent(input$delete, {
-      cal_item <- r$cal_item
-      id <- as.numeric(cal_item[1,2]) 
-      
-      # df_review_grades
-      df_review_grades <- r$df_review_grades
-      temp <- subset(df_review_grades, review_id != id)
-      r$df_review_grades <- temp
-      # sheet_write(
-      #   ss = "https://docs.google.com/spreadsheets/d/1xIC4pGhnnodwxqopHa45KRSHIVcOTxFSfJSEGPbQH20/editgid=2102408290"
-      #   , data = temp
-      #   , sheet = "review_grades"
-      # ) 
-      
-      # Review Table
-      df_review_table <- r$df_review_table
-      temp <- subset(df_review_table, `Review ID` != id)
-      r$df_review_table <- temp
-      # sheet_write(
-      #   ss = "https://docs.google.com/spreadsheets/d/1xIC4pGhnnodwxqopHa45KRSHIVcOTxFSfJSEGPbQH20/editgid=2102408290"
-      #   , data = temp
-      #   , sheet = "review_table"
-      # ) 
-      showNotification("Saved to remote.")
-      removeModal()
+      showModal(
+        modalDialog(
+          title = "Confrim Deletion"
+          , size = "s"
+          , footer = fluidRow(
+            column(width = 6
+                   , actionBttn(
+                     inputId = NS(id, "hardDelete")
+                     , label = "Yes"
+                     , block = T
+                   )
+            )
+            , column(width = 6
+                     , actionBttn(
+                       NS(id, "goBack")
+                       , "Go back"
+                       , block = T
+                     )
+            )
+          )
+        )
+      )
     })
+  
+  observeEvent(input$hardDelete, {
+    cal_item <- r$cal_item
+    id <- as.numeric(cal_item[1,2]) 
+    
+    # df_review_grades
+    df_review_grades <- r$df_review_grades
+    temp <- subset(df_review_grades, review_id != id)
+    r$df_review_grades <- temp
+    
+    # Review Table
+    df_review_table <- r$df_review_table
+    temp <- subset(df_review_table, `Review ID` != id)
+    r$df_review_table <- temp
+    
+    showNotification("Saved to remote.")
+    removeModal()
+  })
+  
+  observeEvent(input$goBack, {
+    removeModal()
+  })
+  
   })
 }
