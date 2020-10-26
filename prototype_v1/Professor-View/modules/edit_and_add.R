@@ -1,6 +1,6 @@
 # Edit and add module ----
 edit_and_add_UI <- function(id){
-  box(width = 4, title = "Edit & Add", status = "primary", height = "225px"
+  box(width = 4, title = "Edit:", status = "primary", height = "225px"
       , fluidRow(
         column(width = 12
                , actionBttn(inputId = NS(id, "editCourseInfo")

@@ -1,7 +1,7 @@
 # Mastery Gradebook application - Professor View
 # Author: Owen Bezick & Calvin Spencer
 source("utils/libraries.R")
-
+source("modules/wizard.R")
 source("modules/course_info.R")
 source("modules/add_homework_button.R")
 source("modules/add_topic_button.R")
@@ -43,8 +43,10 @@ ui <- dashboardPage(
     )
     , dashboardBody(
         includeCSS("utils/style.css")
+        , uiOutput("dataWizard")
         , tabItems(
             tabItem(
+                # Home tab UI ----
                 tabName = "home"
                 , fluidRow(
                     course_info_UI("courseinfo")
@@ -58,12 +60,13 @@ ui <- dashboardPage(
                 )
             )
             , tabItem(
+                # Grade tab UI ----
                 tabName = "grades"
                 , tabBox(title = "Grades", width = 12
-                    , homework_UI("homework")
-                    , review_UI("review")
+                         , homework_UI("homework")
+                         , review_UI("review")
                 )
-               
+                
             )
         )
     )
@@ -72,6 +75,31 @@ ui <- dashboardPage(
 
 # Define server logic 
 server <- function(input, output) {
+    # Data Wizard ----
+    output$dataWizard <- renderUI({
+        showModal(
+            modalDialog(title = "Initial Data Input"
+                        , size = "l"
+                        , footer =  fluidRow(
+                            column(width = 6
+                                   , "Note: more data can be added and edited later in the app."
+                            )
+                            , column(width = 6
+                                     , actionBttn("closeWizard", "Close Wizard"))
+                        )
+                        , easyClose = T
+                        , br()
+                        , fluidRow(wizardUI("dataWizard",r))
+            )
+        )
+    })
+    observeEvent(input$closeWizard, {
+        removeModal()
+    })
+    
+    wizard_server("dataWizard", r)
+    
+    # Other server calls ----
     course_calendar_server("course_calendar", r)
     course_info_server("courseinfo", r)
     edit_and_add_server("edit_and_add", r)
