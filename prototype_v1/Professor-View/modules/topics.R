@@ -15,7 +15,8 @@ topics_server <- function(id, r){
     output$topicTable <- renderRHandsontable({
       df <- r$df_review_table
       df <- df %>%
-        mutate(`Review Date` = ymd(`Review Date`)
+        mutate(`Review Start Date` = ymd(`Review Start Date`)
+               , `Review End Date` = ymd(`Review End Date`)
                , `Review ID` = as.character(`Review ID`))
       rhandsontable(
         df
@@ -38,7 +39,7 @@ topics_server <- function(id, r){
         select(student_id)
 
       data_from_hot <- df_hot %>%
-        pivot_longer(cols = c(4:ncol(df_hot))) %>%
+        pivot_longer(cols = c(5:ncol(df_hot))) %>%
         na.omit()
 
       review_topic_id_hot <- data_from_hot %>%

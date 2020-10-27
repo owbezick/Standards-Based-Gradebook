@@ -1,6 +1,7 @@
 # Mastery Gradebook application - Professor View
 # Author: Owen Bezick & Calvin Spencer
 source("utils/libraries.R")
+source("data/data_intake.R")
 source("modules/wizard.R")
 source("modules/course_info.R")
 source("modules/add_homework_button.R")
@@ -12,7 +13,7 @@ source("modules/edit_roster.R")
 source("modules/topics.R")
 source("modules/view_calendar_item.R")
 source("modules/grade.R")
-source("data/data_intake.R")
+
 
 ui <- dashboardPage(
     skin = "black"
@@ -80,16 +81,12 @@ server <- function(input, output) {
         showModal(
             modalDialog(title = "Initial Data Input"
                         , size = "l"
-                        , footer =  fluidRow(
-                            column(width = 6
-                                   , "Note: more data can be added and edited later in the app."
-                            )
-                            , column(width = 6
-                                     , actionBttn("closeWizard", "Close Wizard"))
-                        )
-                        , easyClose = T
+                        , footer = "Note: more data can be added and edited later in the app."
+                        , easyClose = F
                         , br()
-                        , fluidRow(wizardUI("dataWizard",r))
+                        , fluidRow(
+                            wizardUI("dataWizard", r) 
+                        )
             )
         )
     })
