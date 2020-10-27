@@ -44,7 +44,16 @@ ui <- dashboardPage(
     )
     , dashboardBody(
         includeCSS("utils/style.css")
-        , uiOutput("dataWizard")
+        
+        , modalDialog(title = "Initial Data Input"
+                      , size = "l"
+                      , footer = "Note: more data can be added and edited later in the app."
+                      , easyClose = F
+                      , fluidRow(
+                          wizardUI("dataWizard") 
+                      )
+        )
+        
         , tabItems(
             tabItem(
                 # Home tab UI ----
@@ -75,26 +84,11 @@ ui <- dashboardPage(
 
 
 # Define server logic 
-server <- function(input, output) {
+server <- function(input, output, session) {
     # Data Wizard ----
-    output$dataWizard <- renderUI({
-        showModal(
-            modalDialog(title = "Initial Data Input"
-                        , size = "l"
-                        , footer = "Note: more data can be added and edited later in the app."
-                        , easyClose = F
-                        , br()
-                        , fluidRow(
-                            wizardUI("dataWizard", r) 
-                        )
-            )
-        )
-    })
-    observeEvent(input$closeWizard, {
-        removeModal()
-    })
-    
     wizard_server("dataWizard", r)
+    
+    
     
     # Other server calls ----
     course_calendar_server("course_calendar", r)

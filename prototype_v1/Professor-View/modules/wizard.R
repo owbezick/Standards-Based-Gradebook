@@ -1,224 +1,363 @@
-wizardUI <- function(id, r){
-  df <- r$df_course_info
-  tabsetPanel(id = "wizard"
-         # Course info UI ----
-         , tabPanel(value = "courseInfo", title = "Add Course Info"
-                    , fluidRow(
-                      box(width = 6, status = "primary"
-                          , tags$b("Course Location: ")
-                          , textInput(inputId = NS(id,"location")
-                                      , label = NULL
-                                      , placeholder = "Class location")
-                          , br()
-                          , tags$b("Meeting times: ")
-                          , textInput(inputId = NS(id,"meeting_times")
-                                      , label = NULL
-                                      , placeholder = "Class meeting times")
-                          , br()
-                          , tags$b("Office hours: ")
-                          , textInput(inputId = NS(id,"office_hours")
-                                      , label = NULL
-                                      , placeholder = "Office hours schedule")
-                      )
-                      , box(width = 6, status = "primary"
-                            , column(width = 6
-                                     , tags$b("Link URL: ")
-                                     , textInput(inputId = NS(id,"link1_url")
+wizardUI <- function(id){
+  box(width = 12
+      , tabsetPanel(id = NS(id, "wizard"), type = "hidden"
+                    # Course info UI ----
+                    , tabPanel(title = "Add Course Info", value = "courseInfo"
+                               , "Course Information"
+                               , br()
+                               , fluidRow(
+                                 box(width = 6, status = "primary"
+                                     , tags$b("Course Location: ")
+                                     , textInput(inputId = NS(id,"location")
                                                  , label = NULL
-                                                 , placeholder = "Link URL")
+                                                 , placeholder = "Class location")
                                      , br()
-                                     , tags$b("Link URL: ")
-                                     , textInput(inputId = NS(id,"link2_url")
+                                     , tags$b("Meeting times: ")
+                                     , textInput(inputId = NS(id,"meeting_times")
                                                  , label = NULL
-                                                 , placeholder = "Link URL")
+                                                 , placeholder = "Class meeting times")
                                      , br()
-                                     , tags$b("Link URL: ")
-                                     , textInput(inputId = NS(id,"link3_url")
+                                     , tags$b("Office hours: ")
+                                     , textInput(inputId = NS(id,"office_hours")
                                                  , label = NULL
-                                                 , placeholder = "Link URL")
-                            )
-                            , column(width = 6
-                                     , tags$b("Link Description: ")
-                                     , textInput(inputId = NS(id,"link1_text")
-                                                 , label = NULL
-                                                 , placeholder = "Link text")
-                                     , br()
-                                     , tags$b("Link Description: ")
-                                     , textInput(inputId = NS(id,"link2_text")
-                                                 , label = NULL
-                                                 , placeholder = "Link text")
-                                     , br()
-                                     , tags$b("Link Description: ")
-                                     , textInput(inputId = NS(id,"link3_text")
-                                                 , label = NULL
-                                                 , placeholder = "Link text")
-                            )
-                      )
+                                                 , placeholder = "Office hours schedule")
+                                 )
+                                 , box(width = 6, status = "primary"
+                                       , column(width = 6
+                                                , tags$b("Link URL: ")
+                                                , textInput(inputId = NS(id,"link1_url")
+                                                            , label = NULL
+                                                            , placeholder = "Link URL")
+                                                , br()
+                                                , tags$b("Link URL: ")
+                                                , textInput(inputId = NS(id,"link2_url")
+                                                            , label = NULL
+                                                            , placeholder = "Link URL")
+                                                , br()
+                                                , tags$b("Link URL: ")
+                                                , textInput(inputId = NS(id,"link3_url")
+                                                            , label = NULL
+                                                            , placeholder = "Link URL")
+                                       )
+                                       , column(width = 6
+                                                , tags$b("Link Description: ")
+                                                , textInput(inputId = NS(id,"link1_text")
+                                                            , label = NULL
+                                                            , placeholder = "Link text")
+                                                , br()
+                                                , tags$b("Link Description: ")
+                                                , textInput(inputId = NS(id,"link2_text")
+                                                            , label = NULL
+                                                            , placeholder = "Link text")
+                                                , br()
+                                                , tags$b("Link Description: ")
+                                                , textInput(inputId = NS(id,"link3_text")
+                                                            , label = NULL
+                                                            , placeholder = "Link text")
+                                       )
+                                 )
+                               )
+                               # Buttons ----
+                               , fluidRow(
+                                 column(width = 4)
+                                 , column(width = 4
+                                          , actionBttn(inputId = NS(id,"saveCourseInfo")
+                                                       , label = "Save"
+                                                       , style = "material-flat"
+                                                       , block = T
+                                          )
+                                 )
+                                 , column(width = 4
+                                          , actionBttn(
+                                            inputId = NS(id,"toRoster")
+                                            , label = "Next"
+                                            , style = "material-flat"
+                                            , block = T
+                                          )
+                                 )
+                               )
                     )
-                    , fluidRow(
-                      column(width = 12
-                             , actionBttn(inputId = NS(id,"saveCourseInfo")
-                                          , label = "Add Course Information and Move On"
+                    # Roster UI ----
+                    , tabPanel(value = "roster", title = "Add Roster"
+                               , "Roster"
+                               , br()
+                               , fluidRow(
+                                 box(width = 6, status = "primary"
+                                     , numericInput(
+                                       inputId = NS(id, "addID")
+                                       , label = "Student ID: "
+                                       , value = 801000000
+                                     )   
+                                 )
+                                 , column(width = 6, status = "primary"
+                                          , box(width = 12, status = "primary"
+                                                , textInput(
+                                                  inputId = NS(id, "addName")
+                                                  , label = "Student Name: "
+                                                )
+                                          )
+                                 )
+                               )
+                               # Buttons ----
+                               , fluidRow(
+                                 column(width = 4
+                                        , actionBttn(
+                                          inputId = NS(id,"toCourseInfo")
+                                          , label = "Back"
                                           , style = "material-flat"
                                           , block = T
-                             )
-                      )
-                    )
-         )
-         # Roster UI ----
-         , tabPanel(value = "roster", title = "Add Roster"
-                    , fluidRow(
-                      box(width = 6, status = "primary"
-                          , numericInput(
-                            inputId = NS(id, "addID")
-                            , label = "Student ID: "
-                            , value = 801000000
-                          )   
-                      )
-                      , column(width = 6, status = "primary"
-                               , box(width = 12, status = "primary"
-                                     , textInput(
-                                       inputId = NS(id, "addName")
-                                       , label = "Student Name: "
-                                     )
+                                        )
+                                 )
+                                 , column(width = 4
+                                          , actionBttn(
+                                            inputId = NS(id,"addStudent")
+                                            , label = "Save"
+                                            , style = "material-flat"
+                                            , block = T
+                                          )
+                                 )
+                                 ,    column(width = 4
+                                             , actionBttn(
+                                               inputId = NS(id,"toHomework")
+                                               , label = "Next"
+                                               , style = "material-flat"
+                                               , block = T
+                                             )
+                                 )
                                )
-                      )
                     )
-                    , fluidRow(
-                      column(width = 12
-                             , actionBttn(
-                               inputId = NS(id,"addStudent")
-                               , label = "Add Student"
-                               , style = "material-flat"
-                               , block = T
-                             )
-                      )
-                    )
-         )
-         # Homework UI ----
-         , tabPanel(value = "homework", title = "Add Homeworks"
-                    , fluidRow(
-                      box(width = 6, status = "primary"
-                          , uiOutput(NS(id, "homework_idPicker"))
-                          , br()
-                          , textAreaInput(inputId = NS(id, "homeworkDescription")
-                                          , label = "Homework Description: ")
-                      )
-                      , box(width = 6, status = "primary"
-                            , div(class = "date_inputs", id = "date-inputs"
-                                  , dateInput(inputId = NS(id, "homeworkDateAssigned")
-                                              , label = "Date Assigned: ")
-                                  , br()
-                                  , dateInput(inputId = NS(id, "homeworkDateDue")
-                                              , label = "Date Due: ")
-                            )
-                      )
-                    )
-                    , fluidRow(
-                      column(width = 12
-                             , actionBttn(
-                               inputId = NS(id,"saveHomework")
-                               , label = "Add Homework"
-                               , style = "material-flat"
-                               , block = T
-                             )
-                      )
-                    )
-         )
-         # Topics UI ----
-         , tabPanel(value = "topics", title = "Add Topics"
-                    , fluidRow(
-                      box(width = 2, status = "primary"
-                          , tags$b("Topic Number: ")
-                          , uiOutput(NS(id, "topic_input"))
-                      )
-                      , box(width = 10, status = "primary"
-                            , tags$b("Topic Description: ")
-                            , textAreaInput(inputId = NS(id, "topicDescription")
-                                            , label = NULL
-                            )
-                      )
-                    )
-                    , fluidRow(
-                      column(width = 12
-                             , actionBttn(
-                               inputId = NS(id,"saveTopic")
-                               , label = "Save Topic"
-                               , style = "material-flat"
-                               , block = T
-                             )
-                      )
-                    )
-         )
-         # Review UI ----
-         , tabPanel(value = "review", title = "Add Reviews"
-                    , box(width = 6, status = "primary"
-                          , fluidRow(
-                            column(width = 4
-                                   , uiOutput(NS(id, "review_idPicker"))
-                                   , br()
-                            )
-                            , column(width = 8
-                                     , textInput(inputId = NS(id, "reviewName")
-                                                 , label = "Review ID: ")
+                    # Homework UI ----
+                    , tabPanel(value = "homework", title = "Add Homeworks"
+                               , "Homework"
+                               , br()
+                               , fluidRow(
+                                 box(width = 6, status = "primary"
+                                     , uiOutput(NS(id, "homework_idPicker"))
                                      , br()
-                            )
-                          ) 
-                          , fluidRow(
-                            column(width = 6
-                                   , div(class = "date_inputs", id = "date-inputs"
-                                         , dateInput(inputId = NS(id, "reviewStartDate")
-                                                     , label = "Review Start Date: ")
-                                   )
-                            )
-                            , column(width = 6
-                                     , div(class = "date_inputs", id = "date-inputs"
-                                           , dateInput(inputId = NS(id, "reviewEndDate")
-                                                       , label = "Review End Date: ")
+                                     , textAreaInput(inputId = NS(id, "homeworkDescription")
+                                                     , label = "Homework Description: ")
+                                 )
+                                 , box(width = 6, status = "primary"
+                                       , div(class = "date_inputs", id = "date-inputs"
+                                             , dateInput(inputId = NS(id, "homeworkDateAssigned")
+                                                         , label = "Date Assigned: ")
+                                             , br()
+                                             , dateInput(inputId = NS(id, "homeworkDateDue")
+                                                         , label = "Date Due: ")
+                                       )
+                                 )
+                               )
+                               # Buttons ----
+                               , fluidRow(
+                                 column(width = 4
+                                        , actionBttn(
+                                          inputId = NS(id,"backToRoster")
+                                          , label = "Back"
+                                          , style = "material-flat"
+                                          , block = T
+                                        )
+                                 )
+                                 , column(width = 4
+                                          , actionBttn(
+                                            inputId = NS(id,"saveHomework")
+                                            , label = "Save"
+                                            , style = "material-flat"
+                                            , block = T
+                                          )
+                                 )
+                                 , column(width = 4
+                                          , actionBttn(
+                                            inputId = NS(id,"toTopics")
+                                            , label = "Next"
+                                            , style = "material-flat"
+                                            , block = T
+                                          )
+                                 )
+                               )
+                    )
+                    # Topics UI ----
+                    , tabPanel(value = "topics", title = "Add Topics"
+                               , "Topics"
+                               , br()
+                               , fluidRow(
+                                 box(width = 2, status = "primary"
+                                     , tags$b("Topic Number: ")
+                                     , uiOutput(NS(id, "topic_input"))
+                                 )
+                                 , box(width = 10, status = "primary"
+                                       , tags$b("Topic Description: ")
+                                       , textAreaInput(inputId = NS(id, "topicDescription")
+                                                       , label = NULL
+                                       )
+                                 )
+                               )
+                               # Buttons ----
+                               , fluidRow(
+                                 column(width = 4
+                                        , actionBttn(
+                                          inputId = NS(id,"backToHomework")
+                                          , label = "Back"
+                                          , style = "material-flat"
+                                          , block = T
+                                        )
+                                 )
+                                 , column(width = 4
+                                          , actionBttn(
+                                            inputId = NS(id,"saveTopic")
+                                            , label = "Save"
+                                            , style = "material-flat"
+                                            , block = T
+                                          )
+                                 )
+                                 , column(width = 4
+                                          , actionBttn(
+                                            inputId = NS(id,"toReview")
+                                            , label = "Next"
+                                            , style = "material-flat"
+                                            , block = T
+                                          )
+                                 )
+                               )
+                    )
+                    # Review UI ----
+                    , tabPanel(value = "review", title = "Add Reviews"
+                               , "Reviews"
+                               , br()
+                               , fluidRow(
+                                 box(width = 6, status = "primary"
+                                     , fluidRow(
+                                       column(width = 4
+                                              , uiOutput(NS(id, "review_idPicker"))
+                                              , br()
+                                       )
+                                       , column(width = 8
+                                                , textInput(inputId = NS(id, "reviewName")
+                                                            , label = "Review Name: ")
+                                                , br()
+                                       )
+                                     ) 
+                                     , fluidRow(
+                                       column(width = 6
+                                              , div(class = "date_inputs", id = "date-inputs"
+                                                    , dateInput(inputId = NS(id, "reviewStartDate")
+                                                                , label = "Review Start Date: ")
+                                              )
+                                       )
+                                       , column(width = 6
+                                                , div(class = "date_inputs", id = "date-inputs"
+                                                      , dateInput(inputId = NS(id, "reviewEndDate")
+                                                                  , label = "Review End Date: ")
+                                                )
+                                       )
                                      )
-                            )
-                          )
+                                 )
+                                 , box(width = 6, status = "primary"
+                                       , uiOutput(NS(id, "review_topics"))
+                                 )
+                               )
+                               # Buttons ----
+                               , fluidRow(
+                                 column(width = 4
+                                        , actionBttn(
+                                          inputId = NS(id,"backToTopics")
+                                          , label = "Back"
+                                          , style = "material-flat"
+                                          , block = T
+                                        )
+                                 )
+                                 , column(width = 4
+                                          , actionBttn(
+                                            inputId = NS(id,"saveReview")
+                                            , label = "Save"
+                                            , style = "material-flat"
+                                            , block = T
+                                          )
+                                 )
+                                 , column(width = 4
+                                          , actionBttn(
+                                            inputId = NS(id,"closeWizard")
+                                            , label = "Close Wizard"
+                                            , style = "material-flat"
+                                            , block = T
+                                          )
+                                 )
+                               )
                     )
-                    , box(width = 6, status = "primary"
-                          , uiOutput(NS(id, "review_topics"))
-                    )
-                    , fluidRow(
-                      column(width = 12
-                             , actionBttn(
-                               inputId = NS(id,"saveReview")
-                               , label = "Add Review"
-                               , style = "material-flat"
-                               , block = T
-                             )
-                      )
-                    )
-         )
+      )
   )
-  
 }
 
-wizard_server <- function(id, r) {
+wizard_server <- function(id, r, parent_session) {
   
   `%notin%` <- Negate(`%in%`)
   
   moduleServer(id, function(input, output, session){
-    # Course info ----
+    # Next Buttons ----
+    observeEvent(input$toRoster, {
+      updateTabsetPanel(session, "wizard", selected = "roster")
+    })
+    
+    observeEvent(input$toHomework, {
+      if (nrow(r$df_student) > 0){
+        updateTabsetPanel(session, "wizard", selected = "homework")
+      }else{
+        showNotification("Please add at least one student!")
+      }
+    })
+    
+    observeEvent(input$toTopics, {
+    
+        updateTabsetPanel(session, "wizard", selected = "topics")
+     
+    })
+    
+    observeEvent(input$toReview, {
+      if (nrow(r$df_topic) > 0){
+      updateTabsetPanel(session, "wizard", selected = "review")
+      }else{
+        showNotification("Please add at least one topic!")
+      }
+    })
+    
+    # Back Buttons ----
+    observeEvent(input$toCourseInfo, {
+      updateTabsetPanel(session, "wizard", selected = "courseInfo")
+    })
+    
+    observeEvent(input$backToRoster, {
+      updateTabsetPanel(session, "wizard", selected = "roster")
+    })
+    
+    observeEvent(input$backToHomework, {
+      updateTabsetPanel(session, "wizard", selected = "homework")
+    })
+    
+    observeEvent(input$backToTopics, {
+      updateTabsetPanel(session, "wizard", selected = "topics")
+    })
+    
+    # Close Wizard Button ----
+    observeEvent(input$closeWizard, {
+      removeModal()
+      
+    })
+    # Save Course info ----
     observeEvent(input$saveCourseInfo, {
       course_info <- tibble("location" = input$location
-                       ,"meeting_times" = input$meeting_times
-                       , "office_hours" = input$office_hours
-                       , "link1_url" = input$link1_url
-                       , "link2_url" = input$link2_url
-                       , "link3_url" = input$link3_url
-                       , "link1_text" = input$link1_text
-                       , "link2_text" = input$link2_text
-                       , "link3_text" = input$link3_text
+                            ,"meeting_times" = input$meeting_times
+                            , "office_hours" = input$office_hours
+                            , "link1_url" = input$link1_url
+                            , "link2_url" = input$link2_url
+                            , "link3_url" = input$link3_url
+                            , "link1_text" = input$link1_text
+                            , "link2_text" = input$link2_text
+                            , "link3_text" = input$link3_text
       )
       
       r$df_course_info <- course_info
       showNotification("Saved in session.")
-      
     })
+    
     # Roster ----
     observeEvent(input$addStudent, {
       df_prev_student <- r$df_student
@@ -379,7 +518,7 @@ wizard_server <- function(id, r) {
                             , inputId = "homeworkDescription"
                             , label = "Homework Description: "
                             , value = " ")
-        
+
         showNotification("Saved in session.")
         
       }
@@ -447,26 +586,26 @@ wizard_server <- function(id, r) {
     # Review topic selector 
     output$review_topics <- renderUI({
       choices <- r$df_topic$topic_id
-      checkboxGroupInput("topics", "Topics", choices = choices)
+      checkboxGroupInput(inputId = NS(id, "topics"), label = "Topics", choices = choices)
     })
     
     # Save review
     observeEvent(input$saveReview, {
-      ls_topics <- input$topicNumber
+      ls_topics <- input$topics
       topic <- tibble("topic_id" = ls_topics
-             , topic = rep("Topic", length(ls_topics)
-                           ))
+                      , topic = rep("Topic", length(ls_topics)
+                      ))
       topic_names <- topic %>%
         mutate(name = paste(topic, topic_id)) %>%
         select(name) %>%
         pull()
-    
+      
       # Review Table
       review_table <- tibble(`Review Name` = input$reviewName
-               , `Review ID` = input$reviewNumber
-               , `Review Start Date` = input$reviewStartDate
-               , `Review End Date` = input$reviewEndDate)
-
+                             , `Review ID` = input$reviewNumber
+                             , `Review Start Date` = input$reviewStartDate
+                             , `Review End Date` = input$reviewEndDate)
+      
       review_table <- cbind(review_table, setNames( lapply(topic_names, function(x) x=TRUE), topic_names) )
       r$df_review_table <- review_table
       
@@ -514,7 +653,6 @@ wizard_server <- function(id, r) {
       # Refresh and save data ----
       r$df_review_grades <- df_new_review_data
       showNotification("Saved to remote.")
-
       removeModal()
     })
   }) # End module server ----
