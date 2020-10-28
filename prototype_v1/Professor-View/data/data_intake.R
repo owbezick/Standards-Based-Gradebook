@@ -49,7 +49,7 @@ r <- reactiveValues(df_student = NULL
 r$df_student <- readRDS("data/student.RDS")
 r$df_course_info <- readRDS("data/course_info.RDS")
 r$df_homework <- readRDS("data/homework.RDS")
-r$df_homework_grades <- readRDS("data/homework_grades.RDS")
+r$df_homework_grades <- readRDS("data/homework_grades.RDS")[,1]
 r$df_topic <- readRDS("data/topic.RDS")
 r$df_review_table <- readRDS("data/review_table.RDS")
 r$df_review_grades <-  readRDS("data/review_grades.RDS")

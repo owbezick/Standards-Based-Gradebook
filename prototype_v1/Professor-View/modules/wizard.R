@@ -1,4 +1,4 @@
-wizardUI <- function(id){
+wizardUI <- function(id, doneButton){
   box(width = 12
       , tabsetPanel(id = NS(id, "wizard"), type = "hidden"
                     # Course info UI ----
@@ -186,7 +186,7 @@ wizardUI <- function(id){
                                  )
                                  , box(width = 10, status = "primary"
                                        , tags$b("Topic Description: ")
-                                       , textAreaInput(inputId = NS(id, "topicDescription")
+                                       , textInput(inputId = NS(id, "topicDescription")
                                                        , label = NULL
                                        )
                                  )
@@ -274,12 +274,7 @@ wizardUI <- function(id){
                                           )
                                  )
                                  , column(width = 4
-                                          , actionBttn(
-                                            inputId = NS(id,"closeWizard")
-                                            , label = "Close Wizard"
-                                            , style = "material-flat"
-                                            , block = T
-                                          )
+                                        , doneButton
                                  )
                                )
                     )
@@ -306,14 +301,14 @@ wizard_server <- function(id, r, parent_session) {
     })
     
     observeEvent(input$toTopics, {
-    
-        updateTabsetPanel(session, "wizard", selected = "topics")
-     
+      
+      updateTabsetPanel(session, "wizard", selected = "topics")
+      
     })
     
     observeEvent(input$toReview, {
       if (nrow(r$df_topic) > 0){
-      updateTabsetPanel(session, "wizard", selected = "review")
+        updateTabsetPanel(session, "wizard", selected = "review")
       }else{
         showNotification("Please add at least one topic!")
       }
@@ -336,11 +331,6 @@ wizard_server <- function(id, r, parent_session) {
       updateTabsetPanel(session, "wizard", selected = "topics")
     })
     
-    # Close Wizard Button ----
-    observeEvent(input$closeWizard, {
-      removeModal()
-      
-    })
     # Save Course info ----
     observeEvent(input$saveCourseInfo, {
       course_info <- tibble("location" = input$location
@@ -360,45 +350,44 @@ wizard_server <- function(id, r, parent_session) {
     
     # Roster ----
     observeEvent(input$addStudent, {
-      df_prev_student <- r$df_student
-      new_row <- tibble("student_id" = input$addID
-                        , "name" = input$addName
-      )
-      
+      # Check to see if ID already exists
       if(input$addID %in% r$df_student$student_id){
+        showNotification("Student ID number already exists.", type = "error")
         updateNumericInput(
           session = session
           , inputId = "addID"
           , label = "Student ID: "
           , value = 801000000
         )
-        showNotification("Student ID number already exists.", type = "error")
+      } else{
+        # Save to df_student
+        r$df_student <- rbind(r$df_student
+                              , tibble(
+                                "student_id" = input$addID
+                                , "name" = input$addName
+                              )
+        )
         
-      }else{
-        new_df <- rbind(r$df_student, new_row)
-        r$df_student <- new_df
-        homework_grades <- r$df_homework_grades
-        
-        if (ncol(homework_grades) == 1){
-          temp <- tibble("Student Name" = input$addName)
-        } else if (nrow(homework_grades) == 0){
-          temp <- r$df_homework_grades[1,] %>%
-            mutate(`Student Name` = input$addName) %>%
-            mutate_at(.vars = c(2:ncol(r$df_homework_grades[1,])), .funs = as.character)
-          temp[1,2:ncol(temp)] <- "NA"
-        } else{
-          temp <- r$df_homework_grades[1,] %>%
-            mutate(`Student Name` = input$addName) 
-          temp[1,2:ncol(temp)] <- "NA"
-        }
-        temp <-rbind(homework_grades, temp)
-        r$df_homework_grades <- temp
-        
-        # Should not be the case if starting with an initial review (for the time being)
-        if (nrow(r$df_review_table) != 0){
-          a_student_id <-  r$df_student[1,1] %>%
-            pull()
+        # Save to df_homework_grades
+        if (ncol(r$df_homework_grades) == 1){ #If there are no homeworks, just add name
+          r$df_homework_grades <- rbind(
+            r$df_homework_grades 
+            , tibble(
+              "Student Name" = input$addName
+            )
+          )
           
+        } else{ # If there are homeworks present, add in name and "NA" for grades
+          temp <- r$df_homework_grades[1,] 
+          new_row <- temp %>%
+            mutate(`Student Name` = input$addName) # Add in name
+          new_row[1,2:ncol(new_row)] <- "NA"
+          r$df_homework_grades <- rbind(r$df_homework_grades, new_row)
+        }
+        
+        # Save to df_review_grades
+        # Check to see if there are reviews
+        if (nrow(r$df_review_table) != 0){
           review_grades <- r$df_review_grades
           # If first student being added to review_grades
           if (nrow(review_grades) == 0){
@@ -419,7 +408,10 @@ wizard_server <- function(id, r, parent_session) {
                            , grade = rep("NA", length(topics)))
             
             r$df_review_grades <- temp
-          } else{
+          } else{ # There are already students in the table
+            a_student_id <-r$df_student[1,1] %>%
+              pull()
+            
             new_data <- review_grades %>%
               filter(student_id == a_student_id) %>%
               mutate(student_id = input$addID
@@ -463,11 +455,11 @@ wizard_server <- function(id, r, parent_session) {
                    , label = "Homework Number: "
                    , value = value)
     })
+    
     # Save homework
     observeEvent(input$saveHomework, {
-      df_homework <- r$df_homework
       # Check if HW id exists
-      if(input$homeworkNumber %in% df_homework$id){
+      if(input$homeworkNumber %in% r$df_homework$id){
         showNotification("Homework ID already exists.", type = "error")
         updateNumericInput(
           session = session
@@ -475,27 +467,25 @@ wizard_server <- function(id, r, parent_session) {
           , label = "Homework Number: "
           , value =  max(r$df_homework$id) + 1
         )
-        
-      }else{
-        new_row <- tibble("id" = input$homeworkNumber
-                          , "description" = input$homeworkDescription
-                          , "date_assigned" = input$homeworkDateAssigned
-                          , "date_due" = input$homeworkDateDue
+      }else{ 
+        # Save to df_homework
+        r$df_homework <- rbind(r$df_homework
+                               , tibble(
+                                 "id" = input$homeworkNumber
+                                 , "description" = input$homeworkDescription
+                                 , "date_assigned" = input$homeworkDateAssigned
+                                 , "date_due" = input$homeworkDateDue
+                               )
         )
-        # Save and refresh 
-        new_df <- rbind(df_homework, new_row)
-        r$df_homework <- new_df
         
-        df_homework_grades <- r$df_homework_grades
-        new_column <- c(rep("NA", nrow(df_homework_grades)))
+        # Save to df_homework_grades
+        new_column <- c(rep("NA", nrow(r$df_homework_grades)))
         new_column_name = paste("Homework", input$homeworkNumber)
-        df_homework_grades <- df_homework_grades %>%
+        r$df_homework_grades <- r$df_homework_grades %>%
           mutate(init = new_column) 
-        names(df_homework_grades)[names(df_homework_grades) == "init"] <- new_column_name
+        names(r$df_homework_grades)[names(r$df_homework_grades) == "init"] <- new_column_name
         
-        # Save and refresh 
-        r$df_homework_grades <- df_homework_grades 
-        
+        # Update Inputs
         updateNumericInput(
           session = session
           , inputId = "homeworkNumber"
@@ -518,7 +508,7 @@ wizard_server <- function(id, r, parent_session) {
                             , inputId = "homeworkDescription"
                             , label = "Homework Description: "
                             , value = " ")
-
+        
         showNotification("Saved in session.")
         
       }
@@ -540,21 +530,20 @@ wizard_server <- function(id, r, parent_session) {
       if(input$topicNumber %in% r$df_topic$topic_id){
         showNotification("Topic ID already exists.")
       }else{
-        df_topic <- r$df_topic
-        new_row <- tibble("topic_id" = input$topicNumber
-                          , "description" = input$topicDescription
+        # Save to df_topic
+        r$df_topic <- rbind(r$df_topic
+                            , tibble("topic_id" = input$topicNumber
+                                     , "description" = input$topicDescription
+                            )
         )
-        df_review_table <- r$df_review_table
-        new_column <- c(rep(NA, nrow(df_review_table)))
+        # Save to df_review_tables
+        new_column <- c(rep(NA, nrow(r$df_review_table )))
         new_column_name = paste("Topic", input$topicNumber)
-        df_review_table <- df_review_table %>%
+        r$df_review_table  <- r$df_review_table  %>%
           mutate(init = new_column) 
-        names(df_review_table)[names(df_review_table) == "init"] <- new_column_name
-        new_df <- rbind(df_topic, new_row)
-        r$df_topic <- new_df
-        r$df_review_table <- df_review_table
+        names(r$df_review_table )[names(r$df_review_table ) == "init"] <- new_column_name
         
-        updateTextAreaInput(
+        updateTextInput(
           session = session
           , inputId = "topicDescription"
           , label = NULL
@@ -591,32 +580,44 @@ wizard_server <- function(id, r, parent_session) {
     
     # Save review
     observeEvent(input$saveReview, {
-      ls_topics <- input$topics
-      topic <- tibble("topic_id" = ls_topics
-                      , topic = rep("Topic", length(ls_topics)
-                      ))
-      topic_names <- topic %>%
-        mutate(name = paste(topic, topic_id)) %>%
-        select(name) %>%
-        pull()
+      # Check if review ID exists:
+      if (input$reviewNumber %in% r$df_review_grades$review_id){
+        showNotification("Review ID already exists.", type = "error")
+      } else{
+        
       
-      # Review Table
-      review_table <- tibble(`Review Name` = input$reviewName
-                             , `Review ID` = input$reviewNumber
-                             , `Review Start Date` = input$reviewStartDate
-                             , `Review End Date` = input$reviewEndDate)
+      # save to review_table
+      selected_topics <- paste(
+        rep("Topic", length(input$topics))
+        , input$topics
+      )
+  
+      topics <- unlist(colnames(r$df_review_table[,5:(ncol(r$df_review_table))]))
       
-      review_table <- cbind(review_table, setNames( lapply(topic_names, function(x) x=TRUE), topic_names) )
-      r$df_review_table <- review_table
+      topic_df <- tibble(Topics = topics) %>%
+        mutate(
+          value = case_when(Topics %in% selected_topics ~ "TRUE")
+        ) %>%
+        pivot_wider(names_from = Topics, values_from = value)
+        
+
+      temp <- tibble(
+        `Review Name` = input$reviewName
+        ,`Review ID` = input$reviewNumber
+        , `Review Start Date` = input$reviewStartDate 
+        , `Review End Date` = input$reviewEndDate) %>%
+        cbind(topic_df)
       
+      r$df_review_table <- rbind(r$df_review_table
+                                 ,temp
+                                 )
       # Review Grades
-      df_review_grades <- r$df_review_grades
-      
+      df_review_grades <- r$df_review_grades 
       df_student <- r$df_student %>%
         select(student_id)
       
-      data_from_hot <- review_table %>%
-        pivot_longer(cols = c(5:ncol(review_table))) %>%
+      data_from_hot <- r$df_review_table %>%
+        pivot_longer(cols = c(5:ncol(r$df_review_table))) %>%
         na.omit()
       
       review_topic_id_hot <- data_from_hot %>%
@@ -650,11 +651,12 @@ wizard_server <- function(id, r, parent_session) {
         select(-c(filter_id))
       
       
-      # Refresh and save data ----
       r$df_review_grades <- df_new_review_data
       showNotification("Saved to remote.")
-      removeModal()
+      }
+      
     })
+    
   }) # End module server ----
   
 }

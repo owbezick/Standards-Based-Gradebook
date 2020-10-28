@@ -44,16 +44,8 @@ ui <- dashboardPage(
     )
     , dashboardBody(
         includeCSS("utils/style.css")
-        
-        , modalDialog(title = "Initial Data Input"
-                      , size = "l"
-                      , footer = "Note: more data can be added and edited later in the app."
-                      , easyClose = F
-                      , fluidRow(
-                          wizardUI("dataWizard") 
-                      )
-        )
-        
+        # Initial Data Set Up ----
+        , uiOutput("wizard")
         , tabItems(
             tabItem(
                 # Home tab UI ----
@@ -86,8 +78,33 @@ ui <- dashboardPage(
 # Define server logic 
 server <- function(input, output, session) {
     # Data Wizard ----
+    output$wizard <- renderUI({
+         showModal(modalDialog(title = "Initial Data Input"
+                      , size = "l"
+                      , footer = "Note: more data can be added and edited later in the app."
+                      , easyClose = F
+                      , fluidRow(
+                          wizardUI("dataWizard"
+                                   ,  actionBttn(
+                                       inputId = "closeWizard"
+                                       , label = "Close Wizard"
+                                       , style = "material-flat"
+                                       , block = T
+                                   ) 
+                          ) 
+                      )
+        )
+         )
+    })
     wizard_server("dataWizard", r)
-    
+    # Close Wizard ----
+    observeEvent(input$closeWizard, {
+        if(nrow(r$df_review_grades) > 0){
+            removeModal()
+        }else{
+            showNotification("Please add a review!", type = "error")
+        }
+    })
     
     
     # Other server calls ----
