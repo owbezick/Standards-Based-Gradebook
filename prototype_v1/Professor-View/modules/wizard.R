@@ -596,7 +596,7 @@ wizard_server <- function(id, r, parent_session) {
       
       topic_df <- tibble(Topics = topics) %>%
         mutate(
-          value = case_when(Topics %in% selected_topics ~ "TRUE")
+          value = case_when(Topics %in% selected_topics ~ TRUE)
         ) %>%
         pivot_wider(names_from = Topics, values_from = value)
         
@@ -652,7 +652,7 @@ wizard_server <- function(id, r, parent_session) {
       
       
       r$df_review_grades <- df_new_review_data
-      showNotification("Saved to remote.")
+      showNotification("Saved in session")
       }
       
     })
