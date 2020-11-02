@@ -2,98 +2,118 @@
 # Course information button module ----
 edit_roster_button_UI <- function(id) {
   showModal(
-    modalDialog(title = "Roster", size = "l", footer = NULL, easyClose = T
+    modalDialog(title = "Roster", size = "l", easyClose = T
                 , fluidRow(
                   column(width = 12
-                         , tabsetPanel(
-                           tabPanel(
-                             # Current Roster ----
-                             title = "Current Roster"
-                             , br()
-                             , box(width = 12, status = "primary"
-                                   , formattableOutput(NS(id,"rosterList"))
-                             )
-                             , br()
-                             , fluidRow(
-                               # column(width = 6
-                               #        , actionBttn(
-                               #          inputId = NS(id,"editSave")
-                               #          , label = "Save"
-                               #          , style = "material-flat"
-                               #          , block = T
-                               #        )
-                               # )
-                               column(width = 12
-                                        , actionBttn(
-                                          inputId = NS(id,"editClose")
-                                          , label = "Close"
-                                          , style = "material-flat"
-                                          , block = T
-                                        )
-                               )
-                               
-                             )
-                           )
-                           , tabPanel(
-                             # Add to roster ----
-                             title = "Add to Roster"
-                             , br()
-                             , fluidRow(
-                               column(width = 6
-                                      , box(width = 12, status = "primary"
-                                            , numericInput(
-                                              inputId = NS(id, "addID")
-                                              , label = "Student ID: "
-                                              , value = 801000000
-                                            )
-                                      )   
-                               )
-                               , column(width = 6
-                                        , box(width = 12, status = "primary"
-                                              , textInput(
-                                                inputId = NS(id, "addName")
-                                                , label = "Student Name: "
-                                              )
-                                        )
-                               )
-                             )
-                             , fluidRow(
-                               column(width = 6
-                                      , actionBttn(
-                                        inputId = NS(id,"addSave")
-                                        , label = "Add Student"
-                                        , style = "material-flat"
-                                        , block = T
-                                      )
-                               )
-                               , column(width = 6
-                                        , actionBttn(
-                                          inputId = NS(id,"addClose")
-                                          , label = "Close"
-                                          , style = "material-flat"
-                                          , block = T
-                                        )
-                               )
-                             )
-                           )
-                           , tabPanel(title = "Remove from Roster"
-                                      # Remove from roster ----
-                                      , br()
-                                      , box(width = 12, status = "primary"
-                                            , uiOutput(NS(id, "removeFromRoster"))
-                                      )
-                                      , fluidRow(
-                                        column(width = 12
-                                               , actionBttn(
-                                                 inputId = NS(id, "removeSave")
-                                                 , label = "Remove Students"
-                                                 , style = "material-flat"
-                                                 , block = T
-                                               )
-                                        )
-                                      )
-                           )
+                         , rHandsontableOutput(NS(id, "roster_table"))
+                         
+                         # , tabsetPanel(
+                         #   tabPanel(
+                         #     # Current Roster ----
+                         #     title = "Current Roster"
+                         #     , br()
+                         #     , box(width = 12, status = "primary"
+                         #           , formattableOutput(NS(id,"rosterList"))
+                         #     )
+                         #     , br()
+                         #     , fluidRow(
+                         #       # column(width = 6
+                         #       #        , actionBttn(
+                         #       #          inputId = NS(id,"editSave")
+                         #       #          , label = "Save"
+                         #       #          , style = "material-flat"
+                         #       #          , block = T
+                         #       #        )
+                         #       # )
+                         #       column(width = 12
+                         #                , actionBttn(
+                         #                  inputId = NS(id,"editClose")
+                         #                  , label = "Close"
+                         #                  , style = "material-flat"
+                         #                  , block = T
+                         #                )
+                         #       )
+                         #       
+                         #     )
+                         #   )
+                         #   , tabPanel(
+                         #     # Add to roster ----
+                         #     title = "Add to Roster"
+                         #     , br()
+                         #     , fluidRow(
+                         #       column(width = 6
+                         #              , box(width = 12, status = "primary"
+                         #                    , numericInput(
+                         #                      inputId = NS(id, "addID")
+                         #                      , label = "Student ID: "
+                         #                      , value = 801000000
+                         #                    )
+                         #              )   
+                         #       )
+                         #       , column(width = 6
+                         #                , box(width = 12, status = "primary"
+                         #                      , textInput(
+                         #                        inputId = NS(id, "addName")
+                         #                        , label = "Student Name: "
+                         #                      )
+                         #                )
+                         #       )
+                         #     )
+                         #     , fluidRow(
+                         #       column(width = 6
+                         #              , actionBttn(
+                         #                inputId = NS(id,"addSave")
+                         #                , label = "Add Student"
+                         #                , style = "material-flat"
+                         #                , block = T
+                         #              )
+                         #       )
+                         #       , column(width = 6
+                         #                , actionBttn(
+                         #                  inputId = NS(id,"addClose")
+                         #                  , label = "Close"
+                         #                  , style = "material-flat"
+                         #                  , block = T
+                         #                )
+                         #       )
+                         #     )
+                         #   )
+                         #   , tabPanel(title = "Remove from Roster"
+                         #              # Remove from roster ----
+                         #              , br()
+                         #              , box(width = 12, status = "primary"
+                         #                    , uiOutput(NS(id, "removeFromRoster"))
+                         #              )
+                         #              , fluidRow(
+                         #                column(width = 12
+                         #                       , actionBttn(
+                         #                         inputId = NS(id, "removeSave")
+                         #                         , label = "Remove Students"
+                         #                         , style = "material-flat"
+                         #                         , block = T
+                         #                       )
+                         #                )
+                         #              )
+                         #   )
+                         # )
+                  )
+                )
+                , footer = fluidRow(
+                  column(width = 6
+                         , actionBttn(
+                           inputId = NS(id,"save")
+                           , label = "Save Roster"
+                           , style = "material-flat"
+                           , block = T
                          )
+                  )
+                  , column(width = 6
+                           , actionBttn(
+                             inputId = NS(id, "close")
+                             , label = "Close"
+                             , style = "material-flat"
+                             , block = T
+                           )
                   )
                 )
     )
@@ -119,6 +139,44 @@ edit_roster_button_Server <- function(id, r){
               )
       formattable(df)
     })
+    
+    output$roster_table <- renderRHandsontable({
+      df_roster <- r$df_student %>%
+        select(`Student ID` = student_id
+               , Name = name)
+      
+      #TODO dont allow changes to previous student IDs?
+      
+      rhandsontable(
+        df_roster
+        , rowHeaders = NULL
+        , stretchH = 'all'
+        , readOnly = F
+      ) %>%
+        hot_col("Student ID", readOnly = F, halign = "htLeft")
+      
+    })
+    
+    observeEvent(input$save, {
+      req(input$roster_table)
+      df_new <- hot_to_r(input$roster_table) %>%
+        select(student_id = `Student ID`, name = Name)
+      
+      #TODO student IDs?
+      
+      #Update reactive
+      r$df_student <- df_new
+      
+      #Close modal
+      removeModal()
+      showNotification("Saved in session.")
+      
+    })
+    observeEvent(input$close, {
+      removeModal()
+    })
+    
+    
     # TODO: save edits
     # # BTN: Save edits ----
     # observeEvent(input$editSave, {
@@ -138,149 +196,5 @@ edit_roster_button_Server <- function(id, r){
     #   # save to review_grades ----
     # })
     # 
-    # BTN Add Student Save ----
-    observeEvent(input$addSave, {
-      df_prev_student <- r$df_student
-      new_row <- tibble("student_id" = input$addID
-                        , "name" = input$addName
-      )
-      
-      # CATCH:student id already exists ----
-      if(input$addID %in% r$df_student$student_id){
-        updateNumericInput(
-          session = session
-          , inputId = "addID"
-          , label = "Student ID: "
-          , value = 801000000
-        )
-        showNotification("Student ID number already exists.", type = "error")
-        
-      }else{
-        new_df <- rbind(r$df_student, new_row)
-        r$df_student <- new_df
-        
-        # Save in homework_grades Sheet ----
-        homework_grades <- r$df_homework_grades
-        
-        # CATCH: adding students when there are no homeworks ----
-        if (ncol(homework_grades) == 1){
-          temp <- tibble("Student Name" = input$addName)
-        } else if (nrow(homework_grades) == 0){
-          temp <- r$df_homework_grades[1,] %>%
-            mutate(`Student Name` = input$addName) %>%
-            mutate_at(.vars = c(2:ncol(r$df_homework_grades[1,])), .funs = as.character)
-          temp[1,2:ncol(temp)] <- "NA"
-        } else{
-          temp <- r$df_homework_grades[1,] %>%
-            mutate(`Student Name` = input$addName) 
-          temp[1,2:ncol(temp)] <- "NA"
-        }
-        temp <-rbind(homework_grades, temp)
-        r$df_homework_grades <- temp
-        
-        # Save to review_grades sheet ----
-        # CATCH: if there are no reviews ----
-        # Should not be the case if starting with an initial review (for the time being)
-        if (nrow(r$df_review_table) != 0){
-          a_student_id <-  r$df_student[1,1] %>%
-            pull()
-          
-          review_grades <- r$df_review_grades
-          # If first student being added to review_grades
-          if (nrow(review_grades) == 0){
-            df_review <- r$df_review_table %>%
-              pivot_longer(cols = (4:ncol(r$df_review_table))) %>%
-              filter(value == "TRUE")
-            
-            review_ids <- df_review %>%
-              select(`Review ID`) %>%
-              distinct() %>%
-              pull()
-            
-            topics <- str_split_fixed(df_review$name, " ", n = 2)[,2]
-           
-            temp <- tibble(review_id = df_review$`Review ID`
-                   , topic_id = topics
-                   , student_id = rep(input$addID, length(topics))
-                   , grade = rep("NA", length(topics)))
-            
-            r$df_review_grades <- temp
-          } else{
-          new_data <- review_grades %>%
-            filter(student_id == a_student_id) %>%
-            mutate(student_id = input$addID
-                   , grade = "NA")
-          
-          temp <- rbind(review_grades, new_data) %>%
-            arrange(review_id, topic_id)
-          
-          r$df_review_grades <- temp
-          }
-        }
-        
-        # Update Inputs & show notification ----
-        updateNumericInput(
-          session = session
-          , inputId = "addID"
-          , label = "Student ID: "
-          , value = 801000000
-        )
-        
-        updateTextInput(
-          session = session
-          , inputId = "addName"
-          , value = "New Name"
-          , placeholder = "New Name"
-          , label = "Student Name: "
-        )
-        showNotification("Saved in session.")
-      }
-    })
-    
-    # BTN Remove Student Save ----
-    observeEvent(input$removeSave, {
-      ls_removed_names <- input$removeFromRoster
-      if(length(ls_removed_names) == 0) {
-        showNotification("No students selected to remove.")
-        removeModal()
-      }else{
-        # save student sheet ----
-        df_students <- r$df_student
-        df_new_students <- subset(df_students, !(name %in% ls_removed_names))
-        r$df_student <- df_new_students
-        
-        # save homework_grades sheet ----
-        df_homework_grades <- r$df_homework_grades
-        temp <- subset(df_homework_grades, !(`Student Name` %in% ls_removed_names))
-        r$df_homework_grades <- temp
-        
-        # save df_review_grades ----
-        df_review_grades <- r$df_review_grades 
-        if (ncol(df_review_grades) == 0){
-          
-        } else{
-          df_review_grades <- df_review_grades %>%
-            left_join(df_students) 
-          
-          temp <- subset(df_review_grades, !(name %in% ls_removed_names)) %>%
-            select(-c(name))
-          
-          r$df_review_grades <- temp
-        }
-        
-        showNotification("Saved in session.")
-      }
-    })
-    
-    # BTN closing -----
-    observeEvent(input$addClose, {
-      removeModal()
-    })
-    observeEvent(input$rosterClose, {
-      removeModal()
-    })
-    observeEvent(input$editClose, {
-      removeModal()
-    })
   })
 }

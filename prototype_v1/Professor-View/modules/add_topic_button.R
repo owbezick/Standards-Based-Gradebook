@@ -3,8 +3,7 @@
 add_topic_button_UI <- function(id) {
   showModal(
     modalDialog(title = "Edit Topics", size = "l"
-                , tabBox(width = 12
-                         , tabPanel("Edit Topic Descriptions"
+                , column(width = 12
                                     , fluidRow(
                                       rHandsontableOutput(NS(id, "edit_topics"))
                                     )
@@ -28,41 +27,7 @@ add_topic_button_UI <- function(id) {
                                       )
                                     )
                                     
-                                    
                          )
-                         , tabPanel("Add Topics"
-                                    , fluidRow(
-                                      column(width = 3
-                                             , tags$b("Topic Number: ")
-                                             , uiOutput(NS(id, "topic_input"))
-                                      )
-                                      , column(width = 9
-                                               , tags$b("Topic Description: ")
-                                               , textAreaInput(inputId = NS(id, "topicDescription")
-                                                               , label = NULL
-                                               )
-                                      )
-                                    )
-                                    , fluidRow(
-                                      column(width = 6
-                                             , actionBttn(
-                                               inputId = NS(id,"save")
-                                               , label = "Save Topic"
-                                               , style = "material-flat"
-                                               , block = T
-                                             )
-                                      )
-                                      , column(width = 6
-                                               , actionBttn(
-                                                 inputId = NS(id, "close")
-                                                 , label = "Close"
-                                                 , style = "material-flat"
-                                                 , block = T
-                                               )
-                                      )
-                                    ) 
-                         )
-                )
                 , footer = fluidRow()
     )
   )
@@ -73,10 +38,14 @@ add_topic_button_Server <- function(id, r){
     
     # Topic Table Output ----
     output$edit_topics <- renderRHandsontable({
+      
       df <- r$df_topic
       df <- df %>%
         mutate(id = as.character(`topic_id`)) %>%
         select(id, Description = description)
+      
+      #Sort df by id 
+      df <- df[base::order(df$id),]
       
       rhandsontable(
         df
@@ -85,11 +54,22 @@ add_topic_button_Server <- function(id, r){
         , readOnly = T
       ) %>%
         hot_col("Description", readOnly = F)
+      
+      
     })
     
     observeEvent(input$save_edits, {
+      
+      # Get df from handsontable, fill in topic_id by row number
       df <- hot_to_r(input$edit_topics) %>%
         select(topic_id = id, description = Description)
+      df <- df %>%
+        mutate(topic_id = 1:nrow(df)) # Won't work when rows are removed?
+      
+      #TODO update df_review_table
+      
+      #Update reactive
+      r$df_topic <- df
       
       removeModal()
       showNotification("Saved in session.")
