@@ -57,6 +57,7 @@ view_calendar_hw_Server <- function(id, r){
       removeModal()
     })
     
+    # Save Homework 
     observeEvent(input$save, {
       r$cal_item <- hot_to_r(input$item_info_table)
       
@@ -71,25 +72,32 @@ view_calendar_hw_Server <- function(id, r){
       df_hw[match(df_item$id, df_hw$id), ] <- df_item
       
       r$df_homework <- df_hw
+      
+      #df_homework_grades
+      save_df_homework_grades()
+      
       removeModal()
-      showNotification("Saved to remote.")
+      r$cal_item <- NULL
+      showNotification("Saved in session")
     })
     
+    # Delete homework
     observeEvent(input$delete, {
-      # Save df_homework_grades ----
+      
       cal_item <- r$cal_item
+      # df_homework_grades
       drop <- c(paste("Homework", cal_item[1,1]))
       df_homework_grades <- r$df_homework_grades
       temp <- df_homework_grades[,!(names(df_homework_grades) %in% drop)]
       r$df_homework_grades <- temp
       
-      
-      # Save df_homework ----
+      # df_homework
       df_homework <- r$df_homework
       hw_id <- as.numeric(cal_item[1,1])
       temp <- subset(df_homework, id != hw_id)
       r$df_homework <- temp
       removeModal()
+      r$cal_item <- NULL
       showNotification("Saved to remote.")
     })
     
@@ -179,10 +187,12 @@ view_calendar_review_Server <- function(id, r){
     r$df_review_table <- temp
     
     showNotification("Saved in session.")
+    r$cal_item <- NULL
     removeModal()
   })
   
   observeEvent(input$goBack, {
+    r$cal_item <- NULL
     removeModal()
   })
   

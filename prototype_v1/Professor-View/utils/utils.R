@@ -45,8 +45,22 @@ save_df_homework_grades <- function(){
     r$df_homework_grades <- df_NA_homework_grades
   } else{
     # Merge tables together, keeping values from current and adding values from NA
-    curr <- r$df_homework_grades 
-    r$df_homework_grades <- merge(curr, df_NA_homework_grades)
+    homework_grade_long <- r$df_homework_grades %>%
+      pivot_longer(cols = c(2:ncol(r$df_homework_grades)), names_to = "Homework", values_to = "grade") %>%
+      mutate(unique_id = paste(`Student Name`, Homework)) 
+    
+    
+    NA_homework_grade_long <- df_NA_homework_grades %>%
+      pivot_longer(
+        cols = c(2:ncol(df_NA_homework_grades))
+        , names_to = "Homework", values_to = "grade"
+      ) %>%
+      mutate(unique_id = paste(`Student Name`, Homework)) 
+    
+    r$df_homework_grades <- rbind(subset(NA_homework_grade_long, unique_id %notin% homework_grade_long$unique_id), homework_grade_long) %>%
+      arrange(Homework) %>%
+      pivot_wider(id_cols = c(`Student Name`, Homework), names_from = Homework, values_from = grade) %>%
+      arrange(`Student Name`)
   }
 }
 

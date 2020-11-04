@@ -145,56 +145,34 @@ edit_roster_button_Server <- function(id, r){
         select(`Student ID` = student_id
                , Name = name)
       
-      #TODO dont allow changes to previous student IDs?
-      
       rhandsontable(
         df_roster
         , rowHeaders = NULL
         , stretchH = 'all'
-        , readOnly = F
-      ) %>%
-        hot_col("Student ID", readOnly = F, halign = "htLeft")
+      )
       
     })
     
     observeEvent(input$save, {
       req(input$roster_table)
-      df_new <- hot_to_r(input$roster_table) %>%
-        select(student_id = `Student ID`, name = Name)
-      
-      #TODO student IDs?
-      
-      #Update reactive
-      r$df_student <- df_new
-      
-      #Close modal
-      removeModal()
-      showNotification("Saved in session.")
-      
+      if (length(unique(hot_to_r(input$roster_table)$`Student ID`)) != length(hot_to_r(input$roster_table)$`Student ID`)){
+        showNotification("Ensure that all student ID's are unique!", type = "warning")
+      } else{
+        
+        r$df_student <- hot_to_r(input$roster_table) %>%
+          select(student_id = `Student ID`, name = Name)
+        
+        save_df_homework_grades()
+        save_df_review_grades()
+        
+        showNotification("Saved in session.")
+        
+        removeModal()
+      }
     })
+    
     observeEvent(input$close, {
       removeModal()
     })
-    
-    
-    # TODO: save edits
-    # # BTN: Save edits ----
-    # observeEvent(input$editSave, {
-    #   # save to df_student ----
-    #   temp <- hot_to_r(input$rosterList) %>%
-    #     rename(student_id = `Student ID`
-    #            , name = Name
-    #            , email = Email) %>%
-    #     mutate(student_id = as.numeric(student_id))
-    #   r$df_student <- temp
-    #   sheet_write(
-    #     ss = "https://docs.google.com/spreadsheets/d/1xIC4pGhnnodwxqopHa45KRSHIVcOTxFSfJSEGPbQH20/editgid=2102408290"
-    #     , data = temp
-    #     , sheet = "student"
-    #   ) 
-    #   # save to homework_grades ----
-    #   # save to review_grades ----
-    # })
-    # 
   })
 }

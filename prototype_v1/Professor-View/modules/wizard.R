@@ -134,8 +134,9 @@ wizardUI <- function(id, doneButton){
                                  box(width = 6, status = "primary"
                                      , uiOutput(NS(id, "homework_idPicker"))
                                      , br()
-                                     , textAreaInput(inputId = NS(id, "homeworkDescription")
-                                                     , label = "Homework Description: ")
+                                     , textInput(inputId = NS(id, "homeworkDescription")
+                                                 , label = "Homework Description: "
+                                                 , value = "Homework 1")
                                  )
                                  , box(width = 6, status = "primary"
                                        , div(class = "date_inputs", id = "date-inputs"
@@ -187,7 +188,8 @@ wizardUI <- function(id, doneButton){
                                  , box(width = 10, status = "primary"
                                        , tags$b("Topic Description: ")
                                        , textInput(inputId = NS(id, "topicDescription")
-                                                       , label = NULL
+                                                   , label = NULL
+                                                   , value = "Topic 1"
                                        )
                                  )
                                )
@@ -232,7 +234,8 @@ wizardUI <- function(id, doneButton){
                                        )
                                        , column(width = 8
                                                 , textInput(inputId = NS(id, "reviewName")
-                                                            , label = "Review Name: ")
+                                                            , label = "Review Name: "
+                                                            , value = "Review One")
                                                 , br()
                                        )
                                      ) 
@@ -355,6 +358,7 @@ wizard_server <- function(id, r, parent_session) {
     # Roster ----
     observeEvent(input$addStudent, {
       # Check to see if ID already exists
+      browser()
       if(input$addID %in% r$df_student$student_id){
         showNotification("Student ID number already exists.", type = "error")
         updateNumericInput(
@@ -363,7 +367,10 @@ wizard_server <- function(id, r, parent_session) {
           , label = "Student ID: "
           , value = 801000000
         )
-      } else{
+      } else if (input$addName == "") {
+        showNotification("Please include student name!", type = "warning")
+      }
+      else{
         # Save to df_student
         r$df_student <- rbind(r$df_student
                               , tibble(
@@ -496,7 +503,7 @@ wizard_server <- function(id, r, parent_session) {
           , label = "Date Due: "
           , value = Sys.Date()
         )
-        updateTextAreaInput(session = session
+        updateTextInput(session = session
                             , inputId = "homeworkDescription"
                             , label = "Homework Description: "
                             , value = " ")
@@ -611,6 +618,30 @@ wizard_server <- function(id, r, parent_session) {
       # Save to df_review_grades
       save_df_review_grades()
       
+      # Update Inputs
+      # Update Inputs
+      updateNumericInput(
+        session = session
+        , inputId = "reviewNumber"
+        , label = "Review Number: "
+        , value = max(r$df_review_grades$id) + 1
+      )
+      updateDateInput(
+        session = session
+        , inputId = "reviewStartDate"
+        , label = "Date Assigned: "
+        , value = Sys.Date()
+      )
+      updateDateInput(
+        session = session
+        , inputId = "reviewEndDate"
+        , label = "Date Due: "
+        , value = Sys.Date()
+      )
+      updateTextInput(session = session
+                      , inputId = "reviewName"
+                      , label = "Review Name "
+                      , value = "Review Name")
       showNotification("Saved in session")
       }
       

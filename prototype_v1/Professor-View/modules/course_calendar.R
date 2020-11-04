@@ -7,7 +7,7 @@ course_calendar_UI <- function(id){
 # Have to rework to use with reactive data 
 course_calendar_server <- function(id, r){
   moduleServer(id, function(input,output,session){
-
+    
     # Course Schedule output ----
     output$course_schedule <- renderTimevis({
       df_timevis_homework <-  r$df_homework %>%
@@ -17,9 +17,9 @@ course_calendar_server <- function(id, r){
                , id = paste0("h_", id)
                , group = "homework"
                , className = "homework"
-               ) %>%
+        ) %>%
         select(id, start, end, content, group, className)
-    
+      
       df_timevis_review <- r$df_review_table %>%
         mutate(content = `Review Name`
                , start = as.character(`Review Start Date`)
@@ -41,12 +41,7 @@ course_calendar_server <- function(id, r){
       timevis(df_timevis
               , fit = TRUE
               , groups
-              , showZoom = FALSE
-              , options = list(
-                  zoomable = FALSE
-                , horizontalScroll = TRUE # not working
-                , moveable = TRUE)
-              )
+      )
     })
     
     # Course Schedule Selected ----

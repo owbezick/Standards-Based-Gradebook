@@ -54,6 +54,9 @@ add_topic_button_Server <- function(id, r){
     
     observeEvent(input$save_edits, {
       # Save to df_topic
+      if (length(unique(hot_to_r(input$edit_topics)$id)) != length(hot_to_r(input$edit_topics)$id)){
+        showNotification("Please ensure all topic ID's are unique!", type = "warning")
+      } else{
       r$df_topic <- hot_to_r(input$edit_topics) %>%
         select(topic_id = id, description = Description)
       
@@ -68,7 +71,7 @@ add_topic_button_Server <- function(id, r){
       
       # Save review_grades
       save_df_review_grades()
-      
+      }
       showNotification("Saved in session.")
     })
     
