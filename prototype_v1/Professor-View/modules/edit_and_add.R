@@ -1,4 +1,4 @@
-# Edit and add module ----
+# UI -----
 edit_and_add_UI <- function(id){
   box(width = 4, title = "Edit:", status = "primary", height = "225px"
       , fluidRow(

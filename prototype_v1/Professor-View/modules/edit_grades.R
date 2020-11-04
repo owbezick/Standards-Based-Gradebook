@@ -1,3 +1,4 @@
+# Homework UI ----
 homework_UI <- function(id) {
   tabPanel(title = "Homework"
            , fluidRow(
@@ -16,6 +17,7 @@ homework_UI <- function(id) {
   )
 }
 
+# Homework serrver ----
 homework_server <- function(id, r){
   moduleServer(id, function(input, output, session){
     # Average Homework ----
@@ -92,22 +94,18 @@ homework_server <- function(id, r){
       }
 
     })
-
-    # Saving ----
+    
+    # Save homework
     observeEvent(input$save,{
       df_hot <- hot_to_r(input$homework_table)
       r$df_homework_grades  <- df_hot
-      # sheet_write(
-      #   ss =  "https://docs.google.com/spreadsheets/d/1xIC4pGhnnodwxqopHa45KRSHIVcOTxFSfJSEGPbQH20/edit#gid=2102408290"
-      #   , data = df_hot
-      #   , sheet = "homework_grades"
-      # )
-      showNotification("Saved to remote.")
+      showNotification("Saved in session.")
     })
 
   }) #end module server
 }
 
+# Review UI ----
 review_UI <- function(id) {
   tabPanel(title = "Reviews"
            , fluidRow(
@@ -138,6 +136,7 @@ review_UI <- function(id) {
 
 review_server <- function(id, r){
   moduleServer(id, function(input, output, session){
+    
     # Review by Review ----
     output$review_table_review <- renderRHandsontable({
       df_review_grades <- r$df_review_grades
@@ -176,16 +175,13 @@ review_server <- function(id, r){
         }
           ")
     })
-    # Save Review by Student ----
+    
+    # Save Review by Student 
     observeEvent(input$saveReview,{
-      df_student <- r$df_student
-      df_review_grades <- r$df_review_grades
-      df_hot <- hot_to_r(input$review_table_review)
-      df_temp <- df_hot %>%
-        pivot_longer(cols = c(3:ncol(df_hot))) %>%
-        left_join(df_student, by = "name") %>%
+      r$df_review_grades <- hot_to_r(input$review_table_review) %>%
+        pivot_longer(cols = c(3:ncol(hot_to_r(input$review_table_review)))) %>%
+        left_join(r$df_student, by = "name") %>%
         select(review_id = `Review ID`, topic_id = `Topic ID`, student_id, grade = value)
-      r$df_review_grades <- df_temp
 
       showNotification("Saved in session.")
     })
@@ -242,21 +238,16 @@ review_server <- function(id, r){
 
     })
 
-    # Save by Topuc ----
+    # Save by Topic
     observeEvent(input$saveStudent,{
-      df_student <- r$df_student
-      df_review_grades <- r$df_review_grades
-      df <- hot_to_r(input$review_table_student)
-      df_temp <- df %>%
-        pivot_longer(cols = c(3:ncol(df))) %>%
-        left_join(df_student, by = c("Student Name" = "name")) %>%
+      df_temp <- hot_to_r(input$review_table_student) %>%
+        pivot_longer(cols = c(3:ncol(hot_to_r(input$review_table_student)))) %>%
+        left_join(r$df_student, by = c("Student Name" = "name")) %>%
         na.omit()
 
-      df_temp <- df_temp %>%
+      r$df_review_grades <- df_temp %>%
         mutate(topic_id = str_split_fixed(df_temp$name, " ", 2)[,2]) %>%
         select(review_id = `Review ID`, topic_id, student_id, grade = value)
-
-      r$df_review_grades <- df_temp
 
       showNotification("Saved in session.")
     })

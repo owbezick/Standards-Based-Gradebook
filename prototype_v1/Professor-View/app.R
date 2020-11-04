@@ -1,18 +1,19 @@
 # Mastery Gradebook application - Professor View
 # Author: Owen Bezick & Calvin Spencer
 source("utils/libraries.R")
+source("utils/utils.R")
 source("data/data_intake.R")
 source("modules/wizard.R")
 source("modules/course_info.R")
-source("modules/add_homework_button.R")
-source("modules/add_topic_button.R")
-source("modules/edit_and_add.R")
 source("modules/course_calendar.R")
-source("modules/course_information_button.R")
+source("modules/edit_reviews.R")
+source("modules/edit_course_info.R")
+source("modules/edit_and_add.R")
+source("modules/edit_homework.R")
+source("modules/edit_topic.R")
 source("modules/edit_roster.R")
-source("modules/topics.R")
+source("modules/edit_grades.R")
 source("modules/view_calendar_item.R")
-source("modules/grade.R")
 
 
 ui <- dashboardPage(
@@ -62,7 +63,7 @@ ui <- dashboardPage(
                 )
             )
             , tabItem(
-                # Grade tab UI ----
+                # Grades tab UI ----
                 tabName = "grades"
                 , tabBox(title = "Grades", width = 12
                          , homework_UI("homework")
@@ -97,7 +98,6 @@ server <- function(input, output, session) {
          )
     })
     wizard_server("dataWizard", r)
-    # Close Wizard ----
     observeEvent(input$closeWizard, {
         if(nrow(r$df_review_grades) > 0){
             removeModal()

@@ -296,13 +296,17 @@ wizard_server <- function(id, r, parent_session) {
       if (nrow(r$df_student) > 0){
         updateTabsetPanel(session, "wizard", selected = "homework")
       }else{
-        showNotification("Please add at least one student!")
+        showNotification("Please add at least one student!", type = "error")
       }
     })
     
     observeEvent(input$toTopics, {
-      
-      updateTabsetPanel(session, "wizard", selected = "topics")
+      if (nrow(r$df_homework) > 0){
+        updateTabsetPanel(session, "wizard", selected = "topics")
+      }else{
+        showNotification("Please add at least one homework!", type = "error")
+      }
+    
       
     })
     
@@ -310,7 +314,7 @@ wizard_server <- function(id, r, parent_session) {
       if (nrow(r$df_topic) > 0){
         updateTabsetPanel(session, "wizard", selected = "review")
       }else{
-        showNotification("Please add at least one topic!")
+        showNotification("Please add at least one topic!", type = "error")
       }
     })
     
@@ -368,16 +372,8 @@ wizard_server <- function(id, r, parent_session) {
                               )
         )
         
-        # Save to df_homework_grades
-        if (ncol(r$df_homework_grades) == 1){ #If there are no homeworks, just add name
-          r$df_homework_grades <- rbind(
-            r$df_homework_grades 
-            , tibble(
-              "Student Name" = input$addName
-            )
-          )
-          
-        } else{ # If there are homeworks present, add in name and "NA" for grades
+        # Save to df_homework_grades If there are homeworks present, add in name and "NA" for grades
+        if (ncol(r$df_homework_grades) > 1){
           temp <- r$df_homework_grades[1,] 
           new_row <- temp %>%
             mutate(`Student Name` = input$addName) # Add in name
@@ -456,7 +452,7 @@ wizard_server <- function(id, r, parent_session) {
                    , value = value)
     })
     
-    # Save homework
+    # Save homework ----
     observeEvent(input$saveHomework, {
       # Check if HW id exists
       if(input$homeworkNumber %in% r$df_homework$id){
@@ -468,7 +464,7 @@ wizard_server <- function(id, r, parent_session) {
           , value =  max(r$df_homework$id) + 1
         )
       }else{ 
-        # Save to df_homework
+        # Save to df_homework 
         r$df_homework <- rbind(r$df_homework
                                , tibble(
                                  "id" = input$homeworkNumber
@@ -478,13 +474,9 @@ wizard_server <- function(id, r, parent_session) {
                                )
         )
         
-        # Save to df_homework_grades
-        new_column <- c(rep("NA", nrow(r$df_homework_grades)))
-        new_column_name = paste("Homework", input$homeworkNumber)
-        r$df_homework_grades <- r$df_homework_grades %>%
-          mutate(init = new_column) 
-        names(r$df_homework_grades)[names(r$df_homework_grades) == "init"] <- new_column_name
-        
+        # Function assumes that r$df_homework has been refreshed
+        save_df_homework_grades()
+      
         # Update Inputs
         updateNumericInput(
           session = session
@@ -536,7 +528,8 @@ wizard_server <- function(id, r, parent_session) {
                                      , "description" = input$topicDescription
                             )
         )
-        # Save to df_review_tables
+        
+        # Save to df_review_table
         new_column <- c(rep(NA, nrow(r$df_review_table )))
         new_column_name = paste("Topic", input$topicNumber)
         r$df_review_table  <- r$df_review_table  %>%
@@ -575,7 +568,10 @@ wizard_server <- function(id, r, parent_session) {
     # Review topic selector 
     output$review_topics <- renderUI({
       choices <- r$df_topic$topic_id
-      checkboxGroupInput(inputId = NS(id, "topics"), label = "Topics", choices = choices)
+      checkboxGroupInput(inputId = NS(id, "topics")
+                         , label = "Topics"
+                         , choices = choices
+                         , selected = choices)
     })
     
     # Save review
@@ -583,10 +579,11 @@ wizard_server <- function(id, r, parent_session) {
       # Check if review ID exists:
       if (input$reviewNumber %in% r$df_review_grades$review_id){
         showNotification("Review ID already exists.", type = "error")
-      } else{
-        
-      
-      # save to review_table
+      } else if (is.na(input$topics)) {
+        showNotification("Please add a topic", type = "error")
+        }
+      else{
+      # Save to df_review_table
       selected_topics <- paste(
         rep("Topic", length(input$topics))
         , input$topics
@@ -609,49 +606,11 @@ wizard_server <- function(id, r, parent_session) {
         cbind(topic_df)
       
       r$df_review_table <- rbind(r$df_review_table
-                                 ,temp
+                                 , temp
                                  )
-      # Review Grades
-      df_review_grades <- r$df_review_grades 
-      df_student <- r$df_student %>%
-        select(student_id)
+      # Save to df_review_grades
+      save_df_review_grades()
       
-      data_from_hot <- r$df_review_table %>%
-        pivot_longer(cols = c(5:ncol(r$df_review_table))) %>%
-        na.omit()
-      
-      review_topic_id_hot <- data_from_hot %>%
-        filter(value == "TRUE")
-      
-      review_topic_id_hot <- review_topic_id_hot %>%
-        mutate(topic_id = str_split_fixed(review_topic_id_hot$name, " ", 2)[,2]) %>%
-        select(review_id = `Review ID`, topic_id)
-      
-      number_of_topics <- nrow(review_topic_id_hot)
-      # replicate review_id and topic_id for as many students that are in the class
-      new_review_topic_rep <- do.call("rbind", replicate(nrow(df_student), review_topic_id_hot, simplify = FALSE))
-      
-      # replicate student_id the for as many topics being added
-      student_id <- do.call("rbind", replicate(nrow(review_topic_id_hot), df_student, simplify = FALSE)) %>%
-        arrange(student_id)
-      
-      df_review_grades <- df_review_grades %>%
-        filter(grade != "NA") %>%
-        mutate(
-          filter_id = paste(review_id, topic_id, student_id)
-        )
-      
-      df_new_review_data <- new_review_topic_rep %>%
-        mutate(student_id = student_id$student_id
-               , grade = rep("NA", nrow(new_review_topic_rep))
-               , filter_id = paste(review_id, topic_id, student_id)) %>%
-        filter(filter_id %notin% df_review_grades$filter_id) %>%
-        rbind(df_review_grades) %>%
-        arrange(review_id, topic_id) %>%
-        select(-c(filter_id))
-      
-      
-      r$df_review_grades <- df_new_review_data
       showNotification("Saved in session")
       }
       
