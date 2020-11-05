@@ -53,6 +53,8 @@ add_topic_button_Server <- function(id, r){
     })
     
     observeEvent(input$save_edits, {
+      req(input$edit_topics)
+      
       # Save to df_topic
       if (length(unique(hot_to_r(input$edit_topics)$id)) != length(hot_to_r(input$edit_topics)$id)){
         showNotification("Please ensure all topic ID's are unique!", type = "warning")

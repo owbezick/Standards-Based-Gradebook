@@ -358,7 +358,7 @@ wizard_server <- function(id, r, parent_session) {
     # Roster ----
     observeEvent(input$addStudent, {
       # Check to see if ID already exists
-      browser()
+      #browser()
       if(input$addID %in% r$df_student$student_id){
         showNotification("Student ID number already exists.", type = "error")
         updateNumericInput(
@@ -461,8 +461,9 @@ wizard_server <- function(id, r, parent_session) {
     
     # Save homework ----
     observeEvent(input$saveHomework, {
+      
       # Check if HW id exists
-      if(input$homeworkNumber %in% r$df_homework$id){
+      if (input$homeworkNumber %in% r$df_homework$id){ 
         showNotification("Homework ID already exists.", type = "error")
         updateNumericInput(
           session = session

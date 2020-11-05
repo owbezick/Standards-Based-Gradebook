@@ -65,20 +65,34 @@ add_homework_button_Server <- function(id, r){
     })
     # Saving ----
     observeEvent(input$save, {
+      #browser()
       req(input$homework_table)
-      # Save to df_homework
-      r$df_homework <- hot_to_r(input$homework_table) %>%
+      
+      df_homework_new <- hot_to_r(input$homework_table) %>%
         select(id
                , description = Description
                , date_assigned = `Date Assigned`
                , date_due = `Due Date`)
       
-      # Function assumes that r$df_homework has been refreshed
-      save_df_homework_grades()
+      #Get column of booleans (contains TRUE if date assigned comes after due date)
+      df_date_ranges <- df_homework_new %>%
+        mutate(range = (date_assigned > date_due)) %>%
+        select(range)
       
-      #Close modal
-      removeModal()
-      showNotification("Saved in session.")
+      #Check if date range is invalid
+      if (TRUE %in% df_date_ranges$range) {
+        showNotification("Please ensure date assigned comes before due date!", type = "warning")
+      } else {
+        # Save to df_homework
+        r$df_homework <- df_homework_new
+        
+        # Function assumes that r$df_homework has been refreshed
+        save_df_homework_grades()
+        
+        #Close modal
+        removeModal()
+        showNotification("Saved in session.")
+      }
       
     })
     
