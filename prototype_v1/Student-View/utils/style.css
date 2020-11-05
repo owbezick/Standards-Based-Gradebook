@@ -1,3 +1,24 @@
+.metrics .box-body{
+    font-size: 50px;
+    text-align: center;
+    font-weight: 600;
+    line-height: 50px;
+    padding-top: 0px;
+}
+
+.metrics .fluent_metric .box-primary{
+  border-top-color: #225ea8;
+}
+.metrics .progressing_metric .box-primary{
+  border-top-color: #41b6c4;
+}
+.metrics .nw_metric .box-primary{
+  border-top-color: #a1dab4;
+}
+.metrics .na_metric .box-primary{
+  border-top-color: #dbdbad;
+}
+
 .bttn-material-flat.bttn-default {
     background: #fff;
     color: black;
@@ -93,3 +114,5 @@ a:active {
   color: #ac1a2f;
   text-decoration: underline;
 }
+
+
