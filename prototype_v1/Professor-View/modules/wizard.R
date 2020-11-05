@@ -45,7 +45,7 @@ wizardUI <- function(id, doneButton){
                                        inputId = NS(id, "addID")
                                        , label = "Student ID: "
                                        , value = 801000000
-                                     )   
+                                     )
                                  )
                                  , column(width = 6, status = "primary"
                                           , box(width = 12, status = "primary"
@@ -196,7 +196,7 @@ wizardUI <- function(id, doneButton){
                                                             , value = "Review One")
                                                 , br()
                                        )
-                                     ) 
+                                     )
                                      , fluidRow(
                                        column(width = 6
                                               , div(class = "date_inputs", id = "date-inputs"
@@ -244,15 +244,15 @@ wizardUI <- function(id, doneButton){
 }
 
 wizard_server <- function(id, r, parent_session) {
-  
+
   `%notin%` <- Negate(`%in%`)
-  
+
   moduleServer(id, function(input, output, session){
     # Next Buttons ----
     observeEvent(input$toRoster, {
       updateTabsetPanel(session, "wizard", selected = "roster")
     })
-    
+
     observeEvent(input$toHomework, {
       if (nrow(r$df_student) > 0){
         updateTabsetPanel(session, "wizard", selected = "homework")
@@ -260,17 +260,17 @@ wizard_server <- function(id, r, parent_session) {
         showNotification("Please add at least one student!", type = "error")
       }
     })
-    
+
     observeEvent(input$toTopics, {
       if (nrow(r$df_homework) > 0){
         updateTabsetPanel(session, "wizard", selected = "topics")
       }else{
         showNotification("Please add at least one homework!", type = "error")
       }
-      
-      
+
+
     })
-    
+
     observeEvent(input$toReview, {
       if (nrow(r$df_topic) > 0){
         updateTabsetPanel(session, "wizard", selected = "review")
@@ -278,24 +278,24 @@ wizard_server <- function(id, r, parent_session) {
         showNotification("Please add at least one topic!", type = "error")
       }
     })
-    
+
     # Back Buttons ----
     observeEvent(input$toCourseInfo, {
       updateTabsetPanel(session, "wizard", selected = "courseInfo")
     })
-    
+
     observeEvent(input$backToRoster, {
       updateTabsetPanel(session, "wizard", selected = "roster")
     })
-    
+
     observeEvent(input$backToHomework, {
       updateTabsetPanel(session, "wizard", selected = "homework")
     })
-    
+
     observeEvent(input$backToTopics, {
       updateTabsetPanel(session, "wizard", selected = "topics")
     })
-    
+
     # Add Course info -----
     observeEvent(input$addCourseInfo, {
       insertUI(
@@ -322,17 +322,17 @@ wizard_server <- function(id, r, parent_session) {
         , immediate = TRUE
       )
     })
-    
+
     # Save Course Input ----
     observeEvent(input$saveCourseInput, {
       type <- input$type
       value <- input$value
-      
+
       # Save
       r$df_course_info <- rbind(r$df_course_info
                                 , tibble("Type" = c(type)
                                          , "Value" = c(value)))
-      
+
       # Insert preview to UI
       insertUI(
         selector = paste0("#", NS(id, "addCourseInfo"))
@@ -346,14 +346,14 @@ wizard_server <- function(id, r, parent_session) {
                    )
         )
       )
-      
+
       # Not all UI is being removed... the top box of the border stays?
       removeUI(
         selector = paste0("#", NS(id, "inputs"))
       )
-      
+
     })
-    
+
     # Add WebLink ----
     observeEvent(input$addWebLink, {
       insertUI(
@@ -380,17 +380,17 @@ wizard_server <- function(id, r, parent_session) {
         , immediate = TRUE
       )
     })
-    
+
     # Save Weblink ----
     observeEvent(input$saveLinkInput, {
       type <- input$type
       value <- input$value
-      
+
       # Save
       r$df_links <- rbind(r$df_links
                           , tibble("Link Description" = c(type)
                                    , "Link URL" = c(value)))
-      
+
       # Insert preview to UI
       insertUI(
         selector = paste0("#", NS(id, "addWebLink"))
@@ -407,16 +407,16 @@ wizard_server <- function(id, r, parent_session) {
                    )
         )
       )
-      
+
       # Not all UI is being removed... the top box of the border stays?
       removeUI(
         selector = paste0("#", NS(id, "linkInputs"))
       )
-      
+
     })
     # Save Course info ----
     observeEvent(input$saveCourseInfo, {
-      
+
       course_info <- tibble("location" = input$location
                             ,"meeting_times" = input$meeting_times
                             , "office_hours" = input$office_hours
@@ -427,12 +427,12 @@ wizard_server <- function(id, r, parent_session) {
                             , "link2_text" = input$link2_text
                             , "link3_text" = input$link3_text
       )
-      
+
       r$df_course_info <- course_info
       showNotification("Saved in session.")
     })
-    
-    
+
+
     # Roster ----
     observeEvent(input$addStudent, {
       # Check to see if ID already exists
@@ -455,16 +455,16 @@ wizard_server <- function(id, r, parent_session) {
                                 , "name" = input$addName
                               )
         )
-        
+
         # Save to df_homework_grades If there are homeworks present, add in name and "NA" for grades
         if (ncol(r$df_homework_grades) > 1){
-          temp <- r$df_homework_grades[1,] 
+          temp <- r$df_homework_grades[1,]
           new_row <- temp %>%
             mutate(`Student Name` = input$addName) # Add in name
           new_row[1,2:ncol(new_row)] <- "NA"
           r$df_homework_grades <- rbind(r$df_homework_grades, new_row)
         }
-        
+
         # Save to df_review_grades
         # Check to see if there are reviews
         if (nrow(r$df_review_table) != 0){
@@ -474,43 +474,43 @@ wizard_server <- function(id, r, parent_session) {
             df_review <- r$df_review_table %>%
               pivot_longer(cols = (4:ncol(r$df_review_table))) %>%
               filter(value == "TRUE")
-            
+
             review_ids <- df_review %>%
               select(`Review ID`) %>%
               distinct() %>%
               pull()
-            
+
             topics <- str_split_fixed(df_review$name, " ", n = 2)[,2]
-            
+
             temp <- tibble(review_id = df_review$`Review ID`
                            , topic_id = topics
                            , student_id = rep(input$addID, length(topics))
                            , grade = rep("NA", length(topics)))
-            
+
             r$df_review_grades <- temp
           } else{ # There are already students in the table
             a_student_id <-r$df_student[1,1] %>%
               pull()
-            
+
             new_data <- review_grades %>%
               filter(student_id == a_student_id) %>%
               mutate(student_id = input$addID
                      , grade = "NA")
-            
+
             temp <- rbind(review_grades, new_data) %>%
               arrange(review_id, topic_id)
-            
+
             r$df_review_grades <- temp
           }
         }
-        
+
         updateNumericInput(
           session = session
           , inputId = "addID"
           , label = "Student ID: "
           , value = 801000000
         )
-        
+
         updateTextInput(
           session = session
           , inputId = "addName"
@@ -521,7 +521,7 @@ wizard_server <- function(id, r, parent_session) {
         showNotification("Saved in session.")
       }
     })
-    
+
     # Homework ----
     # homework id picker
     output$homework_idPicker <- renderUI({
@@ -535,11 +535,12 @@ wizard_server <- function(id, r, parent_session) {
                    , label = "Homework Number: "
                    , value = value)
     })
-    
+
     # Save homework ----
     observeEvent(input$saveHomework, {
+
       # Check if HW id exists
-      if(input$homeworkNumber %in% r$df_homework$id){
+      if (input$homeworkNumber %in% r$df_homework$id){
         showNotification("Homework ID already exists.", type = "error")
         updateNumericInput(
           session = session
@@ -547,8 +548,8 @@ wizard_server <- function(id, r, parent_session) {
           , label = "Homework Number: "
           , value =  max(r$df_homework$id) + 1
         )
-      }else{ 
-        # Save to df_homework 
+      }else{
+        # Save to df_homework
         r$df_homework <- rbind(r$df_homework
                                , tibble(
                                  "id" = input$homeworkNumber
@@ -557,10 +558,10 @@ wizard_server <- function(id, r, parent_session) {
                                  , "date_due" = input$homeworkDateDue
                                )
         )
-        
+
         # Function assumes that r$df_homework has been refreshed
         save_df_homework_grades()
-        
+
         # Update Inputs
         updateNumericInput(
           session = session
@@ -584,12 +585,12 @@ wizard_server <- function(id, r, parent_session) {
                         , inputId = "homeworkDescription"
                         , label = "Homework Description: "
                         , value = " ")
-        
+
         showNotification("Saved in session.")
-        
+
       }
     })
-    
+
     # Topics ----
     output$topic_input <- renderUI({
       if(is.na(max(r$df_topic$topic_id))){
@@ -601,7 +602,7 @@ wizard_server <- function(id, r, parent_session) {
                    , label = NULL
                    , value =  + 1)
     })
-    
+
     observeEvent(input$saveTopic, {
       if(input$topicNumber %in% r$df_topic$topic_id){
         showNotification("Topic ID already exists.")
@@ -612,30 +613,30 @@ wizard_server <- function(id, r, parent_session) {
                                      , "description" = input$topicDescription
                             )
         )
-        
+
         # Save to df_review_table
         new_column <- c(rep(NA, nrow(r$df_review_table )))
         new_column_name = paste("Topic", input$topicNumber)
         r$df_review_table  <- r$df_review_table  %>%
-          mutate(init = new_column) 
+          mutate(init = new_column)
         names(r$df_review_table )[names(r$df_review_table ) == "init"] <- new_column_name
-        
+
         updateTextInput(
           session = session
           , inputId = "topicDescription"
           , label = NULL
           , value = "New Description"
         )
-        
+
         updateNumericInput(session = session
                            , inputId = "topicNumber"
                            , label = NULL
                            , value =  as.numeric(max(r$df_topic$topic_id)) + 1)
-        
+
         showNotification("Saved in session.")
       }
     })
-    
+
     # Reviews ----
     output$review_idPicker <- renderUI({
       max_id <- max(r$df_review$id)
@@ -648,8 +649,8 @@ wizard_server <- function(id, r, parent_session) {
                    , label = "Review Number: "
                    , value = value)
     })
-    
-    # Review topic selector 
+
+    # Review topic selector
     output$review_topics <- renderUI({
       choices <- r$df_topic$topic_id
       checkboxGroupInput(inputId = NS(id, "topics")
@@ -657,7 +658,7 @@ wizard_server <- function(id, r, parent_session) {
                          , choices = choices
                          , selected = choices)
     })
-    
+
     # Save review
     observeEvent(input$saveReview, {
       # Check if review ID exists:
@@ -672,29 +673,29 @@ wizard_server <- function(id, r, parent_session) {
           rep("Topic", length(input$topics))
           , input$topics
         )
-        
+
         topics <- unlist(colnames(r$df_review_table[,5:(ncol(r$df_review_table))]))
-        
+
         topic_df <- tibble(Topics = topics) %>%
           mutate(
             value = case_when(Topics %in% selected_topics ~ TRUE)
           ) %>%
           pivot_wider(names_from = Topics, values_from = value)
-        
-        
+
+
         temp <- tibble(
           `Review Name` = input$reviewName
           ,`Review ID` = input$reviewNumber
-          , `Review Start Date` = input$reviewStartDate 
+          , `Review Start Date` = input$reviewStartDate
           , `Review End Date` = input$reviewEndDate) %>%
           cbind(topic_df)
-        
+
         r$df_review_table <- rbind(r$df_review_table
                                    , temp
         )
         # Save to df_review_grades
         save_df_review_grades()
-        
+
         # Update Inputs
         # Update Inputs
         updateNumericInput(
@@ -721,9 +722,9 @@ wizard_server <- function(id, r, parent_session) {
                         , value = "Review Name")
         showNotification("Saved in session")
       }
-      
+
     })
-    
+
   }) # End module server ----
-      
+
 }
