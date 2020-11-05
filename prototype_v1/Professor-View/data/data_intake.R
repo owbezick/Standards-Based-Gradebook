@@ -44,10 +44,18 @@ r <- reactiveValues(df_student = NULL
                     , df_topic = NULL
                     , df_review_table = NULL
                     , df_cal_item = NULL
+                    , df_links = NULL
 )
 
+course_info <- tibble("Type" = c("type")
+       , "Value" = c("value"))
+
+links <- tibble("Link Description" = c("Sample link")
+                , "Link URL" = c("davidson.edu"))
+
 r$df_student <- readRDS("data/student.RDS")
-r$df_course_info <- readRDS("data/course_info.RDS")
+r$df_course_info <- course_info[0,]
+r$df_links <- links[0, ]
 r$df_homework <- readRDS("data/homework.RDS")
 r$df_homework_grades <- readRDS("data/homework_grades.RDS")[,1]
 r$df_topic <- readRDS("data/topic.RDS")

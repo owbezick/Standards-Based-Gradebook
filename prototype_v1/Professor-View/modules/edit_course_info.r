@@ -3,48 +3,13 @@
 course_information_button_UI <- function(id, r) {
   df <- r$df_course_info
   showModal(
-    modalDialog(title = "Edit Course Information", size = "l", easyClose = T
+    modalDialog(title = "Edit Course Information & Links", size = "l", easyClose = T
                 , fluidRow(
                   column(width = 6
-                         , tags$b("Course Location: ")
-                         , textInput(inputId = NS(id,"location")
-                                     , label = NULL, value = df$location)
-                         , br()
-                         , tags$b("Meeting times: ")
-                         , textInput(inputId = NS(id,"meeting_times")
-                                     , label = NULL, value = df$meeting_times)
-                         , br()
-                         , tags$b("Office hours: ")
-                         , textInput(inputId = NS(id,"office_hours")
-                                     , label = NULL, value = df$office_hours)
+                         , rHandsontableOutput(NS(id, "course_info"))
                   )
                   , column(width = 6
-                           , column(width = 6
-                                    , tags$b("Link URL: ")
-                                    , textInput(inputId = NS(id,"link1_url")
-                                                , label = NULL, value = df$link1_url)
-                                    , br()
-                                    , tags$b("Link URL: ")
-                                    , textInput(inputId = NS(id,"link2_url")
-                                                , label = NULL, value = df$link2_url)
-                                    , br()
-                                    , tags$b("Link URL: ")
-                                    , textInput(inputId = NS(id,"link3_url")
-                                                , label = NULL, value = df$link3_url)
-                           )
-                           , column(width = 6
-                                    , tags$b("Link Description: ")
-                                    , textInput(inputId = NS(id,"link1_text")
-                                                , label = NULL, value = df$link1_text)
-                                    , br()
-                                    , tags$b("Link Description: ")
-                                    , textInput(inputId = NS(id,"link2_text")
-                                                , label = NULL, value = df$link2_text)
-                                    , br()
-                                    , tags$b("Link Description: ")
-                                    , textInput(inputId = NS(id,"link3_text")
-                                                , label = NULL, value = df$link3_text)
-                           )
+                           , rHandsontableOutput(NS(id, "links"))
                   )
                 )
                 , footer = fluidRow(
@@ -53,7 +18,7 @@ course_information_button_UI <- function(id, r) {
                                       , label = "Save Information"
                                       , style = "material-flat"
                                       , block = T
-                                      )
+                         )
                   )
                 )
     )
@@ -62,25 +27,30 @@ course_information_button_UI <- function(id, r) {
 
 course_information_button_Server <- function(id, r){
   moduleServer(id, function(input,output,session){
-    observeEvent(input$save, {
-      new_df <- tibble("location" = input$location
-                       ,"meeting_times" = input$meeting_times
-                       , "office_hours" = input$office_hours
-                       , "link1_url" = input$link1_url
-                       , "link2_url" = input$link2_url
-                       , "link3_url" = input$link3_url
-                       , "link1_text" = input$link1_text
-                       , "link2_text" = input$link2_text
-                       , "link3_text" = input$link3_text
+    output$course_info <- renderRHandsontable({
+      rhandsontable(
+        r$df_course_info
+        , rowHeaders = NULL
+        , stretchH = 'all'
       )
-      
-      # Write to sheet ----
-      # Update reactive ----
-      r$df_course_info <- new_df
+    })
+    
+    output$links <- renderRHandsontable({
+      rhandsontable(
+        r$df_links
+        , rowHeaders = NULL
+        , stretchH = 'all'
+      )
+    })
+    
+    
+    observeEvent(input$save, {
+      r$df_course_info <- hot_to_r(input$course_info)
+      r$df_links <- hot_to_r(input$links)
       showNotification("Saved in session.")
       removeModal()
       
     })
-
+    
   })
 }
