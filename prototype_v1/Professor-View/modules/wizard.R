@@ -6,25 +6,48 @@ wizardUI <- function(id, doneButton){
                                , "Course Information"
                                , br()
                                , fluidRow(
-                                 box(width = 12, status = "primary"
-                                     , column(width = 6
-                                              , actionBttn(NS(id, "addCourseInfo"), "Add course information.", block = T, size = "s")
+                                 box(width = 6, status = "primary", id = NS(id, "course_info_box")
+                                     , fluidRow(column(width = 6
+                                                       , textInput(
+                                                         NS(id, "type")
+                                                         , "Information Type"
+                                                         , placeholder = "Class Location"
+                                                       )
                                      )
                                      , column(width = 6
-                                              , actionBttn(NS(id, "addWebLink"), "Add a web-link.", block = T, size = "s")
+                                              , textInput(
+                                                NS(id, "value")
+                                                , "Information"
+                                                , placeholder = "CHAM 1234"
+                                              )
                                      )
+                                     )
+                                     , fluidRow(column(width = 12,actionBttn(NS(id, "saveCourseInput"), "Save")))
+                                     
+                                 )
+                                 , box(width = 6, status = "primary", id = NS(id, "web_link_box")
+                                       , fluidRow(column(width = 6
+                                                         , textInput(
+                                                           NS(id, "link_d")
+                                                           , "Link Description"
+                                                           , placeholder = "Class Moodle Page"
+                                                         )
+                                       )
+                                       , column(width = 6
+                                                , textInput(
+                                                  NS(id, "link")
+                                                  , "Link URL"
+                                                  , placeholder = "moodle.com"
+                                                )
+                                       )
+                                       )
+                                       , fluidRow(column(width = 12,actionBttn(NS(id, "saveLinkInput"), "Save")))
                                  )
                                )
                                # Buttons ----
                                , fluidRow(
                                  column(width = 4)
-                                 , column(width = 4
-                                          , actionBttn(inputId = NS(id,"saveCourseInfo")
-                                                       , label = "Save"
-                                                       , style = "material-flat"
-                                                       , block = T
-                                          )
-                                 )
+                                 , column(width = 4)
                                  , column(width = 4
                                           , actionBttn(
                                             inputId = NS(id,"toRoster")
@@ -45,13 +68,14 @@ wizardUI <- function(id, doneButton){
                                        inputId = NS(id, "addID")
                                        , label = "Student ID: "
                                        , value = 801000000
-                                     )   
+                                     )
                                  )
                                  , column(width = 6, status = "primary"
                                           , box(width = 12, status = "primary"
                                                 , textInput(
                                                   inputId = NS(id, "addName")
                                                   , label = "Student Name: "
+                                                  , value = "Student Name"
                                                 )
                                           )
                                  )
@@ -193,10 +217,10 @@ wizardUI <- function(id, doneButton){
                                        , column(width = 8
                                                 , textInput(inputId = NS(id, "reviewName")
                                                             , label = "Review Name: "
-                                                            , value = "Review One")
+                                                            , value = "Review 1")
                                                 , br()
                                        )
-                                     ) 
+                                     )
                                      , fluidRow(
                                        column(width = 6
                                               , div(class = "date_inputs", id = "date-inputs"
@@ -250,7 +274,13 @@ wizard_server <- function(id, r, parent_session) {
   moduleServer(id, function(input, output, session){
     # Next Buttons ----
     observeEvent(input$toRoster, {
-      updateTabsetPanel(session, "wizard", selected = "roster")
+      if (nrow(r$df_course_info) > 0 && nrow(r$df_links) >0 ){
+        updateTabsetPanel(session, "wizard", selected = "roster")
+      } else{
+        showNotification("Please add at least one course information and link!", type = "error")
+        
+      }
+      
     })
     
     observeEvent(input$toHomework, {
@@ -296,32 +326,6 @@ wizard_server <- function(id, r, parent_session) {
       updateTabsetPanel(session, "wizard", selected = "topics")
     })
     
-    # Add Course info -----
-    observeEvent(input$addCourseInfo, {
-      insertUI(
-        selector = paste0("#", NS(id, "addCourseInfo"))
-        , where = "afterEnd"
-        , ui = div(box(width = 12
-                       , fluidRow(column(width = 6
-                                         , textInput(
-                                           NS(id, "type")
-                                           , "Information Type"
-                                           , placeholder = "Example: Class Location"
-                                         )
-                       )
-                       , column(width = 6
-                                , textInput(
-                                  NS(id, "value")
-                                  , "Information"
-                                  , placeholder = "Example: CHAM 1234"
-                                )
-                       )
-                       )
-                       , fluidRow(actionBttn(NS(id, "saveCourseInput"), "Save"))
-        ), id = NS(id, "inputs"))
-        , immediate = TRUE
-      )
-    })
     
     # Save Course Input ----
     observeEvent(input$saveCourseInput, {
@@ -335,9 +339,9 @@ wizard_server <- function(id, r, parent_session) {
       
       # Insert preview to UI
       insertUI(
-        selector = paste0("#", NS(id, "addCourseInfo"))
+        selector = paste0("#", NS(id, "course_info_box"))
         , where = "beforeBegin"
-        , ui = box(title = NULL
+        , ui = box(title = NULL, width = 12
                    , fluidRow(
                      column(width = 12
                             , tags$b(paste0(type, ":"))
@@ -347,44 +351,23 @@ wizard_server <- function(id, r, parent_session) {
         )
       )
       
-      # Not all UI is being removed... the top box of the border stays?
-      removeUI(
-        selector = paste0("#", NS(id, "inputs"))
+      # Update inputs
+      updateTextInput(
+        session = session
+        , inputId = "value"
+        , value = "New"
       )
-      
-    })
-    
-    # Add WebLink ----
-    observeEvent(input$addWebLink, {
-      insertUI(
-        selector = paste0("#", NS(id, "addWebLink"))
-        , where = "afterEnd"
-        , ui = div(box(width = 12
-                       , fluidRow(column(width = 6
-                                         , textInput(
-                                           NS(id, "type")
-                                           , "Link Description"
-                                           , placeholder = "Example: Class Moodle Page"
-                                         )
-                       )
-                       , column(width = 6
-                                , textInput(
-                                  NS(id, "value")
-                                  , "Link URL"
-                                  , placeholder = "Example: moodle.com"
-                                )
-                       )
-                       )
-                       , fluidRow(actionBttn(NS(id, "saveLinkInput"), "Save"))
-        ), id = NS(id, "linkInputs"))
-        , immediate = TRUE
+      updateTextInput(
+        session = session
+        , inputId = "type"
+        , value = "New"
       )
     })
     
     # Save Weblink ----
     observeEvent(input$saveLinkInput, {
-      type <- input$type
-      value <- input$value
+      type <- input$link_d
+      value <- input$link
       
       # Save
       r$df_links <- rbind(r$df_links
@@ -393,9 +376,9 @@ wizard_server <- function(id, r, parent_session) {
       
       # Insert preview to UI
       insertUI(
-        selector = paste0("#", NS(id, "addWebLink"))
+        selector = paste0("#", NS(id, "web_link_box"))
         , where = "beforeBegin"
-        , ui = box(title = NULL
+        , ui = box(title = NULL, width = 12
                    , fluidRow(
                      column(width = 12
                             , div(tags$a(
@@ -408,28 +391,17 @@ wizard_server <- function(id, r, parent_session) {
         )
       )
       
-      # Not all UI is being removed... the top box of the border stays?
-      removeUI(
-        selector = paste0("#", NS(id, "linkInputs"))
+      # Update inputs
+      updateTextInput(
+        session = session
+        , inputId = "link_d"
+        , value = "New"
       )
-      
-    })
-    # Save Course info ----
-    observeEvent(input$saveCourseInfo, {
-      
-      course_info <- tibble("location" = input$location
-                            ,"meeting_times" = input$meeting_times
-                            , "office_hours" = input$office_hours
-                            , "link1_url" = input$link1_url
-                            , "link2_url" = input$link2_url
-                            , "link3_url" = input$link3_url
-                            , "link1_text" = input$link1_text
-                            , "link2_text" = input$link2_text
-                            , "link3_text" = input$link3_text
+      updateTextInput(
+        session = session
+        , inputId = "link"
+        , value = "New"
       )
-      
-      r$df_course_info <- course_info
-      showNotification("Saved in session.")
     })
     
     
@@ -458,7 +430,7 @@ wizard_server <- function(id, r, parent_session) {
         
         # Save to df_homework_grades If there are homeworks present, add in name and "NA" for grades
         if (ncol(r$df_homework_grades) > 1){
-          temp <- r$df_homework_grades[1,] 
+          temp <- r$df_homework_grades[1,]
           new_row <- temp %>%
             mutate(`Student Name` = input$addName) # Add in name
           new_row[1,2:ncol(new_row)] <- "NA"
@@ -514,8 +486,7 @@ wizard_server <- function(id, r, parent_session) {
         updateTextInput(
           session = session
           , inputId = "addName"
-          , value = "New Name"
-          , placeholder = "New Name"
+          , value = "Student Name"
           , label = "Student Name: "
         )
         showNotification("Saved in session.")
@@ -525,7 +496,7 @@ wizard_server <- function(id, r, parent_session) {
     # Homework ----
     # homework id picker
     output$homework_idPicker <- renderUI({
-      max_id <- max(r$df_homework$id)
+      max_id <- suppressWarnings(max(r$df_homework$id))
       if(max_id == -Inf){
         value = 1
       } else {
@@ -538,8 +509,9 @@ wizard_server <- function(id, r, parent_session) {
     
     # Save homework ----
     observeEvent(input$saveHomework, {
+      
       # Check if HW id exists
-      if(input$homeworkNumber %in% r$df_homework$id){
+      if (input$homeworkNumber %in% r$df_homework$id){
         showNotification("Homework ID already exists.", type = "error")
         updateNumericInput(
           session = session
@@ -547,8 +519,11 @@ wizard_server <- function(id, r, parent_session) {
           , label = "Homework Number: "
           , value =  max(r$df_homework$id) + 1
         )
-      }else{ 
-        # Save to df_homework 
+      }else if (input$homeworkDateAssigned > input$homeworkDateDue) {
+        showNotification("Assignment start date is after assignment end date.", type = "warning")
+      }
+      else{
+        # Save to df_homework
         r$df_homework <- rbind(r$df_homework
                                , tibble(
                                  "id" = input$homeworkNumber
@@ -580,10 +555,11 @@ wizard_server <- function(id, r, parent_session) {
           , label = "Date Due: "
           , value = Sys.Date()
         )
+        
         updateTextInput(session = session
                         , inputId = "homeworkDescription"
                         , label = "Homework Description: "
-                        , value = " ")
+                        , value = paste("Homework", max(r$df_homework$id) + 1))
         
         showNotification("Saved in session.")
         
@@ -592,7 +568,7 @@ wizard_server <- function(id, r, parent_session) {
     
     # Topics ----
     output$topic_input <- renderUI({
-      if(is.na(max(r$df_topic$topic_id))){
+      if(is.na(suppressWarnings(max(r$df_topic$topic_id)))){
         value = 1
       } else {
         value = as.numeric(max(r$df_topic$topic_id)) + 1
@@ -617,14 +593,14 @@ wizard_server <- function(id, r, parent_session) {
         new_column <- c(rep(NA, nrow(r$df_review_table )))
         new_column_name = paste("Topic", input$topicNumber)
         r$df_review_table  <- r$df_review_table  %>%
-          mutate(init = new_column) 
+          mutate(init = new_column)
         names(r$df_review_table )[names(r$df_review_table ) == "init"] <- new_column_name
         
         updateTextInput(
           session = session
           , inputId = "topicDescription"
           , label = NULL
-          , value = "New Description"
+          , value = paste("Topic", max(r$df_topic$topic_id) + 1)
         )
         
         updateNumericInput(session = session
@@ -638,7 +614,7 @@ wizard_server <- function(id, r, parent_session) {
     
     # Reviews ----
     output$review_idPicker <- renderUI({
-      max_id <- max(r$df_review$id)
+      max_id <- suppressWarnings(max(r$df_review$id))
       if(max_id == -Inf){
         value = 1
       } else {
@@ -649,7 +625,7 @@ wizard_server <- function(id, r, parent_session) {
                    , value = value)
     })
     
-    # Review topic selector 
+    # Review topic selector
     output$review_topics <- renderUI({
       choices <- r$df_topic$topic_id
       checkboxGroupInput(inputId = NS(id, "topics")
@@ -665,6 +641,9 @@ wizard_server <- function(id, r, parent_session) {
         showNotification("Review ID already exists.", type = "error")
       } else if (is.na(input$topics)) {
         showNotification("Please add a topic", type = "error")
+      }
+      else if (input$reviewStartDate > input$reviewEndDate){
+        showNotification("Assignment start date is after assignment end date.", type = "warning")
       }
       else{
         # Save to df_review_table
@@ -685,7 +664,7 @@ wizard_server <- function(id, r, parent_session) {
         temp <- tibble(
           `Review Name` = input$reviewName
           ,`Review ID` = input$reviewNumber
-          , `Review Start Date` = input$reviewStartDate 
+          , `Review Start Date` = input$reviewStartDate
           , `Review End Date` = input$reviewEndDate) %>%
           cbind(topic_df)
         
@@ -694,14 +673,13 @@ wizard_server <- function(id, r, parent_session) {
         )
         # Save to df_review_grades
         save_df_review_grades()
-        
         # Update Inputs
         # Update Inputs
         updateNumericInput(
           session = session
           , inputId = "reviewNumber"
           , label = "Review Number: "
-          , value = max(r$df_review_grades$id) + 1
+          , value = max(r$df_review_grades$review_id) + 1
         )
         updateDateInput(
           session = session
@@ -718,12 +696,12 @@ wizard_server <- function(id, r, parent_session) {
         updateTextInput(session = session
                         , inputId = "reviewName"
                         , label = "Review Name "
-                        , value = "Review Name")
+                        , value = paste("Review", max(r$df_review_grades$review_id) + 1))
         showNotification("Saved in session")
       }
       
     })
     
   }) # End module server ----
-      
+  
 }

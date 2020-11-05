@@ -1,32 +1,33 @@
 # UI -----
 edit_and_add_UI <- function(id){
-  box(width = 4, title = "Edit:", status = "primary", height = "22vh"
+  box(width = 4, title = "Edit:", status = "primary", height = "20vh"
       , fluidRow(
-        column(width = 12
-               , actionBttn(inputId = NS(id, "editCourseInfo")
-                            , label = "Course Info"
-                            , style = "material-flat"
-                            , block = T)
-        )
-      )
-      , br()
-      , fluidRow(
-        column(width = 12
+        column(width = 6
                , actionBttn(inputId = NS(id, "editRoster")
                             , label = "Course Roster"
                             , style = "material-flat"
                             , block = T)
+        )
+        , column(width = 6
+                 , actionBttn(inputId = NS(id, "editCourseInfo")
+                              , label = "Course Info"
+                              , style = "material-flat"
+                              , block = T)
         )
       )
       , br()
       , fluidRow(
         column(width = 6
                , actionBttn(inputId = NS(id, "addTopic")
-                            , label = "Topic", style = "material-flat", block = T)
+                            , label = "Topic"
+                            , style = "material-flat"
+                            , block = T)
         )
         , column(width = 6
                  , actionBttn(inputId = NS(id, "addHomework")
-                              , label = "Homework", style = "material-flat", block = T)
+                              , label = "Homework"
+                              , style = "material-flat"
+                              , block = T)
         )
       )
   )

@@ -23,23 +23,32 @@ topics_server <- function(id, r){
         , rowHeaders = NULL
         , stretchH = 'all'
       ) %>%
-        hot_context_menu(allowComments = T)
+        hot_context_menu(allowComments = T) %>%
+        hot_col(col = c("Review ID"), type = "numeric")
     })
 
     # Save topic table -----
     observeEvent(input$save, {
       df_hot <- hot_to_r(input$topicTable)
       
-      # Save df_review_table
-      r$df_review_table <- df_hot
-
-      # Save df_review_grades
-      save_df_review_grades()
+      #Get column of booleans (contains TRUE if date assigned comes after due date)
+      df_date_ranges <- df_hot %>%
+        mutate(range = (`Review Start Date` > `Review End Date`)) %>%
+        select(range)
       
-      showNotification("Saved to remote.")
+      #Check if date range is invalid
+      if (TRUE %in% df_date_ranges$range) {
+        showNotification("Please ensure date assigned comes before due date!", type = "warning")
+      } else {
+        # Save df_review_table
+        r$df_review_table <- df_hot
+  
+        # Save df_review_grades
+        save_df_review_grades()
+        
+        showNotification("Saved to remote.")
+      }
     })
-
-
 
 
   })

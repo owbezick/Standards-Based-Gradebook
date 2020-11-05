@@ -53,6 +53,7 @@ ui <- dashboardPage(
                 tabName = "home"
                 , fluidRow(
                     course_info_UI("courseinfo")
+                    , course_link_UI("courselink")
                     , edit_and_add_UI("edit_and_add")
                 )
                 , fluidRow(
@@ -97,7 +98,9 @@ server <- function(input, output, session) {
         )
          )
     })
+    
     wizard_server("dataWizard", r)
+    
     observeEvent(input$closeWizard, {
         if(nrow(r$df_review_grades) > 0){
             removeModal()
@@ -110,6 +113,7 @@ server <- function(input, output, session) {
     # Other server calls ----
     course_calendar_server("course_calendar", r)
     course_info_server("courseinfo", r)
+    course_link_server("courselink", r)
     edit_and_add_server("edit_and_add", r)
     topics_server("topics", r)
     view_calendar_hw_Server("calendar_hw", r)
