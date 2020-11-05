@@ -149,17 +149,21 @@ edit_roster_button_Server <- function(id, r){
         df_roster
         , rowHeaders = NULL
         , stretchH = 'all'
-      )
+      ) %>%
+        hot_col(col = "Student ID", type = "numeric")
       
     })
     
     observeEvent(input$save, {
       req(input$roster_table)
-      if (length(unique(hot_to_r(input$roster_table)$`Student ID`)) != length(hot_to_r(input$roster_table)$`Student ID`)){
+      roster_table <- hot_to_r(input$roster_table)
+      if (nrow(roster_table) == 0){
+        showNotification("Ensure that there is at least one student!", type = "warning")
+        }else if (length(unique(roster_table$`Student ID`)) != length(roster_table$`Student ID`)){
         showNotification("Ensure that all student ID's are unique!", type = "warning")
       } else{
         
-        r$df_student <- hot_to_r(input$roster_table) %>%
+        r$df_student <- roster_table %>%
           select(student_id = `Student ID`, name = Name)
         
         save_df_homework_grades()

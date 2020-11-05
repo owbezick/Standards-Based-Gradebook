@@ -85,12 +85,14 @@ homework_server <- function(id, r){
       if (ncol(df_homework_grades) == 1){
         rhandsontable(df_homework_grades
                       , rowHeaders = NULL
-                      , stretchH = 'all')
+                      , stretchH = 'all')%>%
+          hot_context_menu(allowRowEdit = FALSE)
       } else{
         rhandsontable(df_homework_grades
                       , rowHeaders = NULL
                       , stretchH = 'all') %>%
-          hot_heatmap(cols = c(2:ncol(df_homework_grades)))
+          hot_context_menu(allowRowEdit = FALSE) %>%
+          hot_col(col = c(2:nco(df_homework_grades)), type = "numeric")
       }
 
     })
@@ -173,10 +175,11 @@ review_server <- function(id, r){
           td.style.background = 'lightgrey';
           }
         }
-          ")
+          ")%>%
+        hot_context_menu(allowRowEdit = FALSE)
     })
     
-    # Save Review by Student 
+    # Save Review by Student ----
     observeEvent(input$saveReview,{
       r$df_review_grades <- hot_to_r(input$review_table_review) %>%
         pivot_longer(cols = c(3:ncol(hot_to_r(input$review_table_review)))) %>%
@@ -190,7 +193,6 @@ review_server <- function(id, r){
     output$review_table_student <- renderRHandsontable({
       df_review_grades <- r$df_review_grades
       df_student <- r$df_student
-      #TODO: add Topic before ID # in columns
       df_review_topic <- df_review_grades %>%
         left_join(df_student, by = "student_id") %>%
         pivot_wider(id_cols = c(review_id, name, topic_id)
@@ -234,11 +236,12 @@ review_server <- function(id, r){
           }
           }
 
-        }")
+        }")%>%
+        hot_context_menu(allowRowEdit = FALSE)
 
     })
 
-    # Save by Topic
+    # Save by Topic ----
     observeEvent(input$saveStudent,{
       df_temp <- hot_to_r(input$review_table_student) %>%
         pivot_longer(cols = c(3:ncol(hot_to_r(input$review_table_student)))) %>%

@@ -45,7 +45,7 @@ save_df_homework_grades <- function(){
     r$df_homework_grades <- df_NA_homework_grades
   } else{
     # Merge tables together, keeping values from current and adding values from NA
-    homework_grade_long <- r$df_homework_grades %>%
+    current_homework_grade_long <- r$df_homework_grades %>%
       pivot_longer(cols = c(2:ncol(r$df_homework_grades)), names_to = "Homework", values_to = "grade") %>%
       mutate(unique_id = paste(`Student Name`, Homework)) 
     
@@ -57,7 +57,12 @@ save_df_homework_grades <- function(){
       ) %>%
       mutate(unique_id = paste(`Student Name`, Homework)) 
     
-    r$df_homework_grades <- rbind(subset(NA_homework_grade_long, unique_id %notin% homework_grade_long$unique_id), homework_grade_long) %>%
+    # filter out deleted homework IDs 
+    filtered_current_homework_grade_long <- filter(current_homework_grade_long, unique_id %in% NA_homework_grade_long$unique_id)
+    # Filter out existing homework IDs
+    new_NA_homework_grade_long <- filter(NA_homework_grade_long, unique_id %notin% filtered_current_homework_grade_long$unique_id)
+    # add in new homework ID
+    r$df_homework_grades <- rbind(filtered_current_homework_grade_long, new_NA_homework_grade_long) %>%
       arrange(Homework) %>%
       pivot_wider(id_cols = c(`Student Name`, Homework), names_from = Homework, values_from = grade) %>%
       arrange(`Student Name`)
@@ -65,7 +70,6 @@ save_df_homework_grades <- function(){
 }
 
 save_df_review_grades <- function(){
-  df_review_grades <- r$df_review_grades 
   df_student <- r$df_student %>%
     select(student_id)
   
@@ -89,7 +93,7 @@ save_df_review_grades <- function(){
   student_id <- do.call("rbind", replicate(nrow(review_topic_id_hot), df_student, simplify = FALSE)) %>%
     arrange(student_id)
   
-  df_review_grades <- df_review_grades %>%
+  df_review_grades <- r$df_review_grades  %>%
     filter(grade != "NA") %>%
     mutate(
       filter_id = paste(review_id, topic_id, student_id)

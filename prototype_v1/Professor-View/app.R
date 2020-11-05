@@ -97,7 +97,9 @@ server <- function(input, output, session) {
         )
          )
     })
+    
     wizard_server("dataWizard", r)
+    
     observeEvent(input$closeWizard, {
         if(nrow(r$df_review_grades) > 0){
             removeModal()

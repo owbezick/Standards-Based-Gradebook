@@ -15,12 +15,11 @@ course_info_server <- function(id, r){
     
     course_info_ui <- reactive({
       if (nrow(r$df_course_info) > 0) {
-        
         list <-  tagList()
         for (row in seq(1:nrow(r$df_course_info))){
-          type = pull(r$df_course_info[row, 1])
-          value = pull(r$df_course_info[row, 2])
-          ui <- box(title = NULL
+          type <-  r$df_course_info[row, 1]
+          value <- r$df_course_info[row, 2]
+          ui <- box(title = NULL, status = "primary"
                     , fluidRow(
                       column(width = 12
                              , tags$b(paste0(type, ":"))
@@ -42,9 +41,9 @@ course_info_server <- function(id, r){
         
         list <-  tagList()
         for (row in seq(1:nrow(r$df_links))){
-          type = pull(r$df_links[row, 1])
-          value = pull(r$df_links[row, 2])
-          ui <- box(title = NULL
+          type <-  r$df_links[row, 1]
+          value <- r$df_links[row, 2]
+          ui <- box(title = NULL, status = "primary"
                     , fluidRow(
                       column(width = 12
                              , div(tags$a(

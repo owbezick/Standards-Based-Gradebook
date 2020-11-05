@@ -1,3 +1,4 @@
+# View Homework UI ----
 view_calendar_hw_UI <- function(id, title){
   showModal(
     modalDialog(title = title, size = "l"
@@ -34,10 +35,11 @@ view_calendar_hw_UI <- function(id, title){
   )
 }
 
-# Homework Item Server ----
+# View Homework Server ----
 view_calendar_hw_Server <- function(id, r){
   moduleServer(id, function(input,output,session){
     
+    # OUT table ----
     output$item_info_table <- renderRHandsontable({
       df <- r$cal_item
       
@@ -53,11 +55,12 @@ view_calendar_hw_Server <- function(id, r){
         hot_col("Homework Number", readOnly = TRUE)
     })
     
+    # BTN Close ----
     observeEvent(input$close, {
       removeModal()
     })
     
-    # Save Homework 
+    # BTN SAVE ----
     observeEvent(input$save, {
       r$cal_item <- hot_to_r(input$item_info_table)
       
@@ -81,7 +84,7 @@ view_calendar_hw_Server <- function(id, r){
       showNotification("Saved in session")
     })
     
-    # Delete homework
+    # BTN Delete ----
     observeEvent(input$delete, {
       
       cal_item <- r$cal_item
@@ -103,21 +106,30 @@ view_calendar_hw_Server <- function(id, r){
     
   })
 }
+# View review UI ----
 view_calendar_review_UI <- function(id, title){
   showModal(
     modalDialog(title = title, size = "l"
                 , rHandsontableOutput(NS(id, "item_info_table"))
                 , br()
                 , footer = fluidRow(
-                  column(width = 6
+                  column(width = 4
                          , actionBttn(
-                           inputId = NS(id, "delete")
-                           , label = "Delete"
+                           inputId = NS(id, "save")
+                           , label = "save"
                            , style = "material-flat"
                            , block = T
                          )
                   )
-                  , column(width = 6
+                  , column(width = 4
+                           , actionBttn(
+                             inputId = NS(id, "delete")
+                             , label = "Delete"
+                             , style = "material-flat"
+                             , block = T
+                           )
+                  )
+                  , column(width = 4
                            , actionBttn(
                              inputId = NS(id, "close")
                              , label = "Close"
@@ -131,22 +143,31 @@ view_calendar_review_UI <- function(id, title){
   )
 }
 
-# View Review Item Server ----
+# View Review server ----
 view_calendar_review_Server <- function(id, r){
   moduleServer(id, function(input,output,session){
-    
+    # OUT table----
     output$item_info_table <- renderRHandsontable({
+      req(r$cal_item)
       aligns <- c(rep("c", NCOL(r$cal_item)))
       
-      rhandsontable(r$cal_item, rowHeaders = F) %>%
-        hot_cols(readOnly = T)
+      rhandsontable(r$cal_item
+                    , rowHeaders = NULL
+                    , stretchH = 'all')
       
     })
     
+    # BTN close -----
     observeEvent(input$close, {
       removeModal()
     })
-    # Deletion ---- 
+    
+    # BTN Save ----
+    observeEvent(input$save, {
+      # browser()
+    })
+    
+    # BTN Delete ----
     observeEvent(input$delete, {
       showModal(
         modalDialog(

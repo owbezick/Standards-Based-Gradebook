@@ -23,7 +23,8 @@ topics_server <- function(id, r){
         , rowHeaders = NULL
         , stretchH = 'all'
       ) %>%
-        hot_context_menu(allowComments = T)
+        hot_context_menu(allowComments = T) %>%
+        hot_col(col = c("Review ID"), type = "numeric")
     })
 
     # Save topic table -----

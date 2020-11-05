@@ -36,11 +36,11 @@ add_homework_button_Server <- function(id, r){
     output$homework_table <- renderRHandsontable({
 
       df_homework <- r$df_homework %>%
-        mutate(id = as.character(id)
+        mutate(id = id
                , Description = description
                , `Date Assigned` = ymd(date_assigned)
                , `Due Date` = ymd(date_due)) %>%
-      select(id, Description, `Date Assigned`, `Due Date`)
+      select(`Homework ID` = id, Description, `Date Assigned`, `Due Date`)
       
      
       rhandsontable(
@@ -48,7 +48,8 @@ add_homework_button_Server <- function(id, r){
         , rowHeaders = NULL
         , stretchH = 'all'
         , readOnly = F
-      )
+      ) %>%
+        hot_col(col = c("Homework ID"), type = "numeric")
     })
     
     # Picker UI ----
@@ -65,23 +66,22 @@ add_homework_button_Server <- function(id, r){
     })
     # Saving ----
     observeEvent(input$save, {
-      #browser()
       req(input$homework_table)
-      
       df_homework_new <- hot_to_r(input$homework_table) %>%
-        select(id
+        select(id = `Homework ID`
                , description = Description
                , date_assigned = `Date Assigned`
-               , date_due = `Due Date`)
+               , date_due = `Due Date`) %>%
+        arrange(id)
       
-      #Get column of booleans (contains TRUE if date assigned comes after due date)
+      # Get column of booleans (contains TRUE if date assigned comes after due date)
       df_date_ranges <- df_homework_new %>%
         mutate(range = (date_assigned > date_due)) %>%
         select(range)
       
       #Check if date range is invalid
       if (TRUE %in% df_date_ranges$range) {
-        showNotification("Please ensure date assigned comes before due date!", type = "warning")
+        showNotification("Assignment start date before assignment end date!", type = "warning")
       } else {
         # Save to df_homework
         r$df_homework <- df_homework_new
