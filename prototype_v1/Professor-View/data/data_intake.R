@@ -62,4 +62,5 @@ r$df_topic <- readRDS("data/topic.RDS")
 r$df_review_table <- readRDS("data/review_table.RDS")
 r$df_review_grades <-  readRDS("data/review_grades.RDS")
 
+write_rds(r$df_student, "data/df_student.RDS")
 
