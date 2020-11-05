@@ -92,7 +92,7 @@ homework_server <- function(id, r){
                       , rowHeaders = NULL
                       , stretchH = 'all') %>%
           hot_context_menu(allowRowEdit = FALSE) %>%
-          hot_col(col = c(2:nco(df_homework_grades)), type = "numeric")
+          hot_col(col = c(2:ncol(df_homework_grades)), type = "numeric")
       }
 
     })

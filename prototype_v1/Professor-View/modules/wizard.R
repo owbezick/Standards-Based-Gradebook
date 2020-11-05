@@ -6,13 +6,42 @@ wizardUI <- function(id, doneButton){
                                , "Course Information"
                                , br()
                                , fluidRow(
-                                 box(width = 12, status = "primary"
-                                     , column(width = 6
-                                              , actionBttn(NS(id, "addCourseInfo"), "Add course information.", block = T, size = "s")
+                                 box(width = 6, status = "primary", id = NS(id, "course_info_box")
+                                     , fluidRow(column(width = 6
+                                                       , textInput(
+                                                         NS(id, "type")
+                                                         , "Information Type"
+                                                         , placeholder = "Class Location"
+                                                       )
                                      )
                                      , column(width = 6
-                                              , actionBttn(NS(id, "addWebLink"), "Add a web-link.", block = T, size = "s")
+                                              , textInput(
+                                                NS(id, "value")
+                                                , "Information"
+                                                , placeholder = "CHAM 1234"
+                                              )
                                      )
+                                     )
+                                     , fluidRow(column(width = 12,actionBttn(NS(id, "saveCourseInput"), "Save")))
+                                     
+                                 )
+                                 , box(width = 6, status = "primary", id = NS(id, "web_link_box")
+                                       , fluidRow(column(width = 6
+                                                         , textInput(
+                                                           NS(id, "link_d")
+                                                           , "Link Description"
+                                                           , placeholder = "Class Moodle Page"
+                                                         )
+                                       )
+                                       , column(width = 6
+                                                , textInput(
+                                                  NS(id, "link")
+                                                  , "Link URL"
+                                                  , placeholder = "moodle.com"
+                                                )
+                                       )
+                                       )
+                                       , fluidRow(column(width = 12,actionBttn(NS(id, "saveLinkInput"), "Save")))
                                  )
                                )
                                # Buttons ----
@@ -46,6 +75,7 @@ wizardUI <- function(id, doneButton){
                                                 , textInput(
                                                   inputId = NS(id, "addName")
                                                   , label = "Student Name: "
+                                                  , value = "Student Name"
                                                 )
                                           )
                                  )
@@ -296,32 +326,6 @@ wizard_server <- function(id, r, parent_session) {
       updateTabsetPanel(session, "wizard", selected = "topics")
     })
     
-    # Add Course info -----
-    observeEvent(input$addCourseInfo, {
-      insertUI(
-        selector = paste0("#", NS(id, "addCourseInfo"))
-        , where = "afterEnd"
-        , ui = div(
-          fluidRow(column(width = 6
-                          , textInput(
-                            NS(id, "type")
-                            , "Information Type"
-                            , placeholder = "Example: Class Location"
-                          )
-          )
-          , column(width = 6
-                   , textInput(
-                     NS(id, "value")
-                     , "Information"
-                     , placeholder = "Example: CHAM 1234"
-                   )
-          )
-          )
-          , fluidRow(actionBttn(NS(id, "saveCourseInput"), "Save"))
-          , id = NS(id, "inputs"))
-        , immediate = TRUE
-      )
-    })
     
     # Save Course Input ----
     observeEvent(input$saveCourseInput, {
@@ -335,9 +339,9 @@ wizard_server <- function(id, r, parent_session) {
       
       # Insert preview to UI
       insertUI(
-        selector = paste0("#", NS(id, "addCourseInfo"))
+        selector = paste0("#", NS(id, "course_info_box"))
         , where = "beforeBegin"
-        , ui = box(title = NULL
+        , ui = box(title = NULL, width = 12
                    , fluidRow(
                      column(width = 12
                             , tags$b(paste0(type, ":"))
@@ -347,44 +351,23 @@ wizard_server <- function(id, r, parent_session) {
         )
       )
       
-      # Not all UI is being removed... the top box of the border stays?
-      removeUI(
-        selector = paste0("#", NS(id, "inputs"))
+      # Update inputs
+      updateTextInput(
+        session = session
+        , inputId = "value"
+        , value = "New"
       )
-      
-    })
-    
-    # Add WebLink ----
-    observeEvent(input$addWebLink, {
-      insertUI(
-        selector = paste0("#", NS(id, "addWebLink"))
-        , where = "afterEnd"
-        , ui = div(
-          fluidRow(column(width = 6
-                          , textInput(
-                            NS(id, "type")
-                            , "Link Description"
-                            , placeholder = "Example: Class Moodle Page"
-                          )
-          )
-          , column(width = 6
-                   , textInput(
-                     NS(id, "value")
-                     , "Link URL"
-                     , placeholder = "Example: moodle.com"
-                   )
-          )
-          )
-          , fluidRow(actionBttn(NS(id, "saveLinkInput"), "Save"))
-          , id = NS(id, "linkInputs"))
-        , immediate = TRUE
+      updateTextInput(
+        session = session
+        , inputId = "type"
+        , value = "New"
       )
     })
     
     # Save Weblink ----
     observeEvent(input$saveLinkInput, {
-      type <- input$type
-      value <- input$value
+      type <- input$link_d
+      value <- input$link
       
       # Save
       r$df_links <- rbind(r$df_links
@@ -393,9 +376,9 @@ wizard_server <- function(id, r, parent_session) {
       
       # Insert preview to UI
       insertUI(
-        selector = paste0("#", NS(id, "addWebLink"))
+        selector = paste0("#", NS(id, "web_link_box"))
         , where = "beforeBegin"
-        , ui = box(title = NULL
+        , ui = box(title = NULL, width = 12
                    , fluidRow(
                      column(width = 12
                             , div(tags$a(
@@ -408,11 +391,17 @@ wizard_server <- function(id, r, parent_session) {
         )
       )
       
-      # Not all UI is being removed... the top box of the border stays?
-      removeUI(
-        selector = paste0("#", NS(id, "linkInputs"))
+      # Update inputs
+      updateTextInput(
+        session = session
+        , inputId = "link_d"
+        , value = "New"
       )
-      
+      updateTextInput(
+        session = session
+        , inputId = "link"
+        , value = "New"
+      )
     })
     
     
@@ -497,8 +486,7 @@ wizard_server <- function(id, r, parent_session) {
         updateTextInput(
           session = session
           , inputId = "addName"
-          , value = "New Name"
-          , placeholder = "New Name"
+          , value = "Student Name"
           , label = "Student Name: "
         )
         showNotification("Saved in session.")
