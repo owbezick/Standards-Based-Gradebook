@@ -8,9 +8,8 @@ topics_server <- function(id, r){
   moduleServer(id, function(input,output,session){
     output$topicTable <- renderRHandsontable({
       df <- r$df_review_table
-      
       df <- df %>%
-        mutate(`Review Date` = ymd(`Review Date`)
+        mutate(`Review Start Date` = ymd(`Review Start Date`)
                , `Review ID` = as.character(`Review ID`))
       rhandsontable(
         df

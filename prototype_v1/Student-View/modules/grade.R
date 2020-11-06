@@ -192,7 +192,7 @@ review_server <- function(id, r){
     df_attempts <- reactive({
       # Total attempts for each topic
       attempts_topic_total <- r$df_review_table %>%
-        pivot_longer(cols = c(4:ncol(r$df_review_table))) %>%
+        pivot_longer(cols = c(5:ncol(r$df_review_table))) %>%
         group_by(name) %>%
         tally(value) %>%
         rename(topic = name, total_attempts = n)
@@ -217,6 +217,7 @@ review_server <- function(id, r){
     # Topic table ----
     output$topic_attempts <- renderRHandsontable({
       req(r$is$auth)
+    
       df <- df_attempts() %>%
         mutate(
           Topic = as.integer(topic_id), `Previous Attempts` = as.integer(attempts)

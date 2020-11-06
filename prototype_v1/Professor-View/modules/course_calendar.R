@@ -19,7 +19,7 @@ course_calendar_server <- function(id, r){
                , className = "homework"
         ) %>%
         select(id, start, end, content, group, className)
-      
+
       df_timevis_review <- r$df_review_table %>%
         mutate(content = `Review Name`
                , start = as.character(`Review Start Date`)
