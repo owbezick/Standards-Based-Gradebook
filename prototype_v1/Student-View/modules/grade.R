@@ -193,7 +193,7 @@ review_server <- function(id, r){
     df_attempts <- reactive({
       # Total attempts for each topic
       attempts_topic_total <- r$df_review_table %>%
-        pivot_longer(cols = c(4:ncol(r$df_review_table))) %>%
+        pivot_longer(cols = c(5:ncol(r$df_review_table))) %>%
         group_by(name) %>%
         tally(value) %>%
         rename(topic = name, total_attempts = n)
@@ -218,6 +218,7 @@ review_server <- function(id, r){
     # Topic table ----
     output$topic_attempts <- renderRHandsontable({
       req(r$is$auth)
+    
       df <- df_attempts() %>%
         mutate(
           Topic = as.integer(topic_id), `Previous Attempts` = as.integer(attempts)
@@ -285,111 +286,50 @@ review_server <- function(id, r){
       
     })
     
-    
-    #TODO find a simpler way to do ALL of this
+  
     # Fluency status data ----
-    df_status <- reactive({
+    df_review_scores <- reactive({
       df <- df_review_grades() %>%
-        select(review_id, topic_id, grade)
-      
-      #Add column with integer grades
-      df$int_grade <- apply(as.matrix(df$grade), 1, grade_to_int)
-      
-      #get number of unique topics
-      numTopics <- r$df_topic %>%
-        select(topic_id) %>%
-        unique() %>%
-        nrow()
-      
-      #get number of unique reviews
-      numReviews <- df %>%
-        select(review_id) %>%
-        unique() %>%
-        nrow()
-      
-      #generate tempate df with rows for status of each topic at each review
-      df_template <- tibble("int_grade" = rep(NA, numTopics*numReviews))
-      df_template$topic_id <- rep(1:numTopics, each = numReviews)
-      df_template$review_id <- rep(1:numReviews, length.out = numTopics*numReviews)
-      df_template$grade <- rep("Not Completed", each = numTopics*numReviews)
-      
-      #Match column types
-      df$topic_id <- as.integer(df$topic_id)
-      df$review_id <- as.integer(df$review_id)
-      
-      #Append template (filler) rows to grade df
-      df_status <- df %>%
-        rbind(df_template) %>%
-        transform(grade_id = paste0(topic_id, "_", review_id))
-      
-      #Get rid of duplicate columns (the filler rows from tempate df get replaced by actual grades)
-      df_status <- df_status[!duplicated(df_status[,c('grade_id')]),] 
-      
-      #Sort
-      df_status <- df_status[order(df_status$review_id, df_status$topic_id),]
-      
-      #Fill in NA grades to show updated progress
-      df_status <- df_status %>%
-        group_by(topic_id) %>%
-        fill(int_grade)
-      
-      #Replace NAs with 0s
-      df_status$int_grade <- replace_na(df_status$int_grade, 0)
-      
-      #Fill in grade strings from integers
-      df_status$grade <- apply(as.matrix(df_status$int_grade), 1, int_to_grade)
-      
-      #count each type of grade grouped by review, pivot so grades are columns
-      df_status <- df_status %>%
         select(review_id, topic_id, grade) %>%
+        mutate(count = 1) %>%
+        pivot_wider(id_cols = c(review_id, topic_id), names_from = grade, values_from = count) %>%
+        mutate_at(c(3:6), ~replace(., is.na(.), 0)) %>%
         group_by(review_id) %>%
-        count(grade) %>%
-        pivot_wider(names_from = grade, values_from = n, values_fill = 0)
-      
-      #Check if columns are missing
-      if (is.null(df_status$`Not Atttempted`)) {
-        df_status$`Not Attempted` <- c(as.integer(rep(0, numReviews)))
-      }
-      if (is.null(df_status$Fluent)) {
-        df_status$Fluent <- c(as.integer(rep(0, numReviews)))
-      }
-      if (is.null(df_status$Progressing)) {
-        df_status$Progressing <- c(as.integer(rep(0, numReviews)))
-      }
-      if (is.null(df_status$`Needs Work`)) {
-        df_status$`Needs Work` <- c(as.integer(rep(0, numReviews)))
-      }
-      
-      return(df_status)
-      
+        summarise_at(.vars = vars(c(2:5)), .funs = sum) %>%
+        rename(NC = `Not Completed`)
+    
+    })
+    
+    df_current_status <- reactive({
+      df <- df_review_grades() %>%
+        select(review_id, topic_id, grade) %>%
+        mutate(grade_to_int = unlist(lapply(df_review_grades()$grade, grade_to_int))) %>%
+        group_by(topic_id) %>%
+        summarise(grade = max(grade_to_int)) %>%
+        mutate(int_to_grade = unlist(lapply(grade, int_to_grade))) %>%
+        mutate(count = 1) %>%
+        group_by(int_to_grade) %>%
+        summarise(count = sum(count)) 
     })
     
     # Fluency stacked bar -----
     output$topic_proficiency_bar <- renderEcharts4r({
-      req(r$is$auth)
-      
+      req(r$is$auth)  
       
       #Get status of fluencies, 
-      df <- df_status() %>%
+      df <- df_review_scores() %>%
         select(Review = review_id, `Not Attempted` = NC, Progressing, `Needs Work`, Fluent) %>%
         mutate(Description = paste0("Review ", Review))
-      
-      # %>%
-      #   group_by(review_id, .add = FALSE) %>% 
-      #   group_split()
-      
-      
-        
       
       df %>%
         group_by(Review) %>%
         e_charts(Description) %>%
-        e_bar(`Not Attempted`
-              , stack = "Not Attempted"
+        e_bar("Not Attempted"
+              , stack = "Attempted"
               , color = theme$NC
               , barWidth = "25%"
               , name = "Not Attempted") %>%
-        e_bar(`Needs Work`
+        e_bar("Needs Work"
               , stack = "Attempted"
               , color = theme$`Needs Work`
               , barWidth = "25%"
@@ -455,38 +395,19 @@ review_server <- function(id, r){
           }
 
         }")
-      
-      
-            # attempted to use glue()
-      # hot_cols(renderer = glue("
-      #   function(instance, td, row, col, prop, value, cellProperties) {{
-      #     Handsontable.renderers.TextRenderer.apply(this, arguments);
-      #     if (value == 'Fluent'){{ d
-      #       td.style.background = '{theme$Fluent}';
-      #     }} else if (value == 'Progressing'){{ d
-      #       td.style.background = '{theme$Progressing}';
-      #     }} else if (value == 'Needs Work'){{
-      #       td.style.background = '{theme$`Needs Work`}';
-      #     }} else if (value == 'Not Completed'){{
-      #       td.style.background = '{theme$NC}';
-      #     }}
-      # 
-      #     if (col > 1){{
-      #       if (!isNaN(value)) {{
-      #         td.style.background = '{theme$NC}';
-      #         cellProperties.readOnly = true;
-      #       }}
-      #     }}
-      # 
-      #   }}"))
     })
     
     
     #Fluent Metric
     output$fluent_metric <- renderUI({
       req(r$is$auth)
-      df <- df_status()
-      val <- df$Fluent[nrow(df)]
+      val <-  df_current_status() %>%
+        filter(int_to_grade == "Fluent") %>%
+        select(count) %>%
+        pull()
+      df <- if (is_empty(val)) {
+        val <- 0
+      } 
         
       paste(val)
     })
@@ -495,17 +416,27 @@ review_server <- function(id, r){
     output$progressing_metric <- renderUI({
       req(r$is$auth)
       
-      df <- df_status()
-      val <- df$Progressing[nrow(df)]
-      
+      val <-  df_current_status() %>%
+        filter(int_to_grade == "Progressing") %>%
+        select(count) %>%
+        pull()
+      df <- if (is_empty(val)) {
+        val <- 0
+      } 
       paste(val)
     })
     
     #Needs Work Metric
     output$nw_metric <- renderUI({
       req(r$is$auth)
-      df <- df_status()
-      val <- df$`Needs Work`[nrow(df)]
+      val <-  df_current_status() %>%
+        filter(int_to_grade == "Needs Work") %>%
+        select(count) %>%
+        pull()
+      
+      df <- if (is_empty(val)) {
+        val <- 0
+      } 
       
       paste(val)
     })
@@ -513,8 +444,13 @@ review_server <- function(id, r){
     #Not Attempted Metric
     output$na_metric <- renderUI({
       req(r$is$auth)
-      df <- df_status()
-      val <- df$`Not Attempted`[nrow(df)]
+      val <-  df_current_status() %>%
+        filter(int_to_grade == "Not Attempted") %>%
+        select(count) %>%
+        pull()
+      df <- if (is_empty(val)) {
+        val <- 0
+      } 
       
       paste(val)
     })

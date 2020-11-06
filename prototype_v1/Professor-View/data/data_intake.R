@@ -53,7 +53,7 @@ course_info <- tibble("Type" = c("type")
 links <- tibble("Link Description" = c("Sample link")
                 , "Link URL" = c("davidson.edu"))
 
-r$df_student <- readRDS("data/student.RDS")
+r$df_student <- readRDS("data/df_student.RDS")
 r$df_course_info <- course_info[0,]
 r$df_links <- links[0, ]
 r$df_homework <- readRDS("data/homework.RDS")
@@ -62,4 +62,5 @@ r$df_topic <- readRDS("data/topic.RDS")
 r$df_review_table <- readRDS("data/review_table.RDS")
 r$df_review_grades <-  readRDS("data/review_grades.RDS")
 
+write_rds(r$df_student, "data/df_student.RDS")
 

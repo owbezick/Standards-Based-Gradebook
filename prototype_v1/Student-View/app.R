@@ -2,10 +2,9 @@
 # Author: Owen Bezick & Calvin Spencer
 
 # Source Libraries
-source("utils/libraries.R", local = TRUE)
-source("data/data_intake.R", local = TRUE)
-source("utils/utils.R", local = TRUE)
-
+source("utils/libraries.R")
+source("utils/utils.R")
+source("data/data_intake.R")
 source("modules/course_info.R")
 source("modules/course_calendar.R")
 source("modules/view_calendar_item.R")
@@ -48,6 +47,7 @@ ui <- dashboardPage(
         tabName = "home"
         , fluidRow(
           course_info_UI("courseinfo")
+          , course_link_UI("courselink")
         )
         , fluidRow(
           course_calendar_UI("course_calendar")

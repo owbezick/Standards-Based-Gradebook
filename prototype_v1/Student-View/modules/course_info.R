@@ -1,59 +1,74 @@
 course_info_UI <- function(id){
-   box(width = 12, title = "Course Information", status = "primary", height = "225px"
-       , column(width = 6
-                , box(width = 12
-                      , tags$b("Course Location: ")
-                      , textOutput(NS(id, "location"))
-                )
-                , box(width = 12
-                      , tags$b("Meeting times: ")
-                      , textOutput(NS(id, "meeting_times"))
-                )
-       )
-       , column(width = 6
-                , box(width = 12
-                      , tags$b("Helpful links: ")
-                      , uiOutput(NS(id, "link"))
-                )
-                , box(width = 12
-                      , tags$b("Office hours: ")
-                      , textOutput(NS(id, "office_hours"))
-                )
-       )
+  box(width = 6, title = "Course Information", status = "primary"
+      , uiOutput(NS(id, "course_info_out"))
+  )
+}
+
+course_link_UI <- function(id){
+  box(width = 6, title = "Course Links", status = "primary"
+      , uiOutput(NS(id, "web_link_out"))
   )
 }
 
 course_info_server <- function(id, r){
   moduleServer(id, function(input,output,session){
-    output$location <- renderText(
-      r$df_course_info$location
-    )
-    output$meeting_times <- renderText(
-      r$df_course_info$meeting_times
-    )
-    output$office_hours <- renderText(
-      r$df_course_info$office_hours
-      
-    )
-    output$link <- renderUI(
-      div(tags$a(
-        paste0(r$df_course_info$link1_text, ",")
-          , href =  r$df_course_info$link1_url
-          , style = "width:33%;"
-        )
+    course_info_ui <- reactive({
+      if (nrow(r$df_course_info) > 0) {
+        list <-  tagList()
+        for (row in seq(1:nrow(r$df_course_info))){
+          type <-  r$df_course_info[row, 1]
+          value <- r$df_course_info[row, 2]
+          ui <- box(title = NULL
+                    , fluidRow(
+                      column(width = 12
+                             , tags$b(paste0(type, ":"))
+                             , value
+                      )
+                    )
+          )
+          list <- append(list,ui)
+        }
+        list[seq(3, length(list), 3)]
+      }
+    })
+    
+    
+    output$course_info_out <- renderUI({
+      course_info_ui()
+    })
+    
+  }) # End server
+}
+
+course_link_server <- function(id, r){
+  moduleServer(id, function(input,output,session){
+    web_link_ui <- reactive({
+      if (nrow(r$df_links) > 0) {
         
-        , tags$a(
-          paste0(r$df_course_info$link2_text, ",")
-          , href =  r$df_course_info$link2_url
-          , style = "width:33%;"
-        )
-        
-        , tags$a(
-          r$df_course_info$link3_text
-          , href =  r$df_course_info$link3_url
-          , style = "width:33%;"
-        )
-      )
-    )
+        list <-  tagList()
+        for (row in seq(1:nrow(r$df_links))){
+          type <-  r$df_links[row, 1]
+          value <- r$df_links[row, 2]
+          ui <- box(title = NULL
+                    , fluidRow(
+                      column(width = 12
+                             , div(tags$a(
+                               type
+                               , href =  value
+                             )
+                             )
+                      )
+                    )
+          )
+          list <- append(list,ui)
+        }
+        list[seq(3, length(list), 3)]
+      }
+    })
+    
+    output$web_link_out <- renderUI({
+      web_link_ui()
+    })
+    
   })
 }

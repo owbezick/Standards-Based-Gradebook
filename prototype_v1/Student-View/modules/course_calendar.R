@@ -57,8 +57,8 @@ course_calendar_server <- function(id, r){
       
       df_timevis_review <- r$df_review_table %>%
         mutate(content = `Review Name`
-               , start = as.character(`Review Date`)
-               , end = NA
+               , start = as.character(`Review Start Date`)
+               , end =  as.character(`Review End Date`)
                , id = paste0("r_", `Review ID`)
                , group = "review"
                , className = "review"

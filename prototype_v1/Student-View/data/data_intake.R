@@ -37,35 +37,13 @@
 # 
 # ls_all_data <- read_all_database_sheets(ls_sheets)
 
-r <- reactiveValues(df_student = NULL
-                    , df_course_info = NULL
-                    , df_homework = NULL
-                    , df_homework_grades = NULL
-                    , df_topic = NULL
-                    , df_review_table = NULL
-                    , df_review_grades = NULL
-                    , df_cal_item = NULL
-)
+r <- reactiveValues()
 
-
-# r$df_student <- ls_all_data$student
-# 
-# r$df_course_info <- ls_all_data$course_info
-# 
-# r$df_homework <- ls_all_data$homework
-# 
-# r$df_homework_grades <- ls_all_data$homework_grades
-# 
-# r$df_topic <- ls_all_data$topic
-# 
-# r$df_review_table <-  ls_all_data$review_table
-# 
-# r$df_review_grades <- ls_all_data$review_grades
-
-r$df_student <- readRDS("data/student.RDS")
-r$df_course_info <- readRDS("data/course_info.RDS")
-r$df_homework <- readRDS("data/homework.RDS")
-r$df_homework_grades <- readRDS("data/homework_grades.RDS")
-r$df_topic <- readRDS("data/topic.RDS")
-r$df_review_table <- readRDS("data/review_table.RDS")
-r$df_review_grades <-  readRDS("data/review_grades.RDS")
+r$df_student <- readRDS("data/df_student.RDS")
+r$df_course_info <- readRDS("data/df_course_info.RDS")
+r$df_links <- readRDS("data/df_links.RDS")
+r$df_homework <- readRDS("data/df_homework.RDS")
+r$df_homework_grades <- readRDS("data/df_homework_grades.RDS")
+r$df_topic <- readRDS("data/df_topic.RDS")
+r$df_review_table <- readRDS("data/df_review_table.RDS")
+r$df_review_grades <-  readRDS("data/df_review_grades.RDS")
