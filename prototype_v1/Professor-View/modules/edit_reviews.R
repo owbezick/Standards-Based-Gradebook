@@ -55,9 +55,29 @@ topics_server <- function(id, r){
         
         #See if row was deleted
         if (length(ids_remaining) != length(ids_original)){
-          # df_review_grades
-          temp <- subset(df_review_grades, review_id %in% ids_remaining)
-          r$df_review_grades <- temp
+          showModal(
+            modalDialog(
+              title = "Confrim Deletion"
+              , size = "s"
+              , footer = fluidRow(
+                column(width = 6
+                       , actionBttn(
+                         inputId = NS(id, "hardDelete")
+                         , label = "Yes"
+                         , block = T
+                       )
+                )
+                , column(width = 6
+                         , actionBttn(
+                           NS(id, "goBack")
+                           , "Go back"
+                           , block = T
+                         )
+                )
+              )
+            )
+          )
+         
         }
         
         # Save df_review_table
@@ -68,6 +88,30 @@ topics_server <- function(id, r){
         
         showNotification("Saved to remote.")
       }
+    })
+    
+    #Make sure they meant to delete row
+    observeEvent(input$hardDelete, {
+      df_hot <- hot_to_r(input$topicTable)
+      #Find which reviews are left
+      ids_remaining <- df_hot$`Review ID`
+      
+      #Use df_review_grades to compare
+      df_review_grades <- r$df_review_grades
+      ids_original <- df_review_grades$review_id %>%
+        unique()
+      # df_review_grades
+      temp <- subset(df_review_grades, review_id %in% ids_remaining)
+      r$df_review_grades <- temp
+      
+      r$df_review_table <- df_hot
+      
+      # Save df_review_grades
+      save_df_review_grades()
+      
+      
+      showNotification("Saved in session.")
+      removeModal()
     })
 
 
