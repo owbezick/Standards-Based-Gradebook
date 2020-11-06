@@ -37,30 +37,16 @@
 # 
 # ls_all_data <- read_all_database_sheets(ls_sheets)
 # 
-r <- reactiveValues(df_student = NULL
-                    , df_course_info = NULL
-                    , df_homework = NULL
-                    , df_homework_grades = NULL
-                    , df_topic = NULL
-                    , df_review_table = NULL
-                    , df_cal_item = NULL
-                    , df_links = NULL
-)
 
-course_info <- tibble("Type" = c("type")
-       , "Value" = c("value"))
+r <- reactiveValues()
 
-links <- tibble("Link Description" = c("Sample link")
-                , "Link URL" = c("davidson.edu"))
+r$df_student <- readRDS("data/df_student.RDS")[0,]
+r$df_course_info <- readRDS("data/df_course_info.RDS")[0,]
+r$df_links <- readRDS("data/df_links.RDS")[0,]
+r$df_homework <- readRDS("data/df_homework.RDS")[0,]
+r$df_homework_grades <- readRDS("data/df_homework_grades.RDS")[0,0]
+r$df_topic <- readRDS("data/df_topic.RDS")[0,]
+r$df_review_table <- readRDS("data/df_review_table.RDS")[0,1:4]
+r$df_review_grades <-  readRDS("data/df_review_grades.RDS")[0,]
 
-r$df_student <- readRDS("data/df_student.RDS")
-r$df_course_info <- course_info[0,]
-r$df_links <- links[0, ]
-r$df_homework <- readRDS("data/homework.RDS")
-r$df_homework_grades <- readRDS("data/homework_grades.RDS")[,1]
-r$df_topic <- readRDS("data/topic.RDS")
-r$df_review_table <- readRDS("data/review_table.RDS")
-r$df_review_grades <-  readRDS("data/review_grades.RDS")
-
-write_rds(r$df_student, "data/df_student.RDS")
 

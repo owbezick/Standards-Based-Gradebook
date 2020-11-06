@@ -159,7 +159,6 @@ view_calendar_review_Server <- function(id, r){
     
     # BTN close -----
     observeEvent(input$close, {
-      browser()
       removeModal()
     })
     
