@@ -161,6 +161,7 @@ review_UI <- function(id) {
                                        , rHandsontableOutput(NS(id,"topic_attempts"))
                               )
                               , column(width = 8
+                                       , "Remaining Topics"
                                        , echarts4rOutput(NS(id,"topic_attempts_bar"), height = "200px")
                               )
                         )
@@ -244,6 +245,20 @@ review_server <- function(id, r){
       df <- df_attempts() %>%
         rename(Topic = topic_id)
       
+      #Find which topics the student is fluent in
+      df_review_to_topic <- df_review_grades() %>%
+        select(topic_id, review_id, grade) %>%
+        mutate(count = 1) %>%
+        pivot_wider(id_cols = c(topic_id, review_id), names_from = grade, values_from = count) %>%
+        mutate_at(c(3:6), ~replace(., is.na(.), 0)) %>%
+        group_by(topic_id) %>%
+        summarise_at(.vars = vars(c(2:5)), .funs = sum) %>%
+        select(Fluent, Topic = topic_id)
+      
+      df <- merge(x = df, y = df_review_to_topic, by = "Topic", all.x = TRUE)
+        
+      #Remove rows where student is fluent
+      df <- df[df$Fluent == 0,]
       
       df %>%
         e_charts(Topic) %>%
@@ -259,12 +274,12 @@ review_server <- function(id, r){
               , name = "Remaining Attempts") %>%
         e_legend(bottom = 'bottom') %>%
         e_tooltip(formatter = htmlwidgets::JS("
-function(params){
-return('value: ' +
-parseFloat((params.value[1] * 10) / 10).toFixed(1))
-}
+        function(params){
+          return('value: ' +
+          parseFloat((params.value[1] * 10) / 10).toFixed(1))
+        }
 ")) %>%
-        e_grid(top = "15%", left= "10%", bottom = "20%", right = "5%") %>%
+        e_grid(top = "15%", left= "10%", bottom = "25%", right = "5%") %>%
         e_tooltip()
       
       
