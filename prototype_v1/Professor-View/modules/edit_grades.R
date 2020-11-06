@@ -149,7 +149,13 @@ review_server <- function(id, r){
         rename(`Review ID` = review_id, `Topic ID` = topic_id)
       df_review <- df_review %>%
         group_by(`Review ID`) %>%
-        arrange(`Review ID`)
+        arrange(`Review ID`) %>%
+        mutate(`Topic ID` = as.numeric(`Topic ID`)
+               ,`Review ID` = as.numeric(`Review ID`))
+      # Sort topics into order
+      df_review <- df_review[order(df_review$`Review ID` , df_review$`Topic ID`),] %>%
+        mutate(`Topic ID` = as.character(`Topic ID`)
+               ,`Review ID` = as.character(`Review ID`))
 
       column_names <- names(df_review)
       student_names <- column_names[3:length(column_names)]

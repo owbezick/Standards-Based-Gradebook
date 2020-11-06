@@ -108,6 +108,6 @@ save_df_review_grades <- function(){
     arrange(review_id, topic_id) %>%
     select(-c(filter_id))
   
-  
-  r$df_review_grades <- df_new_review_data
+                          # Sort by review ID then topic ID
+  r$df_review_grades <- df_new_review_data[order(df_new_review_data$review_id, df_new_review_data$topic_id),]
 }
