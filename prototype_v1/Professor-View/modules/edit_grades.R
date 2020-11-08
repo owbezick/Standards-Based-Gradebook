@@ -79,8 +79,6 @@ homework_server <- function(id, r){
 
     # Homework Table ----
     output$homework_table <- renderRHandsontable({
-
-      # TODO: add catch for empty table
       df_homework_grades <- r$df_homework_grades
       if (ncol(df_homework_grades) == 1){
         rhandsontable(df_homework_grades
@@ -149,7 +147,9 @@ review_server <- function(id, r){
         rename(`Review ID` = review_id, `Topic ID` = topic_id)
       df_review <- df_review %>%
         group_by(`Review ID`) %>%
-        arrange(`Review ID`)
+        mutate(`Topic ID` = as.numeric(`Topic ID`)) %>%
+        arrange(`Review ID`, `Topic ID`) %>%
+        mutate(`Topic ID` = as.character(`Topic ID`))
 
       column_names <- names(df_review)
       student_names <- column_names[3:length(column_names)]
@@ -195,6 +195,9 @@ review_server <- function(id, r){
       df_student <- r$df_student
       df_review_topic <- df_review_grades %>%
         left_join(df_student, by = "student_id") %>%
+        mutate(`topic_id` = as.numeric(`topic_id`)) %>%
+        arrange(`topic_id`) %>%
+        mutate(`topic_id` = as.character(`topic_id`)) %>%
         pivot_wider(id_cols = c(review_id, name, topic_id)
                     , names_from = topic_id
                     , values_from = grade
