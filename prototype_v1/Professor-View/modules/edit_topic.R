@@ -5,7 +5,9 @@ add_topic_button_UI <- function(id) {
     modalDialog(title = "Edit Topics", size = "l"
                 , column(width = 12
                          , fluidRow(
-                           rHandsontableOutput(NS(id, "edit_topics"))
+                           div (id = "edit-topics-modal-table"
+                            , rHandsontableOutput(NS(id, "edit_topics"))
+                           )
                          )
                          , br()
                          , fluidRow(
@@ -48,7 +50,7 @@ add_topic_button_Server <- function(id, r){
         df
         , rowHeaders = NULL
         , stretchH = 'all'
-      )%>%
+      ) %>%
         hot_col(col = "Topic ID", type = "numeric")
     })
     
@@ -107,5 +109,6 @@ add_topic_button_Server <- function(id, r){
     observeEvent(input$close_edits, {
       removeModal()
     })
+    
   })
 }
