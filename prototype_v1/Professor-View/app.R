@@ -41,6 +41,7 @@ ui <- dashboardPage(
                 , text = "Grades"
                 , icon = icon("chalkboard")
             )
+            , downloadButton("report", "Generate report")
         )
     )
     , dashboardBody(
@@ -81,22 +82,22 @@ ui <- dashboardPage(
 server <- function(input, output, session) {
     # Data Wizard ----
     output$wizard <- renderUI({
-         showModal(modalDialog(title = "Initial Data Input"
-                      , size = "l"
-                      , footer = "Note: more data can be added and edited later in the app."
-                      , easyClose = F
-                      , fluidRow(
-                          wizardUI("dataWizard"
-                                   ,  actionBttn(
-                                       inputId = "closeWizard"
-                                       , label = "Close Wizard"
-                                       , style = "material-flat"
-                                       , block = T
-                                   ) 
-                          ) 
-                      )
+        showModal(modalDialog(title = "Initial Data Input"
+                              , size = "l"
+                              , footer = "Note: more data can be added and edited later in the app."
+                              , easyClose = F
+                              , fluidRow(
+                                  wizardUI("dataWizard"
+                                           ,  actionBttn(
+                                               inputId = "closeWizard"
+                                               , label = "Close Wizard"
+                                               , style = "material-flat"
+                                               , block = T
+                                           ) 
+                                  ) 
+                              )
         )
-         )
+        )
     })
     
     wizard_server("dataWizard", r)
@@ -120,6 +121,112 @@ server <- function(input, output, session) {
     view_calendar_review_Server("calendar_review", r)
     homework_server("homework", r)
     review_server("review", r)
+    
+    
+    # Report generation ----
+    output$report <- downloadHandler(
+        
+        # For PDF output, change this to "report.pdf"
+        filename = "report.html",
+        content = function(file) {
+            # Copy the report file to a temporary directory before processing it, in
+            # case we don't have write permissions to the current working dir (which
+            # can happen when deployed).
+            tempReport <- file.path(tempdir(), "report.Rmd")
+            file.copy("report.Rmd", tempReport, overwrite = TRUE)
+            # Set up parameters to pass to Rmd document
+            student_table <- r$df_student %>%
+                rename(`Student ID` = student_id, Name = name) %>%
+                rhandsontable(rowHeaders = NULL, stretchH = 'all', readOnly = T)
+            
+            topic_table <- r$df_review_table %>%
+                mutate(`Review Start Date` = ymd(`Review Start Date`)
+                       , `Review End Date` = ymd(`Review End Date`)
+                       , `Review ID` = as.character(`Review ID`)) %>%
+                rhandsontable(rowHeaders = NULL, stretchH = 'all', readOnly = T)
+            
+            homework_table <- r$df_homework %>%
+                mutate(id = id
+                       , Description = description
+                       , `Date Assigned` = ymd(date_assigned)
+                       , `Due Date` = ymd(date_due)) %>%
+                select(`Homework ID` = id, Description, `Date Assigned`, `Due Date`) %>%
+                rhandsontable(rowHeaders = NULL, stretchH = 'all', readOnly = T)
+            
+            df_review_grades <- r$df_review_grades
+            df_student <- r$df_student
+            df_review_topic <- df_review_grades %>%
+                left_join(df_student, by = "student_id") %>%
+                mutate(`topic_id` = as.numeric(`topic_id`)) %>%
+                arrange(`topic_id`) %>%
+                mutate(`topic_id` = as.character(`topic_id`)) %>%
+                pivot_wider(id_cols = c(review_id, name, topic_id)
+                            , names_from = topic_id
+                            , values_from = grade
+                            , names_prefix = "Topic ") %>%
+                rename(`Review ID` = review_id, `Student Name` = name)
+            
+            df_review_topic <- df_review_topic %>%
+                group_by(`Student Name`) %>%
+                arrange(`Student Name`)
+            column_names <- names(df_review_topic)
+            topic_names <- column_names[3:length(column_names)]
+            grade_types <- factor(c("NA", "Not Completed", "Fluent", "Progressing", "Needs Work"))
+            
+            review_grades <- rhandsontable(df_review_topic
+                                           , rowHeaders = NULL
+                                           , stretchH = 'all'
+                                           , readOnly = T
+                                           , options = c(filters = T)) %>%
+                hot_col(col = "Review ID", readOnly = T, type = "character") %>%
+                hot_col(col = "Student Name", readOnly = T) %>%
+                hot_cols(type = "dropdown", source = grade_types)  %>%
+                hot_cols(renderer = "
+        function(instance, td, row, col, prop, value, cellProperties) {
+          Handsontable.renderers.TextRenderer.apply(this, arguments);
+          if (value == 'Fluent'){
+          td.style.background = 'lightgreen';
+          }
+          else if (value == 'Progressing'){
+          td.style.background = 'lightyellow';
+          } else if (value == 'Needs Work'){
+          td.style.background = 'pink';
+          } else if (value == 'Not Completed'){
+          td.style.background = 'lightgrey';
+          }
+
+          if (col > 1){
+                 if (!isNaN(value)) {
+          td.style.background = 'grey';
+          cellProperties.readOnly = true;
+          }
+          }
+
+        }")
+            df_homework_grades <- r$df_homework_grades
+            homework_grades <- rhandsontable(df_homework_grades
+                                             , rowHeaders = NULL
+                                             , stretchH = 'all'
+                                             , readOnly = T) %>%
+                hot_context_menu(allowRowEdit = FALSE) %>%
+                hot_col(col = c(2:ncol(df_homework_grades)), type = "numeric")
+            
+            params <- list(student_table = student_table
+                           , topic_table = topic_table
+                           , homework_table = homework_table
+                           , homework_grades = homework_grades
+                           , review_grades = review_grades)
+            
+            
+            # Knit the document, passing in the `params` list, and eval it in a
+            # child of the global environment (this isolates the code in the document
+            # from the code in this app).
+            rmarkdown::render(tempReport, output_file = file,
+                              params = params,
+                              envir = new.env(parent = globalenv())
+            )
+        }
+    )
 }
 
 # Run the application 

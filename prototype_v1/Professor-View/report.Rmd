@@ -1,0 +1,40 @@
+---
+title: "Gradebook Status Report"
+date: "11/9/2020"
+output: html_document
+params:
+  topic_table: NA
+  student_table: NA
+  homework_table: NA
+  review_grades: NA
+  homework_grades: NA
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Course Roster
+```{r, echo=FALSE}
+params$student_table
+```
+
+## Homework Table
+```{r, echo=FALSE}
+params$homework_table
+```
+
+## Review Table 
+```{r, echo=FALSE}
+params$topic_table
+```
+
+## Homework Grades
+```{r, echo=FALSE}
+params$homework_grades
+```
+
+## Review Grades
+```{r, echo=FALSE}
+params$review_grades
+```
