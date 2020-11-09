@@ -158,11 +158,10 @@ review_UI <- function(id) {
                         , tabPanel("Topic Attempts", height = "300px"
                               , column(width = 4
                                        #, "Topic Attempts"
-                                       , rHandsontableOutput(NS(id,"topic_attempts"))
+                                       , rHandsontableOutput(NS(id,"topic_attempts_table"))
                               )
                               , column(width = 8
-                                       , "Remaining Topics"
-                                       , echarts4rOutput(NS(id,"topic_attempts_bar"), height = "200px")
+                                       , uiOutput(NS(id, "topic_attempts"))
                               )
                         )
                         , tabPanel("Topic Proficiency", height = "300px"
@@ -189,7 +188,7 @@ review_server <- function(id, r){
     })
     
     
-    # Calculate attempt chart ----
+    # Attempts data ----
     df_attempts <- reactive({
       # Total attempts for each topic
       attempts_topic_total <- r$df_review_table %>%
@@ -215,8 +214,30 @@ review_server <- function(id, r){
       
     }) 
     
-    # Topic table ----
-    output$topic_attempts <- renderRHandsontable({
+    
+    # Attempts Bar Data ---- 
+    df_attempts_bar <- reactive ({
+      df <- df_attempts() %>%
+        rename(Topic = topic_id)
+      
+      #Find which topics the student is fluent in
+      df_review_to_topic <- df_review_grades() %>%
+        select(topic_id, review_id, grade) %>%
+        mutate(count = 1) %>%
+        pivot_wider(id_cols = c(topic_id, review_id), names_from = grade, values_from = count) %>%
+        mutate_at(c(3:6), ~replace(., is.na(.), 0)) %>%
+        group_by(topic_id) %>%
+        summarise_at(.vars = vars(c(2:5)), .funs = sum) %>%
+        select(Fluent, Topic = topic_id)
+      
+      df <- merge(x = df, y = df_review_to_topic, by = "Topic", all.x = TRUE)
+      
+      #Remove rows where student is fluent
+      df <- df[df$Fluent == 0,]
+    })
+    
+    # Topic attempts table ----
+    output$topic_attempts_table <- renderRHandsontable({
       req(r$is$auth)
     
       df <- df_attempts() %>%
@@ -239,50 +260,47 @@ review_server <- function(id, r){
         hot_cols(readOnly = T)
     })
     
-    # Topic bar -----
+    output$topic_attempts <- renderUI({
+      if (nrow(df_attempts_bar()) != 0){
+        echarts4rOutput(NS(id, "topic_attempts_bar"))
+      }
+      else {
+        div(class = "topics_complete_text"
+        ,"You are fluent in all topics!"
+        , icon("smile-beam", class =  "far", lib = "font-awesome"))
+      }
+    })
+    
+    # Topic attempts bar -----
     output$topic_attempts_bar <- renderEcharts4r({
       req(r$is$auth)
       
-      df <- df_attempts() %>%
-        rename(Topic = topic_id)
-      
-      #Find which topics the student is fluent in
-      df_review_to_topic <- df_review_grades() %>%
-        select(topic_id, review_id, grade) %>%
-        mutate(count = 1) %>%
-        pivot_wider(id_cols = c(topic_id, review_id), names_from = grade, values_from = count) %>%
-        mutate_at(c(3:6), ~replace(., is.na(.), 0)) %>%
-        group_by(topic_id) %>%
-        summarise_at(.vars = vars(c(2:5)), .funs = sum) %>%
-        select(Fluent, Topic = topic_id)
-      
-      df <- merge(x = df, y = df_review_to_topic, by = "Topic", all.x = TRUE)
+      df <- df_attempts_bar()
+    
+      if (nrow(df) == 0){
         
-      #Remove rows where student is fluent
-      df <- df[df$Fluent == 0,]
-      
-      df %>%
-        e_charts(Topic) %>%
-        e_bar(attempts
-              , stack = "Topics"
-              , color = "#c41230"
-              , barWidth = "50%"
-              , name = "Previous Attempts") %>%
-        e_bar(remaining
-              , stack = "Topics"
-              , color = "#222D32"
-              , barWidth = "50%"
-              , name = "Remaining Attempts") %>%
-        e_legend(bottom = 'bottom') %>%
-        e_tooltip(formatter = htmlwidgets::JS("
-        function(params){
-          return('value: ' +
-          parseFloat((params.value[1] * 10) / 10).toFixed(1))
-        }
-")) %>%
-        e_grid(top = "15%", left= "10%", bottom = "25%", right = "5%") %>%
-        e_tooltip()
-      
+      } else {
+        df %>%
+          e_charts(Topic) %>%
+          e_bar(attempts
+                , stack = "Topics"
+                , color = "#c41230"
+                , barWidth = "50%"
+                , name = "Previous Attempts") %>%
+          e_bar(remaining
+                , stack = "Topics"
+                , color = "#222D32"
+                , barWidth = "50%"
+                , name = "Remaining Attempts") %>%
+          e_legend(bottom = 'bottom') %>%
+          e_tooltip(formatter = htmlwidgets::JS("
+            function(params){
+              return('value: ' +
+              parseFloat((params.value[1] * 10) / 10).toFixed(1))
+            }")) %>%
+          e_grid(top = "15%", left= "10%", bottom = "25%", right = "5%") %>%
+          e_tooltip()
+      }
       
     })
     
@@ -297,7 +315,6 @@ review_server <- function(id, r){
         group_by(review_id) %>%
         summarise_at(.vars = vars(c(2:5)), .funs = sum) %>%
         rename(NC = `Not Completed`)
-    
     })
     
     df_current_status <- reactive({
@@ -324,23 +341,23 @@ review_server <- function(id, r){
       df %>%
         group_by(Review) %>%
         e_charts(Description) %>%
-        e_bar("Not Attempted"
-              , stack = "Attempted"
+        e_bar(`Not Attempted`
+              , stack = "Grade"
               , color = theme$NC
               , barWidth = "25%"
               , name = "Not Attempted") %>%
-        e_bar("Needs Work"
-              , stack = "Attempted"
+        e_bar(`Needs Work`
+              , stack = "Grade"
               , color = theme$`Needs Work`
               , barWidth = "25%"
               , name = "Needs Work") %>%
         e_bar(Progressing
-              , stack = "Attempted"
+              , stack = "Grade"
               , color = theme$Progressing
               , barWidth = "25%"
               , name = "Progressing") %>%
         e_bar(Fluent
-              , stack = "Attempted"
+              , stack = "Grade"
               , color = theme$Fluent
               , barWidth = "25%"
               , name = "Fluent") %>%
