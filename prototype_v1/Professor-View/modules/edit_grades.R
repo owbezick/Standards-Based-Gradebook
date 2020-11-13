@@ -20,22 +20,9 @@ homework_UI <- function(id) {
 # Homework serrver ----
 homework_server <- function(id, r){
   moduleServer(id, function(input, output, session){
-    # Average Homework ----
-    avg_homework_grade <- reactive({
-      df <- r$df_homework_grades %>%
-        select(-c(`Student Name`)) %>%
-        na.omit()
-
-
-      cols <- c(1:ncol(df))
-      df[,cols] <- lapply(df[,cols], as.double)
-
-      round(mean(as.matrix(df)))
-
-    })
 
     output$title <- renderText(
-      paste0("Average Homework Grade: ", avg_homework_grade(), "%")
+      paste0("Homework Grades (Class Averages)")
     )
     # Homework Bar Chart ----
     output$homework_bar <- renderEcharts4r({
@@ -67,12 +54,12 @@ homework_server <- function(id, r){
                                       return(parseFloat(params.value[1]*100).toFixed(2) +'%');
                                     }
                                     ")) %>%
-        e_mark_line(title = ""
-                    , data = list(type = "average", name = "Average Score")
-                    , animation = FALSE
-                    , lineStyle = c(color = "#444")
-                    , symbol = "circle"
-        ) %>%
+        # e_mark_line(title = ""
+        #             , data = list(type = "average", name = "Average Score")
+        #             , animation = FALSE
+        #             , lineStyle = c(color = "#444")
+        #             , symbol = "circle"
+        # ) %>%
         e_tooltip()
       #e_color(color = rgb(196, 18, 48, alpha = 230, max = 255)) %>%
     })
@@ -153,11 +140,33 @@ review_server <- function(id, r){
 
       column_names <- names(df_review)
       student_names <- column_names[3:length(column_names)]
+      reviews <- df_review %>%
+        select(id = `Review ID`) %>%
+        unique()
+      
+      #Generate borders around reviews
+      borders = list()
+      for (i in 1:(nrow(reviews))){
+        #Find start and end rows in table
+        reviewRows <- which(grepl(i, df_review$`Review ID`))
+        firstRow <- reviewRows[[1]] - 1
+        lastRow <- reviewRows[[length(reviewRows)]] - 1
+        
+        #Load borders lists
+        borders[[length(borders)+1]] <- list(
+          range = list(from = list(row = firstRow, col = 0)
+                       , to = list(row = lastRow, col = length(student_names) + 1))
+          , top = list(width = 2, color = "#222D32")
+          , left = list(width = 2, color = "#222D32")
+          , bottom = list(width = 2, color = "#222D32")
+          , right = list(width = 2, color = "#222D32"))
+      }
 
       grade_types <- r$df_grade_scale$title
       rhandsontable(df_review
                     , rowHeaders = NULL
                     , stretchH = 'all') %>%
+        hot_table(customBorders = borders) %>%
         hot_col(col = "Review ID", readOnly = T) %>%
         hot_col(col = "Topic ID", readOnly = T) %>%
         hot_cols(type = "dropdown", source = grade_types)  %>%
@@ -212,10 +221,28 @@ review_server <- function(id, r){
       
       grade_types <- r$df_grade_scale$title
 
+      borders = list()
+      for (name in df_student$name){
+        #Find start and end rows in table
+        reviewRows <- which(grepl(name, df_review_topic$`Student Name`))
+        firstRow <- reviewRows[[1]] - 1
+        lastRow <- reviewRows[[length(reviewRows)]] - 1
+        
+        #Load borders lists
+        borders[[length(borders)+1]] <- list(
+          range = list(from = list(row = firstRow, col = 0)
+                       , to = list(row = lastRow, col = length(topic_names) + 1))
+          , top = list(width = 2, color = "#222D32")
+          , left = list(width = 2, color = "#222D32")
+          , bottom = list(width = 2, color = "#222D32")
+          , right = list(width = 2, color = "#222D32"))
+      }
+      
       rhandsontable(df_review_topic
                     , rowHeaders = NULL
                     , stretchH = 'all'
                     , options = c(filters = T)) %>%
+        hot_table(customBorders = borders) %>%
         hot_col(col = "Review ID", readOnly = T, type = "character") %>%
         hot_col(col = "Student Name", readOnly = T) %>%
         hot_cols(type = "dropdown", source = grade_types)  %>%

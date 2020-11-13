@@ -70,13 +70,13 @@ homework_server <- function(id, r){
                                       return(parseFloat(params.value[1]*100).toFixed(2) +'%');
                                     }
                                     ")) %>%
-        e_mark_line(title = "  Your Average HW Score"
-                    , data = list(type = "average", name = "Average Score")
-                    , animation = FALSE
-                    , lineStyle = c(color = "#444")
-                    , symbol = "circle"
-                    , title_position = 'insideStartTop'
-        ) %>%
+        # e_mark_line(title = "  Your Average HW Score"
+        #             , data = list(type = "average", name = "Average Score")
+        #             , animation = FALSE
+        #             , lineStyle = c(color = "#444")
+        #             , symbol = "circle"
+        #             , title_position = 'insideStartTop'
+        # ) %>%
         e_color(color = "#c41230") %>%
         e_grid(left = "10%", right = "5%", top = "10%", bottom = "10%") %>%
         e_tooltip()
