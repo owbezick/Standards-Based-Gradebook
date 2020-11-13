@@ -49,7 +49,6 @@ save_df_homework_grades <- function(){
       pivot_longer(cols = c(2:ncol(r$df_homework_grades)), names_to = "Homework", values_to = "grade") %>%
       mutate(unique_id = paste(`Student Name`, Homework)) 
     
-    
     NA_homework_grade_long <- df_NA_homework_grades %>%
       pivot_longer(
         cols = c(2:ncol(df_NA_homework_grades))

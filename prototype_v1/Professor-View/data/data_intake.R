@@ -49,4 +49,5 @@ r$df_topic <- readRDS("data/df_topic.RDS")[0,]
 r$df_review_table <- readRDS("data/df_review_table.RDS")[0,1:4]
 r$df_review_grades <-  readRDS("data/df_review_grades.RDS")[0,]
 
-
+r$df_grade_scale <- tibble("level" = c(1,2,3,4)
+                           , "title" = c("Fluent", "Progressing", "Needs Work", "Incomplete"))

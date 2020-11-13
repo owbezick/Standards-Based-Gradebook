@@ -60,7 +60,44 @@ wizardUI <- function(id, doneButton){
                                  )
                                  , column(width = 6
                                           , actionBttn(
-                                            inputId = NS(id,"toRoster")
+                                            inputId = NS(id,"toGradeScale")
+                                            , label = "Next"
+                                            , style = "material-flat"
+                                            , block = T
+                                          )
+                                 )
+                               )
+                    )
+                    # Grade Scale ----
+                    , tabPanel(title = "Edit Grade Scale", value = "gradeScale"
+                               , "Grade Scale"
+                               , br()
+                               , fluidRow(
+                                 column(width = 12
+                                        , rHandsontableOutput(NS(id, "grade_scale_table"))
+                                 )
+                               )
+                               # Buttons ----
+                               , fluidRow(
+                                 column(width = 4
+                                        , actionBttn(
+                                          inputId = NS(id,"toCourseInfo")
+                                          , label = "Back"
+                                          , style = "material-flat"
+                                          , block = T
+                                        )
+                                 )
+                                 , column(width = 4
+                                        , actionBttn(
+                                          inputId = NS(id,"saveGradeScale")
+                                          , label = "Save Scale"
+                                          , style = "material-flat"
+                                          , block = T
+                                        )
+                                 )
+                                 , column(width = 4
+                                          , actionBttn(
+                                            inputId = NS(id, "toRoster")
                                             , label = "Next"
                                             , style = "material-flat"
                                             , block = T
@@ -94,7 +131,7 @@ wizardUI <- function(id, doneButton){
                                , fluidRow(
                                  column(width = 4
                                         , actionBttn(
-                                          inputId = NS(id,"toCourseInfo")
+                                          inputId = NS(id,"backToGradeScale")
                                           , label = "Back"
                                           , style = "material-flat"
                                           , block = T
@@ -295,14 +332,17 @@ wizard_server <- function(id, r, parent_session) {
       removeModal()
       showNotification("Welcome!")
     })
-    observeEvent(input$toRoster, {
+    
+    observeEvent(input$toGradeScale, {
       if (nrow(r$df_course_info) > 0 && nrow(r$df_links) > 0 ){
-        updateTabsetPanel(session, "wizard", selected = "roster")
+        updateTabsetPanel(session, "wizard", selected = "gradeScale")
       } else{
         showNotification("Please add at least one course information and link!", type = "error")
-        
       }
-      
+    })
+    
+    observeEvent(input$toRoster, {
+        updateTabsetPanel(session, "wizard", selected = "roster")
     })
     
     observeEvent(input$toHomework, {
@@ -334,6 +374,10 @@ wizard_server <- function(id, r, parent_session) {
     # Back Buttons ----
     observeEvent(input$toCourseInfo, {
       updateTabsetPanel(session, "wizard", selected = "courseInfo")
+    })
+    
+    observeEvent(input$backToGradeScale, {
+      updateTabsetPanel(session, "wizard", selected = "gradeScale")
     })
     
     observeEvent(input$backToRoster, {
@@ -426,6 +470,27 @@ wizard_server <- function(id, r, parent_session) {
       )
     })
     
+    # Grade Scale ----
+    output$grade_scale_table <- renderRHandsontable({
+      df_grade_scale <- r$df_grade_scale %>%
+        select(`Level` = level, Title = title)
+      
+      rhandsontable(
+        df_grade_scale
+        , rowHeaders = NULL
+        , stretchH = 'all'
+        , readOnly = F
+      ) %>%
+        hot_col(col = c("Level"), type = "numeric")
+    })
+    
+    observeEvent(input$saveGradeScale, {
+      grade_scale <- hot_to_r(input$grade_scale_table)
+      r$df_grade_scale <- grade_scale %>%
+        select(level = Level, title = Title)
+      
+      showNotification("Saved in session.")
+    })
     
     # Roster ----
     observeEvent(input$addStudent, {
@@ -658,6 +723,7 @@ wizard_server <- function(id, r, parent_session) {
     
     # Save review
     observeEvent(input$saveReview, {
+   
       # Check if review ID exists:
       if (input$reviewNumber %in% r$df_review_grades$review_id){
         showNotification("Review ID already exists.", type = "error")
@@ -668,20 +734,25 @@ wizard_server <- function(id, r, parent_session) {
         showNotification("Assignment start date is after assignment end date.", type = "warning")
       }
       else{
-        # Save to df_review_table
+        
+        # Save to df_review_table ----
         selected_topics <- paste(
           rep("Topic", length(input$topics))
           , input$topics
         )
-        
         topics <- unlist(colnames(r$df_review_table[,5:(ncol(r$df_review_table))]))
-        
-        topic_df <- tibble(Topics = topics) %>%
-          mutate(
-            value = case_when(Topics %in% selected_topics ~ TRUE)
-          ) %>%
-          pivot_wider(names_from = Topics, values_from = value)
-        
+        if (is.null(topics)) {
+          topic_df <- matrix(TRUE, ncol = length(selected_topics), nrow = 1)
+          as_tibble(topic_df)
+          colnames(topic_df) <- selected_topics
+        }else{
+          topic_df <- tibble(Topics = topics) %>%
+            mutate(
+              value = case_when(Topics %in% selected_topics ~ TRUE)
+            ) %>%
+            pivot_wider(names_from = Topics, values_from = value)
+          
+        }
         
         temp <- tibble(
           `Review Name` = input$reviewName
@@ -693,9 +764,10 @@ wizard_server <- function(id, r, parent_session) {
         r$df_review_table <- rbind(r$df_review_table
                                    , temp
         )
-        # Save to df_review_grades
+        
+        # Save to df_review_grades ----
         save_df_review_grades()
-        # Update Inputs
+        
         # Update Inputs
         updateNumericInput(
           session = session

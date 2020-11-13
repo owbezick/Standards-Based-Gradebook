@@ -154,7 +154,7 @@ review_server <- function(id, r){
       column_names <- names(df_review)
       student_names <- column_names[3:length(column_names)]
 
-      grade_types <- c("NA", "Not Completed", "Fluent", "Progressing", "Needs Work")
+      grade_types <- r$df_grade_scale$title
       rhandsontable(df_review
                     , rowHeaders = NULL
                     , stretchH = 'all') %>%
@@ -209,7 +209,8 @@ review_server <- function(id, r){
         arrange(`Student Name`)
       column_names <- names(df_review_topic)
       topic_names <- column_names[3:length(column_names)]
-      grade_types <- factor(c("NA", "Not Completed", "Fluent", "Progressing", "Needs Work"))
+      
+      grade_types <- r$df_grade_scale$title
 
       rhandsontable(df_review_topic
                     , rowHeaders = NULL

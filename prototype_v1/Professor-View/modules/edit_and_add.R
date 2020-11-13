@@ -1,16 +1,22 @@
 # UI -----
 edit_and_add_UI <- function(id){
-  box(width = 4, title = "Edit:", status = "primary", height = "20vh"
+  box(width = 4, title = "Edit:", status = "primary"
       , fluidRow(
-        column(width = 6
+        column(width = 4
                , actionBttn(inputId = NS(id, "editRoster")
-                            , label = "Course Roster"
+                            , label = "Roster"
                             , style = "material-flat"
                             , block = T)
         )
-        , column(width = 6
+        , column(width = 4
                  , actionBttn(inputId = NS(id, "editCourseInfo")
-                              , label = "Course Info"
+                              , label = "Info"
+                              , style = "material-flat"
+                              , block = T)
+        )
+        , column(width = 4
+                 , actionBttn(inputId = NS(id, "editGradeScale")
+                              , label = "Grade Scale"
                               , style = "material-flat"
                               , block = T)
         )
@@ -19,13 +25,13 @@ edit_and_add_UI <- function(id){
       , fluidRow(
         column(width = 6
                , actionBttn(inputId = NS(id, "addTopic")
-                            , label = "Topic"
+                            , label = "Topics"
                             , style = "material-flat"
                             , block = T)
         )
         , column(width = 6
                  , actionBttn(inputId = NS(id, "addHomework")
-                              , label = "Homework"
+                              , label = "Homeworks"
                               , style = "material-flat"
                               , block = T)
         )
@@ -44,6 +50,10 @@ edit_and_add_server <- function(id, r){
       add_homework_button_UI("add_homework")
     }, ignoreInit = T)
     
+    observeEvent(NS(id, input$editGradeScale), {
+      edit_grade_scale_UI("edit_scale")
+    }, ignoreInit = T)
+    
     observeEvent(NS(id, input$addTopic), {
       add_topic_button_UI("add_topic")
     }, ignoreInit = T)
@@ -52,8 +62,10 @@ edit_and_add_server <- function(id, r){
       edit_roster_button_UI("edit_roster")
     }, ignoreInit = T)
   })
+  
   add_homework_button_Server("add_homework", r)
   course_information_button_Server("course_info_button", r)
   add_topic_button_Server("add_topic", r)
   edit_roster_button_Server("edit_roster", r)
+  edit_grade_scale_server("edit_scale", r)
 }
