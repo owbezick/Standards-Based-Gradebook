@@ -14,7 +14,7 @@ source("modules/edit_topic.R")
 source("modules/edit_roster.R")
 source("modules/edit_grades.R")
 source("modules/view_calendar_item.R")
-
+source("modules/edit_grade_scale.R")
 
 ui <- dashboardPage(
     skin = "black"
