@@ -341,12 +341,12 @@ review_server <- function(id, r){
       df %>%
         group_by(Review) %>%
         e_charts(Description) %>%
-        e_bar(`Not Attempted`
+        e_bar("Not Attempted"
               , stack = "Grade"
               , color = theme$NC
               , barWidth = "25%"
               , name = "Not Attempted") %>%
-        e_bar(`Needs Work`
+        e_bar("Needs Work"
               , stack = "Grade"
               , color = theme$`Needs Work`
               , barWidth = "25%"
