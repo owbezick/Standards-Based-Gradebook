@@ -1,3 +1,16 @@
+.wizard-title {
+  font-weight:bold;
+  text-align:center;
+  font-size: 20px;
+}
+
+.download-button {
+  background-color:#ac1a2f!important;
+  border-color:#000000;
+  color:#000000!important;
+  text-decoration: none!important;
+}
+
 .bttn-material-flat.bttn-default {
     background: #fff;
     color: black;

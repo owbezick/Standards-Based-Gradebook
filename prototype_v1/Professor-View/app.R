@@ -37,14 +37,19 @@ ui <- dashboardPage(
                 , icon = icon("home")
             )
             , menuItem(
-                tabName ="grades"
+                tabName = "grades"
                 , text = "Grades"
                 , icon = icon("chalkboard")
             )
-            , column(align = "center", width = 12
-                     , fluidRow(downloadButton("report", "Generate Report"))
+            , column(width = 12
+                     , fluidRow(
+                         downloadButton("report", "Generate Report", class = "download-button")
+                         )
                      , br()
-                     , fluidRow(downloadButton("downloadData", "Download Data"))
+                     , fluidRow(
+                         downloadButton("downloadData", "Download Data", class = "download-button")
+                         
+                     )
             )
         )
     )
@@ -71,7 +76,7 @@ ui <- dashboardPage(
             , tabItem(
                 # Grades tab UI ----
                 tabName = "grades"
-                , tabBox(title = "Grades", width = 6
+                , tabBox(title = "Grades", width = 12
                          , homework_UI("homework")
                          , review_UI("review")
                 )
@@ -91,7 +96,7 @@ server <- function(input, output, session) {
                               , easyClose = F
                               , fluidRow(
                                   wizardUI("dataWizard"
-                                           ,  actionBttn(
+                                           , actionBttn(
                                                inputId = "closeWizard"
                                                , label = "Close Wizard"
                                                , style = "material-flat"

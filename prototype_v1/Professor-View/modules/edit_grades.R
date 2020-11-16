@@ -54,14 +54,7 @@ homework_server <- function(id, r){
                                       return(parseFloat(params.value[1]*100).toFixed(2) +'%');
                                     }
                                     ")) %>%
-        # e_mark_line(title = ""
-        #             , data = list(type = "average", name = "Average Score")
-        #             , animation = FALSE
-        #             , lineStyle = c(color = "#444")
-        #             , symbol = "circle"
-        # ) %>%
         e_tooltip()
-      #e_color(color = rgb(196, 18, 48, alpha = 230, max = 255)) %>%
     })
 
     # Homework Table ----
