@@ -71,7 +71,7 @@ ui <- dashboardPage(
             , tabItem(
                 # Grades tab UI ----
                 tabName = "grades"
-                , tabBox(title = "Grades", width = 8
+                , tabBox(title = "Grades", width = 6
                          , homework_UI("homework")
                          , review_UI("review")
                 )
