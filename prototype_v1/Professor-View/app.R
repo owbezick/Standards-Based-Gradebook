@@ -41,7 +41,11 @@ ui <- dashboardPage(
                 , text = "Grades"
                 , icon = icon("chalkboard")
             )
-            , downloadButton("report", "Generate report")
+            , column(align = "center", width = 12
+                     , fluidRow(downloadButton("report", "Generate Report"))
+                     , br()
+                     , fluidRow(downloadButton("downloadData", "Download Data"))
+            )
         )
     )
     , dashboardBody(
@@ -67,7 +71,7 @@ ui <- dashboardPage(
             , tabItem(
                 # Grades tab UI ----
                 tabName = "grades"
-                , tabBox(title = "Grades", width = 12
+                , tabBox(title = "Grades", width = 8
                          , homework_UI("homework")
                          , review_UI("review")
                 )
@@ -122,6 +126,33 @@ server <- function(input, output, session) {
     homework_server("homework", r)
     review_server("review", r)
     
+    # Download data ---- 
+    output$downloadData <- downloadHandler(
+        filename = function(){paste0("grade_data", Sys.Date(), ".xlsx")}
+        , content = function(file){
+            wb <- createWorkbook(title = "saveMe.xlsx")
+            # Create a worksheets
+            addWorksheet(wb, sheetName = "roster")
+            addWorksheet(wb, sheetName = "homeworks")
+            addWorksheet(wb, sheetName = "reviews")
+            addWorksheet(wb, sheetName = "topics")
+            addWorksheet(wb, sheetName = "homework_grades")
+            addWorksheet(wb, sheetName = "review_grades")
+            
+            # write data to sheets
+            writeData(wb , sheet = "roster", r$df_student)
+            writeData(wb , sheet = "homeworks", r$df_homework)
+            writeData(wb , sheet = "reviews", r$df_review_table)
+            writeData(wb , sheet = "topics", r$df_topic)
+            writeData(wb , sheet = "homework_grades", r$df_homework_grades)
+            writeData(wb , sheet = "review_grades", r$df_review_grades)
+            # Save workbook - this actually writes the file 'saveMe.xlsx' to disk
+            saveWorkbook(wb, file)
+            
+            # clean up 
+            file.remove("saveMe.xlsx")
+        }
+    )
     
     # Report generation ----
     output$report <- downloadHandler(
