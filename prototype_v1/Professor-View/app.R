@@ -37,7 +37,7 @@ ui <- dashboardPage(
                 , icon = icon("home")
             )
             , menuItem(
-                tabName ="grades"
+                tabName = "grades"
                 , text = "Grades"
                 , icon = icon("chalkboard")
             )
