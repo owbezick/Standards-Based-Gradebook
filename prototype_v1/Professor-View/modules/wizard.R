@@ -3,7 +3,7 @@ wizardUI <- function(id, doneButton){
       , tabsetPanel(id = NS(id, "wizard"), type = "hidden"
                     # Course info UI ----
                     , tabPanel(title = "Add Course Info", value = "courseInfo"
-                               , "Course Information"
+                               , div("Course Information", class = "wizard-title")
                                , br()
                                , fluidRow(
                                  box(width = 6, status = "primary", id = NS(id, "course_info_box")
@@ -70,7 +70,7 @@ wizardUI <- function(id, doneButton){
                     )
                     # Grade Scale ----
                     , tabPanel(title = "Edit Grade Scale", value = "gradeScale"
-                               , "Grade Scale"
+                               , div("Grade Scale", class = "wizard-title")
                                , br()
                                , fluidRow(
                                  column(width = 12
@@ -107,7 +107,7 @@ wizardUI <- function(id, doneButton){
                     )
                     # Roster UI ----
                     , tabPanel(value = "roster", title = "Add Roster"
-                               , "Roster"
+                               , div("Roster", class = "wizard-title")
                                , br()
                                , fluidRow(
                                  box(width = 6, status = "primary"
@@ -157,7 +157,7 @@ wizardUI <- function(id, doneButton){
                     )
                     # Homework UI ----
                     , tabPanel(value = "homework", title = "Add Homeworks"
-                               , "Homework"
+                               , div("Homework", class = "wizard-title")
                                , br()
                                , fluidRow(
                                  box(width = 6, status = "primary"
@@ -207,7 +207,7 @@ wizardUI <- function(id, doneButton){
                     )
                     # Topics UI ----
                     , tabPanel(value = "topics", title = "Add Topics"
-                               , "Topics"
+                               , div("Topics", class = "wizard-title")
                                , br()
                                , fluidRow(
                                  box(width = 2, status = "primary"
@@ -252,7 +252,7 @@ wizardUI <- function(id, doneButton){
                     )
                     # Review UI ----
                     , tabPanel(value = "review", title = "Add Reviews"
-                               , "Reviews"
+                               , div("Reviews", class = "wizard-title")
                                , br()
                                , fluidRow(
                                  box(width = 6, status = "primary"
