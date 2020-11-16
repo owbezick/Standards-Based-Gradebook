@@ -68,6 +68,16 @@ save_df_homework_grades <- function(){
   }
 }
 
+#Function to find fluency (string) title given (integer) levl
+getLevelTitle <- function(x){
+  level <- r$df_grade_scale %>%
+    filter(level == x) %>%
+    select(title) %>%
+    pull()
+  
+  return (level)
+}
+
 save_df_review_grades <- function(){
   df_student <- r$df_student %>%
     select(student_id)
@@ -109,4 +119,30 @@ save_df_review_grades <- function(){
   
   
   r$df_review_grades <- df_new_review_data
+}
+
+handsontable_renderer <- function(){
+  return(
+    paste0("
+          function(instance, td, row, col, prop, value, cellProperties) {
+            Handsontable.renderers.TextRenderer.apply(this, arguments);
+            if (value == '", getLevelTitle(1), "'){
+              td.style.background = 'lightgreen';
+            } else if (value == '", getLevelTitle(2), "'){
+              td.style.background = 'lightyellow';
+            } else if (value == '", getLevelTitle(3), "'){
+              td.style.background = 'pink';
+            } else if (value == '", getLevelTitle(4), "'){
+              td.style.background = 'lightgrey';
+            }
+  
+            if (col > 1){
+              if (!isNaN(value)) {
+                td.style.background = 'grey';
+              cellProperties.readOnly = true;
+              }
+            }
+  
+          }")
+  )
 }

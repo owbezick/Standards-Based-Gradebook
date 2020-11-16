@@ -80,7 +80,6 @@ ui <- dashboardPage(
                          , homework_UI("homework")
                          , review_UI("review")
                 )
-                
             )
         )
     )

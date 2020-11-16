@@ -163,21 +163,7 @@ review_server <- function(id, r){
         hot_col(col = "Review ID", readOnly = T) %>%
         hot_col(col = "Topic ID", readOnly = T) %>%
         hot_cols(type = "dropdown", source = grade_types)  %>%
-        hot_cols(renderer = "
-        function(instance, td, row, col, prop, value, cellProperties) {
-          Handsontable.renderers.TextRenderer.apply(this, arguments);
-           if (value == 'Fluent'){
-          td.style.background = 'lightgreen';
-          }
-          else if (value == 'Progressing'){
-          td.style.background = 'lightyellow';
-          } else if (value == 'Needs Work'){
-          td.style.background = 'pink';
-          } else if (value == 'Not Completed'){
-          td.style.background = 'lightgrey';
-          }
-        }
-          ")%>%
+        hot_cols(renderer = handsontable_renderer())%>%
         hot_context_menu(allowRowEdit = FALSE)
     })
     
@@ -239,26 +225,7 @@ review_server <- function(id, r){
         hot_col(col = "Review ID", readOnly = T, type = "character") %>%
         hot_col(col = "Student Name", readOnly = T) %>%
         hot_cols(type = "dropdown", source = grade_types)  %>%
-        hot_cols(renderer = "
-        function(instance, td, row, col, prop, value, cellProperties) {
-          Handsontable.renderers.TextRenderer.apply(this, arguments);
-          if (value == 'Fluent'){
-          td.style.background = 'lightgreen';
-          }
-          else if (value == 'Progressing'){
-          td.style.background = 'lightyellow';
-          } else if (value == 'Needs Work'){
-          td.style.background = 'pink';
-          } else if (value == 'Not Completed'){
-          td.style.background = 'lightgrey';
-          }
-          if (col > 1){
-                 if (!isNaN(value)) {
-          td.style.background = 'grey';
-          cellProperties.readOnly = true;
-          }
-          }
-        }")%>%
+        hot_cols(renderer = handsontable_renderer())%>%
         hot_context_menu(allowRowEdit = FALSE)
 
     })
