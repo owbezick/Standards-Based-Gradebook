@@ -41,10 +41,15 @@ ui <- dashboardPage(
                 , text = "Grades"
                 , icon = icon("chalkboard")
             )
-            , column(align = "center", width = 12
-                     , fluidRow(downloadButton("report", "Generate Report"))
+            , column(width = 12
+                     , fluidRow(
+                         downloadButton("report", "Generate Report", class = "download-button")
+                         )
                      , br()
-                     , fluidRow(downloadButton("downloadData", "Download Data"))
+                     , fluidRow(
+                         downloadButton("downloadData", "Download Data", class = "download-button")
+                         
+                     )
             )
         )
     )
