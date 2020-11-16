@@ -24,7 +24,7 @@ This repository and linked project contains code for a Davidson College Indepede
 * Do the changes I make get saved immediately?
   - No. You must remember to click the save button to save your changes.
 * My RHandsonTable is not visible after I initially viewed it, where did it go?
-  - If a table is not displaying properly, try to click on where it to get it to re-render.
+  - If a table is not displaying properly, try to click on where the table should be to get it to re-render.
 
 ## Credits
 ### Authors: 
