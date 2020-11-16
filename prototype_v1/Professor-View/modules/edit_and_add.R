@@ -16,7 +16,7 @@ edit_and_add_UI <- function(id){
         )
         , column(width = 4
                  , actionBttn(inputId = NS(id, "editGradeScale")
-                              , label = "Grade Scale"
+                              , label = "Gradescale"
                               , style = "material-flat"
                               , block = T)
         )

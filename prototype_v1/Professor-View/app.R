@@ -71,7 +71,7 @@ ui <- dashboardPage(
             , tabItem(
                 # Grades tab UI ----
                 tabName = "grades"
-                , tabBox(title = "Grades", width = 6
+                , tabBox(title = "Grades", width = 12
                          , homework_UI("homework")
                          , review_UI("review")
                 )
@@ -92,7 +92,7 @@ server <- function(input, output, session) {
                               , easyClose = F
                               , fluidRow(
                                   wizardUI("dataWizard"
-                                           ,  actionBttn(
+                                           , actionBttn(
                                                inputId = "closeWizard"
                                                , label = "Close Wizard"
                                                , style = "material-flat"
