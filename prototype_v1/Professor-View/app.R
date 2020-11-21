@@ -155,7 +155,7 @@ server <- function(input, output, session) {
             saveWorkbook(wb, file)
             
             # clean up 
-            file.remove("saveMe.xlsx")
+            file.remove(paste0("grade_data", Sys.Date(), ".xlsx"))
         }
     )
     
@@ -173,13 +173,13 @@ server <- function(input, output, session) {
             # Set up parameters to pass to Rmd document
             student_table <- r$df_student %>%
                 rename(`Student ID` = student_id, Name = name) %>%
-                rhandsontable(rowHeaders = NULL, stretchH = 'all', readOnly = T)
+                rhandsontable(rowHeaders = NULL, stretchH = 'all', readOnly = T, height = "100%", width = "100%")
             
             topic_table <- r$df_review_table %>%
                 mutate(`Review Start Date` = ymd(`Review Start Date`)
                        , `Review End Date` = ymd(`Review End Date`)
                        , `Review ID` = as.character(`Review ID`)) %>%
-                rhandsontable(rowHeaders = NULL, stretchH = 'all', readOnly = T)
+                rhandsontable(rowHeaders = NULL, stretchH = 'all', readOnly = T, height = "100%", width = "100%")
             
             homework_table <- r$df_homework %>%
                 mutate(id = id
@@ -187,7 +187,7 @@ server <- function(input, output, session) {
                        , `Date Assigned` = ymd(date_assigned)
                        , `Due Date` = ymd(date_due)) %>%
                 select(`Homework ID` = id, Description, `Date Assigned`, `Due Date`) %>%
-                rhandsontable(rowHeaders = NULL, stretchH = 'all', readOnly = T)
+                rhandsontable(rowHeaders = NULL, stretchH = 'all', readOnly = T, height = "100%", width = "100%")
             
             df_review_grades <- r$df_review_grades
             df_student <- r$df_student
@@ -213,24 +213,55 @@ server <- function(input, output, session) {
                                            , rowHeaders = NULL
                                            , stretchH = 'all'
                                            , readOnly = T
-                                           , options = c(filters = T)) %>%
+                                           , options = c(filters = T)
+                                           , height = "100%"
+                                           , width = "100%") %>%
                 hot_col(col = "Review ID", readOnly = T, type = "character") %>%
                 hot_col(col = "Student Name", readOnly = T) %>%
                 hot_cols(type = "dropdown", source = grade_types)  %>%
                 hot_cols(renderer = handsontable_renderer())
+            
             df_homework_grades <- r$df_homework_grades
             homework_grades <- rhandsontable(df_homework_grades
                                              , rowHeaders = NULL
                                              , stretchH = 'all'
-                                             , readOnly = T) %>%
+                                             , readOnly = T
+                                             , height = "100%"
+                                             , width = "100%") %>%
                 hot_context_menu(allowRowEdit = FALSE) %>%
                 hot_col(col = c(2:ncol(df_homework_grades)), type = "numeric")
+            
+            df_review <- df_review_grades %>%
+                left_join(df_student, by = "student_id") %>%
+                pivot_wider(id_cols = c(review_id, topic_id), names_from = name, values_from = grade) %>%
+                rename(`Review ID` = review_id, `Topic ID` = topic_id)
+            
+            df_review_summary <- df_review %>%
+                group_by(`Topic ID`) %>%
+                mutate_at(c(3:(nrow(df_student) + 2)),  max_grade) %>%
+                ungroup() %>%
+                filter(!duplicated(`Topic ID`)) %>%
+                select(-`Review ID`) %>%
+                mutate(`Topic ID` = as.numeric(`Topic ID`))
+            
+            df_review_summary <- df_review_summary[order(df_review_summary$`Topic ID`),] %>%
+                mutate(`Topic ID` = as.character(`Topic ID`))
+            
+            summary_grades <- rhandsontable(df_review_summary
+                          , rowHeaders = NULL
+                          , stretchH = 'all'
+                          , readOnly = T
+                          , height = "100%"
+                          , width = "100%") %>%
+                hot_cols(renderer = handsontable_renderer()) %>%
+                hot_context_menu(allowRowEdit = FALSE)
             
             params <- list(student_table = student_table
                            , topic_table = topic_table
                            , homework_table = homework_table
                            , homework_grades = homework_grades
-                           , review_grades = review_grades)
+                           , review_grades = review_grades
+                           , summary_grades = summary_grades)
             
             
             # Knit the document, passing in the `params` list, and eval it in a

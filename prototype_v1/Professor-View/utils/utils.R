@@ -1,15 +1,17 @@
-grade_max <- function(x){
-  max <- "NA"
-  for (grade in x){
-    if (max != "M" & grade == "M"){
-      max <- "M"
-    } else if (max != "J" & max != "M" & grade == "J"){
-      max <- "J"
-    } else if (max != "A" & max != "J" & max != "M" & grade == "A"){
-      max <- "A"
-    } 
+max_grade <- function(vec){
+  max <- nrow(r$df_grade_scale)
+  
+  for (x in vec){
+    levelInt <- getLevelInt(x)
+    
+    if (levelInt != -1){
+      #'max' goes up to 1, actually finding min
+      if (levelInt < max){
+        max <- levelInt
+      }
+    }
   }
-  return(max)
+  return(rep(getLevelTitle(max), length(vec)))
 }
 
 `%notin%` <- Negate(`%in%`)
@@ -68,12 +70,26 @@ save_df_homework_grades <- function(){
   }
 }
 
-#Function to find fluency (string) title given (integer) levl
+#Function to find fluency (string) title given (integer) level
 getLevelTitle <- function(x){
   level <- r$df_grade_scale %>%
     filter(level == x) %>%
     select(title) %>%
     pull()
+  
+  return (level)
+}
+
+#Function to find fluency (int) title given (string) level
+getLevelInt <- function(x){
+  level <- r$df_grade_scale %>%
+    filter(title == x) %>%
+    select(level) %>%
+    pull()
+  
+  if (length(level) == 0){
+    level <- -1
+  }
   
   return (level)
 }

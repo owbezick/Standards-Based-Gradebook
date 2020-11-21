@@ -1,40 +1,50 @@
 ---
 title: "Gradebook Status Report"
-date: "11/9/2020"
-output: html_document
+date: "`r format(Sys.time(), '%d %B, %Y')`"
+output: pdf_document
 params:
   topic_table: NA
   student_table: NA
   homework_table: NA
   review_grades: NA
+  summary_grades: NA
   homework_grades: NA
 ---
 
-```{r setup, include=FALSE}
+```{r setup, echo=FALSE, message=FALSE, warning=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-## Course Roster
-```{r, echo=FALSE}
+## Course Info
+
+#### Roster
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
 params$student_table
 ```
 
-## Homework Table
-```{r, echo=FALSE}
+#### Homework Table
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
 params$homework_table
 ```
 
-## Review Table 
-```{r, echo=FALSE}
+#### Review Table 
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
 params$topic_table
 ```
 
-## Homework Grades
-```{r, echo=FALSE}
+## Grades
+
+#### Homework Grades
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
 params$homework_grades
 ```
 
-## Review Grades
-```{r, echo=FALSE}
+#### Topic Completion Summary
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+params$summary_grades
+```
+
+#### Review Grades
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
 params$review_grades
 ```

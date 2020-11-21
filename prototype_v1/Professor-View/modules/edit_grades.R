@@ -92,12 +92,11 @@ review_UI <- function(id) {
              tabBox(width = 12
                     # Review by Review ----
                     , tabPanel(title = "Review Grade by Student"
+                               , box(width = 12, status = "primary", title = "Topic Summary"
+                                     , rHandsontableOutput(NS(id, "review_table_summary"), width = "100%"))
                                , box(width = 12, status = "primary"
                                      , title = "Review Grade by Student"
-
-                                       , rHandsontableOutput(NS(id, "review_table_review"))
-
-
+                                     , rHandsontableOutput(NS(id, "review_table_review"), width = "100%")
                                )
                                , actionBttn(NS(id, "saveReview"), "Save", style = "material-flat", block = T)
                     )
@@ -105,7 +104,7 @@ review_UI <- function(id) {
                     , tabPanel(title = "Review Grade by Topic"
                                , box(width = 12, status = "primary"
                                      , title = "Review Grade by Topic"
-                                     , rHandsontableOutput(NS(id, "review_table_student"))
+                                     , rHandsontableOutput(NS(id, "review_table_student"), width = "100%")
                                )
                                , actionBttn(NS(id, "saveStudent"), "Save", style = "material-flat", block = T)
                     )
@@ -164,6 +163,34 @@ review_server <- function(id, r){
         hot_col(col = "Topic ID", readOnly = T) %>%
         hot_cols(type = "dropdown", source = grade_types)  %>%
         hot_cols(renderer = handsontable_renderer())%>%
+        hot_context_menu(allowRowEdit = FALSE)
+    })
+    
+    # Review grade summary ----
+    output$review_table_summary <- renderRHandsontable({
+      df_review_grades <- r$df_review_grades
+      df_student <- r$df_student
+      df_review <- df_review_grades %>%
+        left_join(df_student, by = "student_id") %>%
+        pivot_wider(id_cols = c(review_id, topic_id), names_from = name, values_from = grade) %>%
+        rename(`Review ID` = review_id, `Topic ID` = topic_id)
+      
+      df_review_summary <- df_review %>%
+        group_by(`Topic ID`) %>%
+        mutate_at(c(3:(nrow(df_student) + 2)),  max_grade) %>%
+        ungroup() %>%
+        filter(!duplicated(`Topic ID`)) %>%
+        select(-`Review ID`) %>%
+        mutate(`Topic ID` = as.numeric(`Topic ID`))
+        
+      df_review_summary <- df_review_summary[order(df_review_summary$`Topic ID`),] %>%
+        mutate(`Topic ID` = as.character(`Topic ID`))
+      
+      rhandsontable(df_review_summary
+                    , rowHeaders = NULL
+                    , stretchH = 'all'
+                    , readOnly = T) %>%
+        hot_cols(renderer = handsontable_renderer()) %>%
         hot_context_menu(allowRowEdit = FALSE)
     })
     
