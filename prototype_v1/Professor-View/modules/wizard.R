@@ -70,7 +70,7 @@ wizardUI <- function(id, doneButton){
                     )
                     # Grade Scale ----
                     , tabPanel(title = "Edit Grade Scale", value = "gradeScale"
-                               , div("Grade Scale", class = "wizard-title")
+                               , div("Grade Scale (1 = Completion)", class = "wizard-title")
                                , br()
                                , fluidRow(
                                  column(width = 12
