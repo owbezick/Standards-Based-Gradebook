@@ -1,7 +1,7 @@
 ---
 title: "Gradebook Status Report"
 date: "`r format(Sys.time(), '%d %B, %Y')`"
-output: pdf_document
+output: html_document
 params:
   topic_table: NA
   student_table: NA
