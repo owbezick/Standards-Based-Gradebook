@@ -155,7 +155,7 @@ server <- function(input, output, session) {
             saveWorkbook(wb, file)
             
             # clean up 
-            file.remove("saveMe.xlsx")
+            file.remove(paste0("grade_data", Sys.Date(), ".xlsx"))
         }
     )
     
