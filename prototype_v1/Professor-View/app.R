@@ -46,7 +46,7 @@ ui <- dashboardPage(
             )
             , column(width = 12
                      , fluidRow(
-                         downloadButton("report", "Generate Report", class = "download-button")
+                         actionBttn("reportModal", "Generate Reports", style = "material-flat")
                      )
                      , br()
                      , fluidRow(
@@ -171,6 +171,17 @@ server <- function(input, output, session) {
         }
     )
     
+    observeEvent(input$reportModal, {
+        ls_students <- append("All Students", r$df_student$name)
+        showModal(modalDialog(title = "Select report to generate"
+                              , pickerInput("reportSelect"
+                                            , label = "Select"
+                                            , choices = ls_students, selected = ls_students[1])
+                              , downloadButton("report", "Generate Report", class = "download-button")
+            
+        )
+        )
+    })
     # Report generation ----
     output$report <- downloadHandler(
         

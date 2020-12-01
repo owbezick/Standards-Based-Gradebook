@@ -418,6 +418,7 @@ wizard_server <- function(id, r, parent_session) {
       r$df_links <- rbind(r$df_links
                           , tibble("Link Description" = c(type)
                                    , "Link URL" = c(value)))
+      write_rds(r$df_links, "data/df_links.RDS")
       
       # Insert preview to UI
       insertUI(
@@ -493,7 +494,7 @@ wizard_server <- function(id, r, parent_session) {
                                 , "name" = input$addName
                               )
         )
-        write_rds(r$df_course_info, "data/df_course_info.RDS")
+        write_rds(r$df_student, "data/df_student.RDS")
         
         # Save to df_homework_grades If there are homeworks present, add in name and "NA" for grades
         if (ncol(r$df_homework_grades) > 1){
