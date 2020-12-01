@@ -48,6 +48,8 @@ course_information_button_Server <- function(id, r){
       req(input$course_info, input$links)
       r$df_course_info <- hot_to_r(input$course_info)
       r$df_links <- hot_to_r(input$links)
+      write_rds(r$df_course_info, "data/df_course_info.RDS")
+      write_rds(r$df_links, "data/df_links.RDS")
       showNotification("Saved in session.")
       removeModal()
     })

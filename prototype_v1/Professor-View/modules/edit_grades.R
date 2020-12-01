@@ -79,6 +79,7 @@ homework_server <- function(id, r){
     observeEvent(input$save,{
       df_hot <- hot_to_r(input$homework_table)
       r$df_homework_grades  <- df_hot
+      write_rds(r$df_homework, "data/df_homework.RDS")
       showNotification("Saved in session.")
     })
 
@@ -199,7 +200,7 @@ review_server <- function(id, r){
         pivot_longer(cols = c(3:ncol(hot_to_r(input$review_table_review)))) %>%
         left_join(r$df_student, by = "name") %>%
         select(review_id = `Review ID`, topic_id = `Topic ID`, student_id, grade = value)
-
+      write_rds(r$df_review_grades, "data/df_review_grades.RDS")
       showNotification("Saved in session.")
     })
 
@@ -266,7 +267,7 @@ review_server <- function(id, r){
       r$df_review_grades <- df_temp %>%
         mutate(topic_id = str_split_fixed(df_temp$name, " ", 2)[,2]) %>%
         select(review_id = `Review ID`, topic_id, student_id, grade = value)
-
+      write_rds(r$df_review_grades, "data/df_review_grades.RDS")
       showNotification("Saved in session.")
     })
   })

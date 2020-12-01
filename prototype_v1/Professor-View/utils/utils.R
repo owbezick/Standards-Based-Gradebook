@@ -45,6 +45,7 @@ save_df_homework_grades <- function(){
   # If df_homework_grades has no data
   if(nrow(df_homework_grades) == 0){
     r$df_homework_grades <- df_NA_homework_grades
+    write_rds(r$df_homework_grades, "data/df_homework_grades.RDS")
   } else{
     # Merge tables together, keeping values from current and adding values from NA
     current_homework_grade_long <- r$df_homework_grades %>%
@@ -67,7 +68,9 @@ save_df_homework_grades <- function(){
       arrange(Homework) %>%
       pivot_wider(id_cols = c(`Student Name`, Homework), names_from = Homework, values_from = grade) %>%
       arrange(`Student Name`)
+    write_rds(r$df_homework_grades, "data/df_homework_grades.RDS")
   }
+  
 }
 
 #Function to find fluency (string) title given (integer) level
@@ -135,6 +138,7 @@ save_df_review_grades <- function(){
   
   
   r$df_review_grades <- df_new_review_data
+  write_rds(r$df_review_grades, "data/df_review_grades.RDS")
 }
 
 handsontable_renderer <- function(){
