@@ -292,8 +292,7 @@ server <- function(input, output, session) {
     
     
     # Save Data in RDS Files ----
-    onStop(function(){
-        observe({
+    observe(onStop(), {
         write_rds(r$df_student, "data/df_student.RDS")
         write_rds(r$df_course_info, "data/df_course_info.RDS")
         write_rds(r$df_links, "data/df_links.RDS")
@@ -303,9 +302,8 @@ server <- function(input, output, session) {
         write_rds(r$df_review_table, "data/df_review_table.RDS")
         write_rds(r$df_review_grades, "data/df_review_grades.RDS")
         write_rds(r$df_grade_scale, "data/df_grade_scale,RDS")
-        })
-    }
-    )
+    })
+
 }
 
 # Run the application 
