@@ -92,12 +92,12 @@ review_UI <- function(id) {
              tabBox(width = 12
                     # Review by Review ----
                     , tabPanel(title = "Review Grade by Student"
-                               , box(width = 12, status = "primary", title = "Topic Summary"
-                                     , rHandsontableOutput(NS(id, "review_table_summary"), width = "100%"))
                                , box(width = 12, status = "primary"
                                      , title = "Review Grade by Student"
                                      , rHandsontableOutput(NS(id, "review_table_review"), width = "100%")
                                )
+                               , box(width = 12, status = "primary", title = "Topic Summary"
+                                     , rHandsontableOutput(NS(id, "review_table_summary"), width = "100%"))
                                , actionBttn(NS(id, "saveReview"), "Save", style = "material-flat", block = T)
                     )
                     # Review by Student ----
@@ -115,7 +115,6 @@ review_UI <- function(id) {
 
 review_server <- function(id, r){
   moduleServer(id, function(input, output, session){
-    
     # Review by Review ----
     output$review_table_review <- renderRHandsontable({
       df_review_grades <- r$df_review_grades

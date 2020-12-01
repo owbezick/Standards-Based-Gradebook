@@ -1,5 +1,7 @@
 # Mastery Gradebook application - Professor View
-# Author: Owen Bezick & Calvin Spencer
+# Authors: Owen Bezick & Calvin Spencer
+
+# Import Source Files ----
 source("utils/libraries.R")
 source("utils/utils.R")
 source("data/data_intake.R")
@@ -16,6 +18,7 @@ source("modules/edit_grades.R")
 source("modules/view_calendar_item.R")
 source("modules/edit_grade_scale.R")
 
+# Generate Dashboard Page UI ----
 ui <- dashboardPage(
     skin = "black"
     , dashboardHeader(
@@ -44,7 +47,7 @@ ui <- dashboardPage(
             , column(width = 12
                      , fluidRow(
                          downloadButton("report", "Generate Report", class = "download-button")
-                         )
+                     )
                      , br()
                      , fluidRow(
                          downloadButton("downloadData", "Download Data", class = "download-button")
@@ -90,22 +93,31 @@ ui <- dashboardPage(
 server <- function(input, output, session) {
     # Data Wizard ----
     output$wizard <- renderUI({
-        showModal(modalDialog(title = "Initial Data Input"
-                              , size = "l"
-                              , footer = "Note: more data can be added and edited later in the app."
-                              , easyClose = F
-                              , fluidRow(
-                                  wizardUI("dataWizard"
-                                           , actionBttn(
-                                               inputId = "closeWizard"
-                                               , label = "Close Wizard"
-                                               , style = "material-flat"
-                                               , block = T
-                                           ) 
-                                  ) 
-                              )
-        )
-        )
+        if(num_students > 0) {
+            showModal(modalDialog(
+                title = "Welcome Back!"
+                , size = "s"
+                , easyClose = T
+                , footer = NULL)
+            )
+        } else {
+            showModal(modalDialog(title = "Initial Data Input"
+                                  , size = "l"
+                                  , footer = "Note: more data can be added and edited later in the app."
+                                  , easyClose = F
+                                  , fluidRow(
+                                      wizardUI("dataWizard"
+                                               , actionBttn(
+                                                   inputId = "closeWizard"
+                                                   , label = "Close Wizard"
+                                                   , style = "material-flat"
+                                                   , block = T
+                                               ) 
+                                      ) 
+                                  )
+            )
+            )
+        }
     })
     
     wizard_server("dataWizard", r)
@@ -168,9 +180,11 @@ server <- function(input, output, session) {
             # Copy the report file to a temporary directory before processing it, in
             # case we don't have write permissions to the current working dir (which
             # can happen when deployed).
-            tempReport <- file.path(tempdir(), "report.Rmd")
-            file.copy("report.Rmd", tempReport, overwrite = TRUE)
-            # Set up parameters to pass to Rmd document
+            for(name in ls_student_names){
+                
+            }
+            
+            # Set up parameters to pass to Rmd document ----
             student_table <- r$df_student %>%
                 rename(`Student ID` = student_id, Name = name) %>%
                 rhandsontable(rowHeaders = NULL, stretchH = 'all', readOnly = T, height = "100%", width = "100%")
@@ -248,11 +262,11 @@ server <- function(input, output, session) {
                 mutate(`Topic ID` = as.character(`Topic ID`))
             
             summary_grades <- rhandsontable(df_review_summary
-                          , rowHeaders = NULL
-                          , stretchH = 'all'
-                          , readOnly = T
-                          , height = "100%"
-                          , width = "100%") %>%
+                                            , rowHeaders = NULL
+                                            , stretchH = 'all'
+                                            , readOnly = T
+                                            , height = "100%"
+                                            , width = "100%") %>%
                 hot_cols(renderer = handsontable_renderer()) %>%
                 hot_context_menu(allowRowEdit = FALSE)
             
@@ -263,7 +277,9 @@ server <- function(input, output, session) {
                            , review_grades = review_grades
                            , summary_grades = summary_grades)
             
-            
+            tempReport <- file.path(tempdir(), "report.Rmd")
+            file.copy("report.Rmd", tempReport, overwrite = TRUE)
+            # knit document ----
             # Knit the document, passing in the `params` list, and eval it in a
             # child of the global environment (this isolates the code in the document
             # from the code in this app).
@@ -272,6 +288,23 @@ server <- function(input, output, session) {
                               envir = new.env(parent = globalenv())
             )
         }
+    )
+    
+    
+    # Save Data in RDS Files ----
+    onStop(function(){
+        observe({
+        write_rds(r$df_student, "data/df_student.RDS")
+        write_rds(r$df_course_info, "data/df_course_info.RDS")
+        write_rds(r$df_links, "data/df_links.RDS")
+        write_rds(r$df_homework, "data/df_homework.RDS")
+        write_rds(r$df_homework_grades, "data/df_homework_grades.RDS")
+        write_rds(r$df_topic, "data/df_topic.RDS")
+        write_rds(r$df_review_table, "data/df_review_table.RDS")
+        write_rds(r$df_review_grades, "data/df_review_grades.RDS")
+        write_rds(r$df_grade_scale, "data/df_grade_scale,RDS")
+        })
+    }
     )
 }
 

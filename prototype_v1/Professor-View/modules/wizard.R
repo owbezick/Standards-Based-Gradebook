@@ -51,12 +51,6 @@ wizardUI <- function(id, doneButton){
                                # Buttons ----
                                , fluidRow(
                                  column(width = 6
-                                        , actionBttn(
-                                          NS(id, "skip")
-                                          , "Skip to Mid-Semester View"
-                                          , style = "material-flat"
-                                          , block = T
-                                        )
                                  )
                                  , column(width = 6
                                           , actionBttn(
@@ -320,19 +314,6 @@ wizard_server <- function(id, r, parent_session) {
   
   moduleServer(id, function(input, output, session){
     # Next Buttons ----
-    observeEvent(input$skip, {
-      r$df_student <- readRDS("data/df_student.RDS")
-      r$df_course_info <- readRDS("data/df_course_info.RDS")
-      r$df_links <- readRDS("data/df_links.RDS")
-      r$df_homework <- readRDS("data/df_homework.RDS")
-      r$df_homework_grades <- readRDS("data/df_homework_grades.RDS")
-      r$df_topic <- readRDS("data/df_topic.RDS")
-      r$df_review_table <- readRDS("data/df_review_table.RDS")
-      r$df_review_grades <-  readRDS("data/df_review_grades.RDS")
-      removeModal()
-      showNotification("Welcome!")
-    })
-    
     observeEvent(input$toGradeScale, {
       if (nrow(r$df_course_info) > 0 && nrow(r$df_links) > 0 ){
         updateTabsetPanel(session, "wizard", selected = "gradeScale")
@@ -359,8 +340,6 @@ wizard_server <- function(id, r, parent_session) {
       }else{
         showNotification("Please add at least one homework!", type = "error")
       }
-      
-      
     })
     
     observeEvent(input$toReview, {
