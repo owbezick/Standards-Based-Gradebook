@@ -16,6 +16,25 @@ max_grade <- function(vec){
 
 `%notin%` <- Negate(`%in%`)
 
+#Helper function for report generation naming in app.R
+make_filename <- function(name){
+  if (name == "All Students"){
+    return(
+      "Class-" %>%
+        paste0(Sys.Date()) %>%
+        paste0("-Report.html")
+      )
+  } else {
+    return (
+      name %>%
+      str_replace_all(" ", "-") %>%
+        paste0("-") %>%
+        paste0(Sys.Date()) %>%
+        paste0("-Report.html")
+    )
+  }
+}
+
 
 save_df_homework_grades <- function(){
   # Save to df_homework_grades ----

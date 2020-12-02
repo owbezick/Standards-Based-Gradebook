@@ -78,8 +78,10 @@ homework_server <- function(id, r){
     # Save homework
     observeEvent(input$save,{
       df_hot <- hot_to_r(input$homework_table)
+      
+      #browser()
       r$df_homework_grades  <- df_hot
-      write_rds(r$df_homework, "data/df_homework.RDS")
+      write_rds(r$df_homework_grades, "data/df_homework_grades.RDS")
       showNotification("Saved in session.")
     })
 
