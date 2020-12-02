@@ -176,7 +176,7 @@ server <- function(input, output, session) {
         showModal(modalDialog(title = "Select report to generate"
                               , pickerInput("reportSelect"
                                             , label = "Select"
-                                            , choices = ls_students, selected = ls_students[3])
+                                            , choices = ls_students, selected = ls_students[1])
                               , downloadButton("report", "Generate Report", class = "download-button")
             )
         )
