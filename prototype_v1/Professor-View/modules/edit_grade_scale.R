@@ -51,7 +51,7 @@ edit_grade_scale_server <- function(id, r){
       grade_scale <- hot_to_r(input$grade_scale_table)
       r$df_grade_scale <- grade_scale %>%
         select(level = Level, title = Title)
-      
+      write_rds(r$df_grade_scale, "data/df_grade_scale.RDS")
       showNotification("Saved in session.")
       
       removeModal()

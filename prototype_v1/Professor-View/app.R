@@ -1,5 +1,7 @@
 # Mastery Gradebook application - Professor View
-# Author: Owen Bezick & Calvin Spencer
+# Authors: Owen Bezick & Calvin Spencer
+
+# Import Source Files ----
 source("utils/libraries.R")
 source("utils/utils.R")
 source("data/data_intake.R")
@@ -16,6 +18,7 @@ source("modules/edit_grades.R")
 source("modules/view_calendar_item.R")
 source("modules/edit_grade_scale.R")
 
+# Generate Dashboard Page UI ----
 ui <- dashboardPage(
     skin = "black"
     , dashboardHeader(
@@ -43,8 +46,8 @@ ui <- dashboardPage(
             )
             , column(width = 12
                      , fluidRow(
-                         downloadButton("report", "Generate Report", class = "download-button")
-                         )
+                         actionBttn("reportModal", "Generate Reports", style = "material-flat")
+                     )
                      , br()
                      , fluidRow(
                          downloadButton("downloadData", "Download Data", class = "download-button")
@@ -90,22 +93,31 @@ ui <- dashboardPage(
 server <- function(input, output, session) {
     # Data Wizard ----
     output$wizard <- renderUI({
-        showModal(modalDialog(title = "Initial Data Input"
-                              , size = "l"
-                              , footer = "Note: more data can be added and edited later in the app."
-                              , easyClose = F
-                              , fluidRow(
-                                  wizardUI("dataWizard"
-                                           , actionBttn(
-                                               inputId = "closeWizard"
-                                               , label = "Close Wizard"
-                                               , style = "material-flat"
-                                               , block = T
-                                           ) 
-                                  ) 
-                              )
-        )
-        )
+        if(num_students > 0) {
+            showModal(modalDialog(
+                title = "Welcome Back!"
+                , size = "s"
+                , easyClose = T
+                , footer = NULL)
+            )
+        } else {
+            showModal(modalDialog(title = "Initial Data Input"
+                                  , size = "l"
+                                  , footer = "Note: more data can be added and edited later in the app."
+                                  , easyClose = F
+                                  , fluidRow(
+                                      wizardUI("dataWizard"
+                                               , actionBttn(
+                                                   inputId = "closeWizard"
+                                                   , label = "Close Wizard"
+                                                   , style = "material-flat"
+                                                   , block = T
+                                               ) 
+                                      ) 
+                                  )
+            )
+            )
+        }
     })
     
     wizard_server("dataWizard", r)
@@ -159,21 +171,39 @@ server <- function(input, output, session) {
         }
     )
     
+    observeEvent(input$reportModal, {
+        ls_students <- append("All Students", r$df_student$name)
+        showModal(modalDialog(title = "Select report to generate"
+                              , pickerInput("reportSelect"
+                                            , label = "Select"
+                                            , choices = ls_students, selected = ls_students[1])
+                              , downloadButton("report", "Generate Report", class = "download-button")
+            )
+        )
+    })
+    
+    #Reactive expression of selection from picker input
+    filter_selection <- reactive({
+        input$reportSelect
+    })
+    
     # Report generation ----
     output$report <- downloadHandler(
-        
         # For PDF output, change this to "report.pdf"
-        filename = "report.html",
-        content = function(file) {
+       # filename = make_filename(filter_selection())
+        filename = function(){
+            make_filename(filter_selection())
+        }
+        , content = function(file) {
+            
             # Copy the report file to a temporary directory before processing it, in
             # case we don't have write permissions to the current working dir (which
             # can happen when deployed).
-            tempReport <- file.path(tempdir(), "report.Rmd")
-            file.copy("report.Rmd", tempReport, overwrite = TRUE)
-            # Set up parameters to pass to Rmd document
-            student_table <- r$df_student %>%
-                rename(`Student ID` = student_id, Name = name) %>%
-                rhandsontable(rowHeaders = NULL, stretchH = 'all', readOnly = T, height = "100%", width = "100%")
+            # for(name in ls_student_names){
+            #     
+            # }
+            
+            # Set up parameters to pass to Rmd document ----
             
             topic_table <- r$df_review_table %>%
                 mutate(`Review Start Date` = ymd(`Review Start Date`)
@@ -189,8 +219,28 @@ server <- function(input, output, session) {
                 select(`Homework ID` = id, Description, `Date Assigned`, `Due Date`) %>%
                 rhandsontable(rowHeaders = NULL, stretchH = 'all', readOnly = T, height = "100%", width = "100%")
             
-            df_review_grades <- r$df_review_grades
-            df_student <- r$df_student
+            selected_student <- input$reportSelect
+            
+            # Filterable dataframes
+            if (selected_student == "All Students"){ # Without Filtering
+                df_student <- r$df_student
+                 df_review_grades <- r$df_review_grades
+                 df_homework_grades <- r$df_homework_grades
+            }
+            else{ # With filtering
+                df_student <- r$df_student %>%
+                    filter(name == selected_student)
+    
+                df_review_grades <- r$df_review_grades %>%
+                    filter(student_id ==  df_student$student_id)
+                df_homework_grades <- r$df_homework_grades %>%
+                    filter(`Student Name` ==  df_student$name)
+            }
+            
+            student_table <- df_student %>%
+                rename(Name = name, ID = student_id) %>%
+                rhandsontable(rowHeaders = NULL, stretchH = 'all', readOnly = T, height = "100%", width = "100%")
+                
             df_review_topic <- df_review_grades %>%
                 left_join(df_student, by = "student_id") %>%
                 mutate(`topic_id` = as.numeric(`topic_id`)) %>%
@@ -205,6 +255,7 @@ server <- function(input, output, session) {
             df_review_topic <- df_review_topic %>%
                 group_by(`Student Name`) %>%
                 arrange(`Student Name`)
+           
             column_names <- names(df_review_topic)
             topic_names <- column_names[3:length(column_names)]
             grade_types <- factor(c("NA", "Not Completed", "Fluent", "Progressing", "Needs Work"))
@@ -221,7 +272,7 @@ server <- function(input, output, session) {
                 hot_cols(type = "dropdown", source = grade_types)  %>%
                 hot_cols(renderer = handsontable_renderer())
             
-            df_homework_grades <- r$df_homework_grades
+            
             homework_grades <- rhandsontable(df_homework_grades
                                              , rowHeaders = NULL
                                              , stretchH = 'all'
@@ -248,11 +299,11 @@ server <- function(input, output, session) {
                 mutate(`Topic ID` = as.character(`Topic ID`))
             
             summary_grades <- rhandsontable(df_review_summary
-                          , rowHeaders = NULL
-                          , stretchH = 'all'
-                          , readOnly = T
-                          , height = "100%"
-                          , width = "100%") %>%
+                                            , rowHeaders = NULL
+                                            , stretchH = 'all'
+                                            , readOnly = T
+                                            , height = "100%"
+                                            , width = "100%") %>%
                 hot_cols(renderer = handsontable_renderer()) %>%
                 hot_context_menu(allowRowEdit = FALSE)
             
@@ -263,7 +314,9 @@ server <- function(input, output, session) {
                            , review_grades = review_grades
                            , summary_grades = summary_grades)
             
-            
+            tempReport <- file.path(tempdir(), "report.Rmd")
+            file.copy("report.Rmd", tempReport, overwrite = TRUE)
+            # knit document ----
             # Knit the document, passing in the `params` list, and eval it in a
             # child of the global environment (this isolates the code in the document
             # from the code in this app).
@@ -273,6 +326,8 @@ server <- function(input, output, session) {
             )
         }
     )
+    
+
 }
 
 # Run the application 

@@ -169,6 +169,8 @@ edit_roster_button_Server <- function(id, r){
         save_df_homework_grades()
         save_df_review_grades()
         
+        write_rds(r$df_student, "data/df_student.RDS")
+        
         showNotification("Saved in session.")
         
         removeModal()

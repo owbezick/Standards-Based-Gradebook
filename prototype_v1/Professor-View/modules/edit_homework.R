@@ -85,7 +85,7 @@ add_homework_button_Server <- function(id, r){
       } else {
         # Save to df_homework
         r$df_homework <- df_homework_new
-        
+        write_rds(r$df_homework, "data/df_homework.RDS")
         # Function assumes that r$df_homework has been refreshed
         save_df_homework_grades()
         

@@ -93,9 +93,13 @@ add_topic_button_Server <- function(id, r){
         if(nrow(test) == 0){
           showNotification("Please ensure there is a topic selected for each exam!", type = "warning")
         } else{
-          r$df_topic <- edit_topics_df
           
+          r$df_topic <- edit_topics_df
           r$df_review_table <- new_review_table 
+          
+          write_rds(r$df_topic, "data/df_topic.RDS")
+          write_rds(r$df_review_table, "data/df_review_table.RDS")
+          
           # Save review_grades
           save_df_review_grades()
           removeModal()

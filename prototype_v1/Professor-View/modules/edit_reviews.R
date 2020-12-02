@@ -42,7 +42,7 @@ topics_server <- function(id, r){
       } else {
         # Save df_review_table
         r$df_review_table <- df_hot
-  
+        write_rds(r$df_review_table, "data/df_review_table.RDS")
         # Save df_review_grades
         save_df_review_grades()
         

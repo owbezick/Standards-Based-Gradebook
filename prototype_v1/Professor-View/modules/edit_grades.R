@@ -78,7 +78,10 @@ homework_server <- function(id, r){
     # Save homework
     observeEvent(input$save,{
       df_hot <- hot_to_r(input$homework_table)
+      
+      #browser()
       r$df_homework_grades  <- df_hot
+      write_rds(r$df_homework_grades, "data/df_homework_grades.RDS")
       showNotification("Saved in session.")
     })
 
@@ -92,12 +95,12 @@ review_UI <- function(id) {
              tabBox(width = 12
                     # Review by Review ----
                     , tabPanel(title = "Review Grade by Student"
-                               , box(width = 12, status = "primary", title = "Topic Summary"
-                                     , rHandsontableOutput(NS(id, "review_table_summary"), width = "100%"))
                                , box(width = 12, status = "primary"
                                      , title = "Review Grade by Student"
                                      , rHandsontableOutput(NS(id, "review_table_review"), width = "100%")
                                )
+                               , box(width = 12, status = "primary", title = "Topic Summary"
+                                     , rHandsontableOutput(NS(id, "review_table_summary"), width = "100%"))
                                , actionBttn(NS(id, "saveReview"), "Save", style = "material-flat", block = T)
                     )
                     # Review by Student ----
@@ -115,7 +118,6 @@ review_UI <- function(id) {
 
 review_server <- function(id, r){
   moduleServer(id, function(input, output, session){
-    
     # Review by Review ----
     output$review_table_review <- renderRHandsontable({
       df_review_grades <- r$df_review_grades
@@ -200,7 +202,7 @@ review_server <- function(id, r){
         pivot_longer(cols = c(3:ncol(hot_to_r(input$review_table_review)))) %>%
         left_join(r$df_student, by = "name") %>%
         select(review_id = `Review ID`, topic_id = `Topic ID`, student_id, grade = value)
-
+      write_rds(r$df_review_grades, "data/df_review_grades.RDS")
       showNotification("Saved in session.")
     })
 
@@ -267,7 +269,7 @@ review_server <- function(id, r){
       r$df_review_grades <- df_temp %>%
         mutate(topic_id = str_split_fixed(df_temp$name, " ", 2)[,2]) %>%
         select(review_id = `Review ID`, topic_id, student_id, grade = value)
-
+      write_rds(r$df_review_grades, "data/df_review_grades.RDS")
       showNotification("Saved in session.")
     })
   })

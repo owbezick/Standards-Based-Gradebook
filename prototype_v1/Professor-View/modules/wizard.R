@@ -51,12 +51,6 @@ wizardUI <- function(id, doneButton){
                                # Buttons ----
                                , fluidRow(
                                  column(width = 6
-                                        , actionBttn(
-                                          NS(id, "skip")
-                                          , "Skip to Mid-Semester View"
-                                          , style = "material-flat"
-                                          , block = T
-                                        )
                                  )
                                  , column(width = 6
                                           , actionBttn(
@@ -320,19 +314,6 @@ wizard_server <- function(id, r, parent_session) {
   
   moduleServer(id, function(input, output, session){
     # Next Buttons ----
-    observeEvent(input$skip, {
-      r$df_student <- readRDS("data/df_student.RDS")
-      r$df_course_info <- readRDS("data/df_course_info.RDS")
-      r$df_links <- readRDS("data/df_links.RDS")
-      r$df_homework <- readRDS("data/df_homework.RDS")
-      r$df_homework_grades <- readRDS("data/df_homework_grades.RDS")
-      r$df_topic <- readRDS("data/df_topic.RDS")
-      r$df_review_table <- readRDS("data/df_review_table.RDS")
-      r$df_review_grades <-  readRDS("data/df_review_grades.RDS")
-      removeModal()
-      showNotification("Welcome!")
-    })
-    
     observeEvent(input$toGradeScale, {
       if (nrow(r$df_course_info) > 0 && nrow(r$df_links) > 0 ){
         updateTabsetPanel(session, "wizard", selected = "gradeScale")
@@ -359,8 +340,6 @@ wizard_server <- function(id, r, parent_session) {
       }else{
         showNotification("Please add at least one homework!", type = "error")
       }
-      
-      
     })
     
     observeEvent(input$toReview, {
@@ -402,7 +381,7 @@ wizard_server <- function(id, r, parent_session) {
       r$df_course_info <- rbind(r$df_course_info
                                 , tibble("Type" = c(type)
                                          , "Value" = c(value)))
-      
+      write_rds(r$df_course_info, "data/df_course_info.RDS")
       # Insert preview to UI
       insertUI(
         selector = paste0("#", NS(id, "course_info_box"))
@@ -439,6 +418,7 @@ wizard_server <- function(id, r, parent_session) {
       r$df_links <- rbind(r$df_links
                           , tibble("Link Description" = c(type)
                                    , "Link URL" = c(value)))
+      write_rds(r$df_links, "data/df_links.RDS")
       
       # Insert preview to UI
       insertUI(
@@ -488,7 +468,7 @@ wizard_server <- function(id, r, parent_session) {
       grade_scale <- hot_to_r(input$grade_scale_table)
       r$df_grade_scale <- grade_scale %>%
         select(level = Level, title = Title)
-      
+      write_rds(r$df_grade_scale, "data/df_grade_scale.RDS")
       showNotification("Saved in session.")
     })
     
@@ -514,6 +494,7 @@ wizard_server <- function(id, r, parent_session) {
                                 , "name" = input$addName
                               )
         )
+        write_rds(r$df_student, "data/df_student.RDS")
         
         # Save to df_homework_grades If there are homeworks present, add in name and "NA" for grades
         if (ncol(r$df_homework_grades) > 1){
@@ -522,6 +503,8 @@ wizard_server <- function(id, r, parent_session) {
             mutate(`Student Name` = input$addName) # Add in name
           new_row[1,2:ncol(new_row)] <- "NA"
           r$df_homework_grades <- rbind(r$df_homework_grades, new_row)
+          write_rds(r$df_homework_grades, "data/df_homework_grades.RDS")
+          
         }
         
         # Save to df_review_grades
@@ -547,6 +530,7 @@ wizard_server <- function(id, r, parent_session) {
                            , grade = rep("NA", length(topics)))
             
             r$df_review_grades <- temp
+            write_rds(r$df_review_grades, "data/df_review_grades.RDS")
           } else{ # There are already students in the table
             a_student_id <-r$df_student[1,1] %>%
               pull()
@@ -560,6 +544,7 @@ wizard_server <- function(id, r, parent_session) {
               arrange(review_id, topic_id)
             
             r$df_review_grades <- temp
+            write_rds(r$df_review_grades, "data/df_review_grades.RDS")
           }
         }
         
@@ -619,7 +604,7 @@ wizard_server <- function(id, r, parent_session) {
                                  , "date_due" = input$homeworkDateDue
                                )
         )
-        
+        write_rds(r$df_homework, "data/df_homework.RDS")
         # Function assumes that r$df_homework has been refreshed
         save_df_homework_grades()
         
@@ -675,14 +660,14 @@ wizard_server <- function(id, r, parent_session) {
                                      , "description" = input$topicDescription
                             )
         )
-        
+        write_rds(r$df_topic, "data/df_topic.RDS")
         # Save to df_review_table
         new_column <- c(rep(NA, nrow(r$df_review_table )))
         new_column_name = paste("Topic", input$topicNumber)
         r$df_review_table  <- r$df_review_table  %>%
           mutate(init = new_column)
         names(r$df_review_table )[names(r$df_review_table ) == "init"] <- new_column_name
-        
+        write_rds(r$df_review_table, "data/df_review_table.RDS")
         updateTextInput(
           session = session
           , inputId = "topicDescription"
@@ -764,7 +749,7 @@ wizard_server <- function(id, r, parent_session) {
         r$df_review_table <- rbind(r$df_review_table
                                    , temp
         )
-        
+        write_rds(r$df_review_table, "data/df_review_table.RDS")
         # Save to df_review_grades ----
         save_df_review_grades()
         
