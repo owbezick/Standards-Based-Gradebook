@@ -1,18 +1,17 @@
 # Standards Based Gradebook Software
 ## Description
-This repository and linked project contains code for a Davidson College Indepedent Study to create a software for teachers and students utilizng the standards based approach to grading in the classroom. 
-
+This repository and linked project contains code for a Davidson College Indepedent Study to create a software for teachers utilizng the standards based approach to grading in the classroom. The software is coded in R and can be ran through the RStudio browser. No servers needed!
 
 
 ## Table of Contents
-* prototype_v1
-  + This directory is our initial prototype for feedback purposes.
-
+* Beta release 1.0
+  + This directory contains the code needed to run the application on a user's computer.
 
 ## Usage
+* First, if you do not have R or RStudio on your computer, follow the tutorial [here](https://rstudio-education.github.io/hopr/starting.html).
 
 ## Contributing
-
+If you would like to contribute to the project, feel free to submit issues or pull requests!
 ## FAQ
 ### RHandsonTable
 * How do I edit cell contents?
