@@ -15,7 +15,7 @@ This repository contains code for a Davidson College Indepedent Study to create 
 * To create a separate app for a different class, just repeat the process and save the code in a different directory.
 
 ## Contributing
-If you would like to contribute to the project, feel free to submit issues or pull requests!
+* If you would like to contribute to the project, feel free to submit issues or pull requests!
 ## FAQ
 ### RHandsonTable
 * How do I edit cell contents?
