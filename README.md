@@ -3,8 +3,10 @@
 This repository contains code for a Davidson College Indepedent Study to create a software for teachers utilizng the standards based approach to grading in the classroom. The software is coded in R and can be ran through the RStudio browser. No servers needed!
 
 ## Table of Contents
-* Beta release 1.0
+* beta_release
   + This directory contains the code needed to run the application on a user's computer.
+* LICENSE
+* README.md
 
 ## Usage
 * First, if you do not have R or RStudio on your computer, follow the tutorial [here](https://rstudio-education.github.io/hopr/starting.html).
