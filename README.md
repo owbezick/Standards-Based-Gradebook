@@ -8,6 +8,7 @@ This repository contains code for a Davidson College Indepedent Study to create 
 
 ## Usage
 * First, if you do not have R or RStudio on your computer, follow the tutorial [here](https://rstudio-education.github.io/hopr/starting.html).
+The following instructions are documented in [this](https://youtu.be/e5deUoDPng8) video.
 * Once you have R, download the repository as a .zip file.
 * Open the .rproj. Once the RStudio window is open, navigate to utils > libraries.R. Once you are on this page, ensure each dependency is installed (there should be a banner on the top which prompts the user to install them).
 * Once the libraries are installed, click the Run App button on the top right of the script.
