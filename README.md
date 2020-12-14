@@ -12,9 +12,9 @@ This repository contains code for a Davidson College Indepedent Study to create 
 * First, if you do not have R or RStudio on your computer, follow the tutorial [here](https://rstudio-education.github.io/hopr/starting.html).
 
 The following instructions are documented in [this](https://youtu.be/e5deUoDPng8) video.
-* Once you have R, download the repository as a .zip file.
-* Open the .rproj. Once the RStudio window is open, navigate to utils > libraries.R. Once you are on this page, ensure each dependency is installed (there should be a banner on the top which prompts the user to install them).
-* Once the libraries are installed, click the Run App button on the top right of the script.
+* Once you have R & RStudio, download the repository as a .zip file.
+* Open the .rproj. Once the RStudio window is open, navigate to Professor-App > utils > libraries.R. Once you are on this page, ensure each dependency is installed (there should be a banner on the top which prompts the user to install them).
+* Once the libraries are installed, navigate to the App.R file, and click the Run App button on the top right of the script.
 * From there, follow the prompts to initialize your class and you are up and running!
 * To create a separate app for a different class, just repeat the process and save the code in a different directory.
 
@@ -32,6 +32,8 @@ The following instructions are documented in [this](https://youtu.be/e5deUoDPng8
   - No. You must remember to click the save button to save your changes.
 * My RHandsonTable is not visible after I initially viewed it, where did it go?
   - If a table is not displaying properly, try to click on where the table should be to get it to re-render.
+### Uploading Data
+
 
 ## Credits
 ### Authors: 
