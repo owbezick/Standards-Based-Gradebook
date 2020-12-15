@@ -156,6 +156,9 @@ server <- function(input, output, session) {
             addWorksheet(wb, sheetName = "topics")
             addWorksheet(wb, sheetName = "homework_grades")
             addWorksheet(wb, sheetName = "review_grades")
+            addWorksheet(wb, sheetName = "course_info")
+            addWorksheet(wb, sheetName = "course_links")
+            addWorksheet(wb, sheetName = "grade_scale")
             
             # write data to sheets
             writeData(wb , sheet = "roster", r$df_student)
@@ -164,12 +167,12 @@ server <- function(input, output, session) {
             writeData(wb , sheet = "topics", r$df_topic)
             writeData(wb , sheet = "homework_grades", r$df_homework_grades)
             writeData(wb , sheet = "review_grades", r$df_review_grades)
+            writeData(wb , sheet = "course_info", r$df_links)
+            writeData(wb , sheet = "course_links", r$df_course_info)
+            writeData(wb , sheet = "grade_scale", r$df_grade_scale)
             
-            # Save workbook - this actually writes the file 'saveMe.xlsx' to disk
+            # Save workbook - this actually writes the file to disk
             saveWorkbook(wb, file)
-            
-            # clean up 
-            file.remove(paste0("grade_data", Sys.Date(), ".xlsx"))
         }
     )
     
