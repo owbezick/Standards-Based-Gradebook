@@ -400,10 +400,14 @@ server <- function(input, output, session) {
             
         }else{
             path_to_xlsx <- inFile$datapath
+            # Rename column headers to work with app
             df_student <- read.xlsx(path_to_xlsx, sheet = "roster")
-            df_course_info <- read.xlsx(path_to_xlsx, sheet = "course_info")
+            df_course_info <- read.xlsx(path_to_xlsx, sheet = "course_info") %>%
+                rename(link_desc = `Link Description`, link_url = `Link URL`)
             df_homework <- read.xlsx(path_to_xlsx, sheet = "homeworks")
-            df_review_table <- read.xlsx(path_to_xlsx, sheet = "reviews")
+            df_review_table <- read.xlsx(path_to_xlsx, sheet = "reviews") %>%
+                rename(review_name = `Review Name`, review_id = `Review ID`, review_start_date = `Review Start Date`
+                       , review_end_date = `Review End Date`) # Rename topic headers??
             df_topic <- read.xlsx(path_to_xlsx, sheet = "topics")
             df_review_grades <- read.xlsx(path_to_xlsx, sheet = "homework_grades")
             df_review_grades <- read.xlsx(path_to_xlsx, sheet = "review_grades")
