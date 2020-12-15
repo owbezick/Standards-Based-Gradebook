@@ -300,7 +300,7 @@ server <- function(input, output, session) {
             df_review <- df_review_grades %>%
                 left_join(df_student, by = "student_id") %>%
                 pivot_wider(id_cols = c(review_id, topic_id), names_from = name, values_from = grade) %>%
-                rename(`Review ID` = review_id, `Topic ID` = topic_id)
+                rename(`Review ID` = review_id, `Topic ID` = topic_id) 
             
             df_review_summary <- df_review %>%
                 group_by(`Topic ID`) %>%
