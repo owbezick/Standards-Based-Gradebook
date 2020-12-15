@@ -6,6 +6,7 @@ edit_roster_button_UI <- function(id) {
                 , fluidRow(
                   column(width = 12
                          , rHandsontableOutput(NS(id, "roster_table"))
+                         , div(class = "info-text", "Right click to add a row to the table.")
                          
                          # , tabsetPanel(
                          #   tabPanel(

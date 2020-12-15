@@ -9,6 +9,7 @@ params:
   review_grades: NA
   summary_grades: NA
   homework_grades: NA
+  completed_topics: NA
 ---
 
 ```{r setup, echo=FALSE, message=FALSE, warning=FALSE}
@@ -42,6 +43,9 @@ params$homework_grades
 #### Topic Completion Summary
 ```{r, echo=FALSE, message=FALSE, warning=FALSE}
 params$summary_grades
+```
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+params$completed_topics
 ```
 
 #### Review Grades

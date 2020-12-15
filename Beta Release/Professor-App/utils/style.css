@@ -12,6 +12,7 @@
   border-color:#000000;
   color:#000000!important;
   text-decoration: none!important;
+  margin-left: 45px;
 }
 
 .bttn-material-flat.bttn-default {
@@ -112,4 +113,9 @@ a:hover {
 a:active {
   color: #ac1a2f;
   text-decoration: underline;
+}
+
+.info-text {
+  font-size: 12px;
+  color: #333;
 }

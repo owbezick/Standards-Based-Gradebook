@@ -309,11 +309,30 @@ server <- function(input, output, session) {
                 hot_cols(renderer = handsontable_renderer()) %>%
                 hot_context_menu(allowRowEdit = FALSE)
             
+            completed <- r$df_grade_scale$title[1]
+            df_num_completed <- df_review_summary %>%
+                gather(Name, value, c(2:ncol(df_review_summary))) %>%
+                group_by(Name) %>%
+                tally(value == completed) %>%
+                ungroup() %>%
+                select(`Student Name` = Name, `Topics Completed` = n)
+            
+            
+            completed_topics <- rhandsontable(df_num_completed
+                                              , rowHeaders = NULL
+                                              , stretchH = 'all'
+                                              , readOnly = T
+                                              , height = "100%"
+                                              , width = "100%") %>%
+                hot_context_menu(allowRowEdit = FALSE)
+            
+            
             params <- list(student_table = student_table
                            , topic_table = topic_table
                            , homework_table = homework_table
                            , homework_grades = homework_grades
                            , review_grades = review_grades
+                           , completed_topics = completed_topics
                            , summary_grades = summary_grades)
             
             tempReport <- file.path(tempdir(), "report.Rmd")
