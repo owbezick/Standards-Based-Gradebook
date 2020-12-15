@@ -48,11 +48,21 @@ ui <- dashboardPage(
             )
             , column(width = 12
                      , fluidRow(
-                         actionBttn("reportModal", "Generate Reports", style = "material-flat")
+                         actionBttn("reportModal", "Generate Reports", style = "material-flat", size = "sm")
                      )
                      , br()
                      , fluidRow(
                          downloadButton("downloadData", "Download Data", class = "download-button")
+                         
+                     )
+                     , br()
+                     , fluidRow(
+                         actionBttn("uploadData", "Upload Data", style = "material-flat", size = "sm")
+                         
+                     )
+                     , br()
+                     , fluidRow(
+                         actionBttn("clearData", "Clear Data", style = "material-flat", size = "sm")
                          
                      )
             )
