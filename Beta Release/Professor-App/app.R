@@ -346,7 +346,7 @@ server <- function(input, output, session) {
         df_student <- readRDS("data/df_student.RDS")[0,c(1,2)]
         num_students <- nrow(readRDS("data/df_student.RDS")[0,c(1,2)])
         df_course_info <- readRDS("data/df_course_info.RDS")[0,c(1,2)]
-        df_links <- readRDS("data/df_links.RDS")
+        df_links <- readRDS("data/df_links.RDS")[0, c(1,2)]
         df_homework <- readRDS("data/df_homework.RDS")[0, c(1:4)]
         df_homework_grades <- readRDS("data/df_homework_grades.RDS")[0,1]
         df_topic <- readRDS("data/df_topic.RDS")[0,c(1,2)]
