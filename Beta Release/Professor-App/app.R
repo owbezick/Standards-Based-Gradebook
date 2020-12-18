@@ -177,8 +177,8 @@ server <- function(input, output, session) {
             writeData(wb , sheet = "topics", r$df_topic)
             writeData(wb , sheet = "homework_grades", r$df_homework_grades)
             writeData(wb , sheet = "review_grades", r$df_review_grades)
-            writeData(wb , sheet = "course_info", r$df_links)
-            writeData(wb , sheet = "course_links", r$df_course_info)
+            writeData(wb , sheet = "course_info", r$df_course_info)
+            writeData(wb , sheet = "course_links", r$df_links)
             writeData(wb , sheet = "grade_scale", r$df_grade_scale)
             
             # Save workbook - this actually writes the file to disk
@@ -418,20 +418,34 @@ server <- function(input, output, session) {
         if (is.null(inFile)) {
             
         }else{
+            origin = "1899-12-30" # Specific origin for my machine
             path_to_xlsx <- inFile$datapath
+            path_to_xlsx <- "grade_data.xlsx"
             # Rename column headers to work with app
             df_student <- read.xlsx(path_to_xlsx, sheet = "roster")
-            df_course_info <- read.xlsx(path_to_xlsx, sheet = "course_info") %>%
-                rename(link_desc = `Link Description`, link_url = `Link URL`)
-            df_homework <- read.xlsx(path_to_xlsx, sheet = "homeworks")
+            df_course_info <- read.xlsx(path_to_xlsx, sheet = "course_info") 
+            df_homework <- read.xlsx(path_to_xlsx, sheet = "homeworks") %>%
+                mutate(date_assigned = ymd(as.Date(date_assigned, origin = origin))
+                       , date_due = ymd(as.Date(date_due, origin = origin))
+                       )
+            # TODO: Rename each topic head
             df_review_table <- read.xlsx(path_to_xlsx, sheet = "reviews") %>%
-                rename(review_name = `Review Name`, review_id = `Review ID`, review_start_date = `Review Start Date`
-                       , review_end_date = `Review End Date`) # Rename topic headers??
+                rename(`Review Name` = Review.Name, `Review ID` = Review.ID, `Review Start Date` = Review.Start.Date
+                       , `Review End Date` = Review.End.Date) %>%
+                mutate(`Review Start Date` = ymd(as.Date(`Review Start Date`, origin = origin))
+                       , `Review End Date` = ymd(as.Date(`Review End Date`, origin = origin))
+                       )
+            topic_number <- seq(1, ncol(df_review_table) - 4)
+            names(df_review_table)[seq(5, ncol(df_review_table), by = 1)] =  paste("Topic", topic_number)
             df_topic <- read.xlsx(path_to_xlsx, sheet = "topics")
-            df_review_grades <- read.xlsx(path_to_xlsx, sheet = "homework_grades")
+            df_homework_grades <- read.xlsx(path_to_xlsx, sheet = "homework_grades") %>%
+                rename(`Student Name` = Student.Name)
+            homework_number <- seq(1, ncol(df_homework_grades) - 1)
+            names(df_homework_grades)[seq(2, ncol(df_homework_grades), by = 1)] =  paste("Topic", homework_number)
             df_review_grades <- read.xlsx(path_to_xlsx, sheet = "review_grades")
             df_grade_scale <- read.xlsx(path_to_xlsx, sheet = "grade_scale")
-            df_links <- read.xlsx(path_to_xlsx, sheet = "course_links")
+            df_links <- read.xlsx(path_to_xlsx, sheet = "course_links") %>%
+                rename(`Link Description` = Link.Description, `Link URL` = Link.URL)
             
             write_rds(df_student, "data/df_student.RDS")
             write_rds(df_course_info, "data/df_course_info.RDS")
