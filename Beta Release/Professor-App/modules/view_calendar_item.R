@@ -164,7 +164,17 @@ view_calendar_review_Server <- function(id, r){
     
     # BTN Save ----
     observeEvent(input$save, {
-      # browser()
+      r$cal_item <- hot_to_r(input$item_info_table)
+      
+      df_review_temp <- r$df_review_table
+      
+      df_review_temp[match(r$cal_item$`Review ID`, r$df_review_table$`Review ID`), ] <- r$cal_item 
+    
+      r$df_review_table <- df_review_temp
+      
+      removeModal()
+      r$cal_item <- NULL
+      showNotification("Saved in session")
     })
     
     # BTN Delete ----

@@ -94,23 +94,23 @@
      opacity: 0.8;
 }
 
-a:link {
+links:link {
   color: #ac1a2f;
   text-decoration: underline;
 }
 
-a:visited {
+links:visited {
   color: #ac1a2f;
   text-decoration: underline;
 }
 
-a:hover {
+links:hover {
   color: #ac1a2f;
   text-decoration: underline;
   font-weight: 700;
 }
 
-a:active {
+links:active {
   color: #ac1a2f;
   text-decoration: underline;
 }

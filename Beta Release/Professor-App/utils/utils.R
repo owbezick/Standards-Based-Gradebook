@@ -139,7 +139,7 @@ save_df_review_grades <- function(){
   # replicate student_id the for as many topics being added
   student_id <- do.call("rbind", replicate(nrow(review_topic_id_hot), df_student, simplify = FALSE)) %>%
     arrange(student_id)
-  
+  # browser()
   df_review_grades <- r$df_review_grades  %>%
     filter(grade != "NA") %>%
     mutate(
